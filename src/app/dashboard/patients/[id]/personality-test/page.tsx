@@ -78,7 +78,7 @@ export default function PersonalityTest() {
                             <tr key={question.id} className="border border-gray-300">
                                 <td className="border border-gray-300 px-4 py-2">{index + 1}</td>
                                 <td className="border border-gray-300 px-4 py-2 text-left">{question.text}</td>
-                                {[1, 2, 3, 4].map((value) => (
+                                {[4, 3, 2, 1].map((value) => (
                                     <td key={value} className="border border-gray-300 px-4 py-2">
                                         <input
                                             type="radio"
