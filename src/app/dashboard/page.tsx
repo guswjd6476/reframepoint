@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
 import { useRouter } from 'next/navigation';
+import { getPatients, addNewPatient } from '../api/supabaseApi';
 
 export default function Dashboard() {
     const [patients, setPatients] = useState<
@@ -23,7 +23,7 @@ export default function Dashboard() {
     }, []);
 
     const fetchPatients = async () => {
-        const { data, error } = await supabase.from('patients').select('*');
+        const { data, error } = await getPatients();
         if (error) {
             console.error(error);
         } else {
@@ -36,7 +36,7 @@ export default function Dashboard() {
         setNewPatient((prev) => ({ ...prev, [name]: value }));
     };
 
-    const addPatient = async () => {
+    const handleAddPatient = async () => {
         const { name, birth_date, email, phone } = newPatient;
 
         if (!name.trim() || !birth_date.trim() || !email.trim() || !phone.trim()) {
@@ -45,7 +45,7 @@ export default function Dashboard() {
         }
 
         setLoading(true);
-        const { data, error } = await supabase.from('patients').insert([{ name, birth_date, email, phone }]).select();
+        const { data, error } = await addNewPatient({ name, birth_date, email, phone });
         setLoading(false);
 
         if (error) {
@@ -106,7 +106,7 @@ export default function Dashboard() {
                     </div>
 
                     <button
-                        onClick={addPatient}
+                        onClick={handleAddPatient}
                         className="bg-blue-500 text-white px-6 py-2 rounded-md shadow-md w-full mb-4 disabled:bg-gray-400"
                         disabled={loading}
                     >
@@ -115,7 +115,6 @@ export default function Dashboard() {
                 </>
             )}
 
-            {/* 상담 대상자 목록 테이블 */}
             <div className="overflow-x-auto">
                 <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
                     <thead className="bg-gray-100">

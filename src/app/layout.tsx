@@ -65,9 +65,14 @@ function Navigation() {
                             컨텐츠
                         </Link>
                         {session ? (
-                            <button onClick={logout} className="text-gray-600 hover:text-blue-500">
-                                로그아웃
-                            </button>
+                            <>
+                                <Link className="text-gray-600 hover:text-blue-500" href="/dashboard">
+                                    대시보드
+                                </Link>
+                                <button onClick={logout} className="text-gray-600 hover:text-blue-500">
+                                    로그아웃
+                                </button>
+                            </>
                         ) : (
                             <Link className="text-gray-600 hover:text-blue-500" href="/login">
                                 로그인

@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { supabase } from '@/app/lib/supabase'; // ✅ Supabase 가져오기
 import { emotions } from '@/app/lib/question';
 import { useParams } from 'next/navigation';
+import { saveCoreEmotionTest } from '@/app/api/supabaseApi';
 
 const CoreEmotionTest = () => {
     const params = useParams();
@@ -21,8 +21,6 @@ const CoreEmotionTest = () => {
             }
 
             const key = `${category}: ${item}`;
-
-            // ✅ 제한 없이 다 선택 가능하도록 개선
             updatedAnswers[emotionId] = [...new Set([...updatedAnswers[emotionId], key])];
 
             return updatedAnswers;
@@ -40,16 +38,10 @@ const CoreEmotionTest = () => {
         }
 
         try {
-            const { data, error } = await supabase.from('core_emotion_tests').insert([
-                {
-                    patient_id: String(patientId),
-                    answers: answers,
-                    created_at: new Date().toISOString(),
-                },
-            ]);
+            const { data, error } = await saveCoreEmotionTest(patientId, answers); // ✅ Supabase 호출 → api 함수 사용
 
             if (error) throw error;
-            console.log('📌 Supabase 응답:', { data, error });
+            console.log('📌 Supabase 응답:', { data });
             setMessage('✅ 검사 결과가 성공적으로 저장되었습니다!');
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : '알 수 없는 오류 발생';

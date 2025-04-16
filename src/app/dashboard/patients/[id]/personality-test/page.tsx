@@ -2,8 +2,8 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { supabase } from '@/app/lib/supabase';
 import { questions } from '@/app/lib/question';
+import { savePersonalityTest } from '@/app/api/supabaseApi';
 
 export default function PersonalityTest() {
     const params = useParams();
@@ -42,12 +42,7 @@ export default function PersonalityTest() {
             return;
         }
 
-        const { error } = await supabase.from('personality_tests').insert([
-            {
-                patient_id: patientId,
-                answers: answers,
-            },
-        ]);
+        const { error } = await savePersonalityTest(patientId, answers); // ✅ Supabase 직접 호출 제거
 
         if (error) {
             console.error(error);

@@ -3,22 +3,52 @@ import { motion } from 'framer-motion';
 export default function About() {
     return (
         <motion.section
-            className="py-24 container mx-auto px-6 text-center"
+            className="py-24 px-6 max-w-7xl mx-auto"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: 'easeOut' }}
         >
-            <h2 className="text-5xl font-extrabold text-gray-900 leading-snug">
-                우리의 <span className="text-primary">미션</span>
-            </h2>
-            <p className="text-lg text-gray-600 mt-6 max-w-4xl mx-auto leading-relaxed">
-                ReframePoint는 교육을 통해 개인의 잠재력을 극대화하고, 깊은 사고를 촉진하는 혁신적인 플랫폼을
-                제공합니다. 우리는 더 나은 배움을 위해 연구하고 발전합니다.
-            </p>
-            <div className="mt-10">
-                <button className="px-6 py-3 bg-primary text-white rounded-lg font-semibold shadow-md hover:bg-primary-dark transition">
-                    더 알아보기
-                </button>
+            <div className="text-center mb-20">
+                <h2 className="text-4xl md:text-5xl font-extrabold leading-tight text-gray-900">
+                    2030세대를 위한 <span className="text-primary">멘토링 커뮤니티</span>
+                </h2>
+                <p className="text-lg text-gray-600 mt-6 max-w-2xl mx-auto leading-relaxed">
+                    ReframePoint는 심리상담사, 재능기부자 등 다양한 분야의 멘토들이 모여
+                    <br className="hidden md:inline" />
+                    청년들의 성장과 자립을 돕는 플랫폼입니다.
+                </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                {/* 카드 1 */}
+                <div className="bg-white rounded-2xl p-8 shadow-md hover:shadow-lg transition-all">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-4">진로 · 심리 멘토링</h3>
+                    <p className="text-gray-600 text-sm leading-relaxed">
+                        진로, 자존감, 인간관계 등 다양한 고민을 나누고
+                        <br />
+                        전문가의 조언을 받을 수 있어요.
+                    </p>
+                </div>
+
+                {/* 카드 2 */}
+                <div className="bg-white rounded-2xl p-8 shadow-md hover:shadow-lg transition-all">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-4">재능 나눔 커뮤니티</h3>
+                    <p className="text-gray-600 text-sm leading-relaxed">
+                        다양한 분야의 멘토와 멘티가 만나
+                        <br />
+                        서로의 재능을 나누며 함께 성장합니다.
+                    </p>
+                </div>
+
+                {/* 카드 3 */}
+                <div className="bg-white rounded-2xl p-8 shadow-md hover:shadow-lg transition-all">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-4">따뜻한 연결</h3>
+                    <p className="text-gray-600 text-sm leading-relaxed">
+                        단순한 상담을 넘어 지속적인 관계와
+                        <br />
+                        정서적 지지를 경험할 수 있습니다.
+                    </p>
+                </div>
             </div>
         </motion.section>
     );

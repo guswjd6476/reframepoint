@@ -1,131 +1,105 @@
 'use client';
+
 import React from 'react';
 import * as motion from 'motion/react-client';
 import Image from 'next/image';
+import MainClassSlider from './MainClassSlider';
+import Brandintro from './Brandintro';
+import MainStatistics from './MainStatistics';
 
 export default function Home() {
     return (
-        <div className="text-gray-900">
-            {/* 첫 번째 섹션: Hero */}
-            <div className="relative w-full h-screen flex flex-col justify-center items-center sm:items-left">
+        <div className="text-gray-900 font-sans">
+            <section className="relative w-full h-screen flex items-center justify-center bg-black overflow-hidden">
                 <Image
                     src="/back.jpg"
-                    alt="Hero Background"
+                    alt="Main Hero Background"
                     layout="fill"
                     objectFit="cover"
-                    className="absolute top-0 left-0 w-full h-full z-[-1] "
+                    className="absolute inset-0 w-full h-full object-cover z-0"
                 />
+                <div className="absolute inset-0 bg-black opacity-40 z-10"></div>
+
                 <motion.div
-                    className="container mx-auto px-6 text-center sm:text-left"
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
+                    className="relative z-20 text-center px-6"
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 1 }}
                 >
-                    <h2 className="lg:text-5xl text-2xl font-bold drop-shadow-lg text-white">
-                        교육을 통해 성장하는 ReframePoint
-                    </h2>
-                    <p className="mt-4 text-lg drop-shadow-md text-white">
-                        자기 개발을 위한 최적의 솔루션을 제공합니다.
-                    </p>
-                </motion.div>
-            </div>
-
-            <motion.div
-                id="about"
-                className="container mx-auto px-6 py-20 flex flex-col md:flex-row items-center"
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1 }}
-                viewport={{ once: true }}
-            >
-                {/* 왼쪽 설명 */}
-                <div className="md:w-1/2 text-center md:text-left">
-                    <h3 className="text-4xl font-semibold">회사 소개</h3>
-                    <p className="mt-4 text-gray-600 leading-relaxed">
-                        ReframePoint는 자기 계발을 위한 혁신적인 교육 플랫폼입니다.
+                    <h1 className="text-white text-4xl md:text-5xl font-bold leading-snug mb-6">
+                        나의 지식과 경험이
                         <br />
-                        우리는 맞춤형 학습과 전문 강의를 통해 학습자들의 성장을 돕습니다.
+                        길이 되는 곳
+                    </h1>
+                    <p className="text-gray-200 text-lg md:text-xl mb-8">
+                        ReframePoint는 콘텐츠를 통해 가치를 연결합니다.
+                        <br />
+                        지금, 나만의 길을 열어보세요
                     </p>
-                </div>
+                    <button className="bg-white text-black font-semibold px-6 py-3 rounded-full shadow-md hover:bg-gray-200 transition">
+                        REFRAMEPOINT 와 협력하기
+                    </button>
+                </motion.div>
+            </section>
 
-                {/* 오른쪽 로고 */}
-                <div className="md:w-1/2 flex justify-center mt-10 md:mt-0">
-                    <Image
-                        src="/logo.png"
-                        alt="ReframePoint Logo"
-                        width={300}
-                        height={300}
-                        className="w-[250px] h-[250px] md:w-[300px] md:h-[300px] object-contain"
-                    />
-                </div>
-            </motion.div>
+            <MainStatistics />
 
-            <motion.div
-                id="features"
-                className="bg-gray-200 py-20"
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                transition={{ duration: 1 }}
-                viewport={{ once: true }}
-            >
+            <MainClassSlider />
+
+            <Brandintro />
+
+            {/* 대표 콘텐츠 섹션 */}
+            <section id="features" className="py-24 bg-[#f5f5f5]">
                 <div className="container mx-auto px-6 text-center">
-                    <h3 className="text-3xl font-semibold">대표 컨텐츠</h3>
-                    <motion.div
-                        className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6"
-                        initial={{ opacity: 0 }}
-                        whileInView={{ opacity: 1 }}
-                        transition={{ duration: 1 }}
-                        viewport={{ once: true }}
-                    >
+                    <h2 className="text-3xl font-bold mb-12">추천 콘텐츠</h2>
+                    <div className="grid md:grid-cols-3 gap-10">
                         {[
                             {
+                                title: '탐색: 내면의 자아',
+                                desc: '나를 이해하는 여정. 진정한 자아를 찾아가는 콘텐츠 구성.',
+                                image: '/mind.jpg',
+                            },
+                            {
                                 title: '경험: TEXTHIP',
-                                desc: '우리가 꼭 읽어야 하는 고전을 통해 사고를 확장하고 깊이를 더합니다. "읽어야 할 책"들을 만나보세요.',
+                                desc: '고전을 통한 사고력 향상. 반드시 읽어야 할 텍스트들을 큐레이션합니다.',
                                 image: '/book.jpg',
                             },
                             {
-                                title: '탐색: 내면의 자아',
-                                desc: '자아와 자기 이해를 돕는 탐구의 여정을 시작하세요. 내면의 깊이를 들여다봅니다.',
-                                image: '/mind.jpg',
+                                title: '표현: 브랜딩 콘텐츠',
+                                desc: '나를 말하고, 보여주는 법. 브랜드화하는 실전 클래스.',
+                                image: '/branding.jpg',
                             },
-                        ].map((feature, index) => (
+                        ].map((item, index) => (
                             <motion.div
                                 key={index}
-                                className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-300 ease-in-out"
-                                initial={{ y: 50, opacity: 0 }}
-                                whileInView={{ y: 0, opacity: 1 }}
-                                transition={{ duration: 0.8, delay: index * 0.2 }}
+                                className="bg-white rounded-xl shadow-md hover:shadow-lg p-6 transition-all duration-300 text-left"
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.6, delay: index * 0.2 }}
                                 viewport={{ once: true }}
                             >
                                 <Image
-                                    src={feature.image}
-                                    alt={feature.title}
+                                    src={item.image}
+                                    alt={item.title}
                                     width={500}
-                                    height={300}
-                                    className="w-full h-[200px] object-cover rounded-md mb-4"
+                                    height={250}
+                                    className="rounded-md mb-4 object-cover w-full h-[180px]"
                                 />
-                                <h4 className="font-semibold text-xl">{feature.title}</h4>
-                                <p className="text-gray-600 mt-2">{feature.desc}</p>
+                                <h3 className="text-xl font-semibold">{item.title}</h3>
+                                <p className="text-gray-600 mt-2 text-sm">{item.desc}</p>
                             </motion.div>
                         ))}
-                    </motion.div>
+                    </div>
                 </div>
-            </motion.div>
+            </section>
 
-            {/* 네 번째 섹션: 연락처 */}
-            <motion.div
-                id="contact"
-                className="bg-gray-800 text-white py-6 mt-20"
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                transition={{ duration: 1 }}
-                viewport={{ once: true }}
-            >
-                <div className="container mx-auto text-center">
+            {/* 푸터 */}
+            <footer className="bg-gray-900 text-white py-10 mt-10">
+                <div className="container mx-auto text-center text-sm">
                     <p>© 2025 ReframePoint. All rights reserved.</p>
                     <p className="mt-2">문의: contact@reframepoint.com</p>
                 </div>
-            </motion.div>
+            </footer>
         </div>
     );
 }
