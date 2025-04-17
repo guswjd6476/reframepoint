@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { createCounselorAccount } from '@/app/api/supabaseApi';
 
 export default function CreateCounselorPage() {
@@ -8,6 +9,7 @@ export default function CreateCounselorPage() {
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
     const [message, setMessage] = useState('');
+    const router = useRouter();
 
     const handleCreateCounselor = async () => {
         try {
@@ -16,12 +18,15 @@ export default function CreateCounselorPage() {
             setEmail('');
             setPassword('');
             setName('');
+
+            if (result.success) {
+                alert('계정이 생성되었습니다');
+                router.push('/admins');
+            }
         } catch (err: unknown) {
-            // We can check if err is an instance of Error
             if (err instanceof Error) {
                 setMessage(err.message);
             } else {
-                // In case the error isn't an instance of Error, handle it gracefully
                 setMessage('An unknown error occurred.');
             }
         }
@@ -53,7 +58,7 @@ export default function CreateCounselorPage() {
             />
             <button
                 onClick={handleCreateCounselor}
-                className="w-full bg-primary text-white py-3 rounded-md hover:bg-primary-dark"
+                className="w-full bg-primary text-black py-3 rounded-md hover:bg-primary-dark"
             >
                 계정 생성
             </button>

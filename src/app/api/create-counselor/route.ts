@@ -6,33 +6,22 @@ export async function POST(req: Request) {
     const { email, password, name } = body;
 
     if (!email || !password || !name) {
-        return NextResponse.json({ message: '모든 필드를 입력해주세요.' }, { status: 400 });
+        return NextResponse.json({ success: false, message: '모든 필드를 입력하세요.' }, { status: 400 });
     }
 
-    const { data: userData, error: createError } = await supabase.auth.admin.createUser({
-        email,
-        password,
-        email_confirm: true,
-    });
+    const { data: user, error: signUpError } = await supabase.auth.signUp({ email, password });
 
-    if (createError) {
-        return NextResponse.json({ message: '유저 생성 실패: ' + createError.message }, { status: 500 });
+    if (signUpError) {
+        return NextResponse.json({ success: false, message: signUpError.message }, { status: 400 });
     }
 
-    const userId = userData.user?.id;
-
-    // 2. counselors 테이블에 추가
-    const { error: insertError } = await supabase.from('counselors').insert([
-        {
-            id: userId,
-            email,
-            name,
-        },
-    ]);
+    const { error: insertError } = await supabase
+        .from('counselors')
+        .insert([{ user_id: user.user?.email, name, email }]);
 
     if (insertError) {
-        return NextResponse.json({ message: 'DB 저장 실패: ' + insertError.message }, { status: 500 });
+        return NextResponse.json({ success: false, message: insertError.message }, { status: 400 });
     }
 
-    return NextResponse.json({ message: '상담사 계정이 성공적으로 생성되었습니다.' });
+    return NextResponse.json({ success: true, message: '상담사 계정 생성 완료' });
 }

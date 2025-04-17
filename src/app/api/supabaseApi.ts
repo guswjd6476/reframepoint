@@ -41,15 +41,43 @@ export const savePersonalityTest = async (patientId: string, answers: Record<str
 };
 
 export const getPatients = async () => {
-    return await supabase.from('patients').select('*');
+    const {
+        data: { user },
+        error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError || !user) {
+        console.error('유저 정보 오류:', userError);
+        return { data: [], error: userError };
+    }
+    console.log({ user });
+
+    const { data, error } = await supabase.from('patients').select('*').eq('counselors', user.id);
+
+    return { data, error };
 };
 
-export const addNewPatient = async (newPatient: { name: string; birth_date: string; email: string; phone: string }) => {
-    return await supabase.from('patients').insert([newPatient]).select();
+// supabaseApi.ts
+export const addNewPatient = async (patient: { name: string; birth_date: string; email: string; phone: string }) => {
+    const {
+        data: { user },
+        error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError || !user) {
+        return { data: null, error: userError };
+    }
+
+    const { data, error } = await supabase
+        .from('patients')
+        .insert([{ ...patient, counselors: user.id }])
+        .select();
+
+    return { data, error };
 };
 
 export const createCounselorAccount = async (email: string, password: string, name: string) => {
-    const res = await fetch('/api/admin/create-counselor', {
+    const res = await fetch('/api/create-counselor', {
         method: 'POST',
         body: JSON.stringify({ email, password, name }),
     });

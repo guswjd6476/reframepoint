@@ -27,7 +27,7 @@ export default function Dashboard() {
         if (error) {
             console.error(error);
         } else {
-            setPatients(data || []);
+            setPatients(data ?? []);
         }
     };
 
@@ -52,7 +52,7 @@ export default function Dashboard() {
             console.error(error);
             alert('추가 중 오류가 발생했습니다.');
         } else {
-            setPatients((prev) => [...prev, ...data]);
+            setPatients((prev) => [...prev, ...(data ?? [])]);
             setNewPatient({ name: '', birth_date: '', email: '', phone: '' });
             setShowForm(false);
         }
