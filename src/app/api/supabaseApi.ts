@@ -58,7 +58,13 @@ export const getPatients = async () => {
 };
 
 // supabaseApi.ts
-export const addNewPatient = async (patient: { name: string; birth_date: string; email: string; phone: string }) => {
+export const addNewPatient = async (patient: {
+    name: string;
+    birth_date: string;
+    email: string;
+    phone: string;
+    signatureUrl: string;
+}) => {
     const {
         data: { user },
         error: userError,
@@ -87,4 +93,22 @@ export const createCounselorAccount = async (email: string, password: string, na
         throw new Error(result.message || '상담사 생성 실패');
     }
     return result;
+};
+
+export const uploadSignature = async (dataUrl: string, fileName: string) => {
+    const blob = await (await fetch(dataUrl)).blob();
+
+    const { error: uploadError } = await supabase.storage.from('signatures').upload(fileName, blob, {
+        contentType: 'image/png',
+    });
+
+    if (uploadError) {
+        return { url: null, error: uploadError };
+    }
+
+    const {
+        data: { publicUrl },
+    } = supabase.storage.from('signatures').getPublicUrl(fileName);
+
+    return { url: publicUrl, error: null };
 };
