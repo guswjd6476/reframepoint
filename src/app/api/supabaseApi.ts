@@ -63,7 +63,7 @@ export const addNewPatient = async (patient: {
     birth_date: string;
     email: string;
     phone: string;
-    signatureUrl: string;
+    signatureurl: string;
 }) => {
     const {
         data: { user },
@@ -98,14 +98,16 @@ export const createCounselorAccount = async (email: string, password: string, na
 export const uploadSignature = async (dataUrl: string, fileName: string) => {
     const blob = await (await fetch(dataUrl)).blob();
 
-    const { error: uploadError } = await supabase.storage.from('signatures').upload(fileName, blob, {
+    const filePath = `signatures/${fileName}`;
+    const { data, error } = await supabase.storage.from('signatures').upload(fileName, blob, {
         contentType: 'image/png',
     });
 
-    if (uploadError) {
-        return { url: null, error: uploadError };
+    if (error) {
+        return { url: null, error };
     }
 
+    // 3. Public URL 가져오기
     const {
         data: { publicUrl },
     } = supabase.storage.from('signatures').getPublicUrl(fileName);

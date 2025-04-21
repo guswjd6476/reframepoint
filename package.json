@@ -11,6 +11,7 @@
     "dependencies": {
         "@supabase/auth-helpers-nextjs": "^0.10.0",
         "@supabase/supabase-js": "^2.49.1",
+        "dom-to-image": "^2.6.0",
         "framer-motion": "^12.0.6",
         "motion": "^12.0.6",
         "next": "15.1.6",
@@ -23,6 +24,7 @@
     "devDependencies": {
         "@eslint/eslintrc": "^3",
         "@tailwindcss/postcss": "^4",
+        "@types/dom-to-image": "^2.6.7",
         "@types/node": "^20",
         "@types/react": "^19",
         "@types/react-dom": "^19",
