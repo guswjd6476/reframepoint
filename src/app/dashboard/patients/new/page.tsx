@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import SignatureCanvas from 'react-signature-canvas';
 import domtoimage from 'dom-to-image';
 import { uploadSignature, addNewPatient } from '@/app/api/supabaseApi';
+import Image from 'next/image';
 
 export default function NewPatientPage() {
     const router = useRouter();
@@ -181,10 +182,12 @@ export default function NewPatientPage() {
                             <div>
                                 <p>서명자:</p>
                                 {signatureImg ? (
-                                    <img
+                                    <Image
                                         src={signatureImg}
                                         alt="서명 이미지"
-                                        className="w-[200px] h-[100px] border rounded object-contain mt-1"
+                                        width={200}
+                                        height={100}
+                                        className="border rounded object-contain mt-1"
                                     />
                                 ) : (
                                     <p className="text-gray-500">__________________</p>
@@ -227,9 +230,11 @@ export default function NewPatientPage() {
                 <>
                     <h3 className="text-lg font-semibold mb-2">서약서 미리보기</h3>
                     {previewData ? (
-                        <img
+                        <Image
                             src={previewData}
                             alt="서약서 미리보기"
+                            width={800}
+                            height={1000}
                             className="w-full h-auto border p-2 rounded"
                         />
                     ) : (

@@ -99,7 +99,7 @@ export const uploadSignature = async (dataUrl: string, fileName: string) => {
     const blob = await (await fetch(dataUrl)).blob();
 
     const filePath = `signatures/${fileName}`;
-    const { data, error } = await supabase.storage.from('signatures').upload(fileName, blob, {
+    const { error } = await supabase.storage.from('signatures').upload(filePath, blob, {
         contentType: 'image/png',
     });
 
@@ -107,10 +107,9 @@ export const uploadSignature = async (dataUrl: string, fileName: string) => {
         return { url: null, error };
     }
 
-    // 3. Public URL 가져오기
     const {
         data: { publicUrl },
-    } = supabase.storage.from('signatures').getPublicUrl(fileName);
+    } = supabase.storage.from('signatures').getPublicUrl(filePath);
 
     return { url: publicUrl, error: null };
 };
