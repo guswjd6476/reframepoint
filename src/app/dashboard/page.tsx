@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { getPatients } from '../api/supabaseApi';
+import { getPatients, deletePatient } from '../api/supabaseApi';
 
 type Patient = {
     id: string;
@@ -25,6 +25,19 @@ export default function Dashboard() {
         const { data, error } = await getPatients();
         if (error) console.error(error);
         else setPatients(data ?? []);
+    };
+
+    const handleDelete = async (id: string) => {
+        const confirm = window.confirm('정말 삭제하시겠습니까?');
+        if (!confirm) return;
+
+        const { error } = await deletePatient(id);
+        if (error) {
+            console.error('삭제 오류:', error.message);
+            alert('삭제에 실패했습니다.');
+        } else {
+            setPatients((prev) => prev.filter((p) => p.id !== id));
+        }
     };
 
     return (
@@ -63,16 +76,29 @@ export default function Dashboard() {
                             {patients.map((patient) => (
                                 <tr
                                     key={patient.id}
-                                    className="border-t hover:bg-gray-50 cursor-pointer"
-                                    onClick={() => router.push(`/dashboard/patients/${patient.id}`)}
+                                    className="border-t hover:bg-gray-50"
                                 >
-                                    <td className="py-3 px-4">{patient.name}</td>
+                                    <td
+                                        className="py-3 px-4 cursor-pointer"
+                                        onClick={() => router.push(`/dashboard/patients/${patient.id}`)}
+                                    >
+                                        {patient.name}
+                                    </td>
                                     <td className="py-3 px-4 hidden md:table-cell">{patient.birth_date}</td>
                                     <td className="py-3 px-4 hidden md:table-cell">{patient.email}</td>
                                     <td className="py-3 px-4 hidden md:table-cell">{patient.phone}</td>
-                                    <td className="py-3 px-4">
-                                        <button className="bg-blue-500 text-white px-3 py-1 rounded-md text-sm hover:bg-blue-600">
+                                    <td className="py-3 px-4 flex gap-2">
+                                        <button
+                                            onClick={() => router.push(`/dashboard/patients/${patient.id}`)}
+                                            className="bg-blue-500 text-white px-3 py-1 rounded-md text-sm hover:bg-blue-600"
+                                        >
                                             상세 보기
+                                        </button>
+                                        <button
+                                            onClick={() => handleDelete(patient.id)}
+                                            className="bg-red-500 text-white px-3 py-1 rounded-md text-sm hover:bg-red-600"
+                                        >
+                                            삭제
                                         </button>
                                     </td>
                                 </tr>

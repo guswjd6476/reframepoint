@@ -1,7 +1,6 @@
 import { supabase } from '../lib/supabase';
 import { Session } from '@supabase/auth-helpers-nextjs';
 
-// Auth API
 export const getSession = async (): Promise<Session | null> => {
     const { data, error } = await supabase.auth.getSession();
     if (error) return null;
@@ -20,7 +19,6 @@ export const onAuthStateChange = (callback: (event: string, session: Session | n
     return supabase.auth.onAuthStateChange(callback);
 };
 
-// Data Insertion
 export const saveCoreEmotionTest = async (patientId: string, answers: Record<number, string[]>) => {
     return await supabase.from('core_emotion_tests').insert([
         {
@@ -57,7 +55,6 @@ export const getPatients = async () => {
     return { data, error };
 };
 
-// supabaseApi.ts
 export const addNewPatient = async (patient: {
     name: string;
     birth_date: string;
@@ -113,3 +110,6 @@ export const uploadSignature = async (dataUrl: string, fileName: string) => {
 
     return { url: publicUrl, error: null };
 };
+export async function deletePatient(id: string) {
+    return await supabase.from('patients').delete().eq('id', id);
+}

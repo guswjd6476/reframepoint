@@ -75,12 +75,15 @@ export default function CounselorDetailPage() {
                 <strong>이메일:</strong> {counselor.email}
             </p>
 
-            <h2 className="text-2xl font-semibold mt-10">담당 환자 목록</h2>
+            <h2 className="text-2xl font-semibold mt-10">목록</h2>
             {patients.length > 0 ? (
                 <ul className="list-disc list-inside space-y-2">
                     {patients.map((patient) => (
                         <li key={patient.id}>
-                            <Link href={`/dashboard/patients/${patient.id}`} className="text-blue-600 hover:underline">
+                            <Link
+                                href={`/dashboard/patients/${patient.id}`}
+                                className="text-blue-600 hover:underline"
+                            >
                                 {patient.name}
                             </Link>{' '}
                             ({patient.birth_date})
