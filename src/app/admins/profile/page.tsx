@@ -1,4 +1,3 @@
-// app/dashboard/profile/page.tsx
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
@@ -15,7 +14,6 @@ export default function CounselorProfilePage() {
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // 1) 마운트 시 내 프로필 정보 로드
     useEffect(() => {
         (async () => {
             const {
@@ -52,6 +50,15 @@ export default function CounselorProfilePage() {
         setPreviewUrl(URL.createObjectURL(file));
     };
 
+    const sanitizeFileName = (fileName: string): string => {
+        const extension = fileName.split('.').pop();
+        const baseName = fileName
+            .replace(/\.[^/.]+$/, '') // 확장자 제거
+            .replace(/[^a-zA-Z0-9_-]/g, ''); // 안전하지 않은 문자 제거
+        const timestamp = Date.now();
+        return `${baseName}_${timestamp}.${extension}`;
+    };
+
     const handleSave = async () => {
         setLoading(true);
 
@@ -59,6 +66,7 @@ export default function CounselorProfilePage() {
             data: { user },
             error: authError,
         } = await supabase.auth.getUser();
+
         if (authError || !user) {
             alert('사용자 인증 실패');
             setLoading(false);
@@ -66,11 +74,11 @@ export default function CounselorProfilePage() {
         }
 
         let updatedPhotoUrl = profile.photoUrl;
-
         const file = fileInputRef.current?.files?.[0];
+
         if (file) {
-            const filePath = `${Date.now()}-${file.name}`;
-            const { error: uploadError } = await supabase.storage.from('counselor-photos').upload(filePath, file);
+            const safeFileName = sanitizeFileName(file.name);
+            const { error: uploadError } = await supabase.storage.from('counselor-photos').upload(safeFileName, file);
 
             if (uploadError) {
                 console.error('Storage 업로드 실패:', uploadError.message);
@@ -81,7 +89,7 @@ export default function CounselorProfilePage() {
 
             const {
                 data: { publicUrl },
-            } = supabase.storage.from('counselor-photos').getPublicUrl(filePath);
+            } = supabase.storage.from('counselor-photos').getPublicUrl(safeFileName);
 
             updatedPhotoUrl = publicUrl;
         }
@@ -102,9 +110,8 @@ export default function CounselorProfilePage() {
             alert('정보 수정 실패');
         } else {
             alert('정보가 업데이트되었습니다.');
-            // // 로컬 상태 반영
-            // setProfile((prev) => ({ ...prev, photoUrl: updatedPhotoUrl }));
             setPreviewUrl(null);
+            setProfile((prev) => ({ ...prev, photoUrl: updatedPhotoUrl }));
         }
     };
 
@@ -134,19 +141,10 @@ export default function CounselorProfilePage() {
                     <div className="w-[100px] h-[100px] bg-gray-200 rounded-full" />
                 )}
 
-                <button
-                    onClick={() => fileInputRef.current?.click()}
-                    className="text-sm text-blue-600 underline"
-                >
+                <button onClick={() => fileInputRef.current?.click()} className="text-sm text-blue-600 underline">
                     사진 변경
                 </button>
-                <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                    ref={fileInputRef}
-                    className="hidden"
-                />
+                <input type="file" accept="image/*" onChange={handleFileChange} ref={fileInputRef} className="hidden" />
             </div>
 
             <div className="space-y-4">
