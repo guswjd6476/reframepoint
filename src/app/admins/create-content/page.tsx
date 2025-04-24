@@ -2,12 +2,15 @@
 
 import { useState, useRef } from 'react';
 import { supabase } from '@/app/lib/supabase';
+import Image from 'next/image'; // Import the Image component from next/image
 
 export default function CreateContentPage() {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
+    const [isFeatured, setIsFeatured] = useState(false);
+    const [isRecommended, setIsRecommended] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [imagePreview, setImagePreview] = useState<string | null>(null); // State for the image preview
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleSubmit = async () => {
@@ -23,10 +26,14 @@ export default function CreateContentPage() {
         const file = fileInputRef.current?.files?.[0];
         if (file) {
             const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, '')}`;
-            const { error: uploadError } = await supabase.storage.from('contents').upload(fileName, file);
+
+            const { error: uploadError } = await supabase.storage.from('contents').upload(fileName, file, {
+                contentType: file.type,
+                upsert: true,
+            });
 
             if (uploadError) {
-                alert('이미지 업로드 실패: ' + uploadError.message);
+                alert(`이미지 업로드 실패: ${uploadError.message}`);
                 setLoading(false);
                 return;
             }
@@ -43,19 +50,23 @@ export default function CreateContentPage() {
                 title,
                 description,
                 image_url: imageUrl,
+                is_featured: isFeatured,
+                is_recommended: isRecommended,
             },
         ]);
 
         setLoading(false);
 
         if (insertError) {
-            alert('컨텐츠 저장 실패: ' + insertError.message);
+            alert(`컨텐츠 저장 실패: ${insertError.message}`);
         } else {
             alert('컨텐츠가 저장되었습니다!');
             setTitle('');
             setDescription('');
+            setIsFeatured(false);
+            setIsRecommended(false);
             if (fileInputRef.current) fileInputRef.current.value = '';
-            setImagePreview(null); // Reset image preview
+            setImagePreview(null);
         }
     };
 
@@ -64,7 +75,7 @@ export default function CreateContentPage() {
         if (file) {
             const reader = new FileReader();
             reader.onloadend = () => {
-                setImagePreview(reader.result as string); // Set image preview when file is selected
+                setImagePreview(reader.result as string);
             };
             reader.readAsDataURL(file);
         }
@@ -97,20 +108,43 @@ export default function CreateContentPage() {
                         />
                     </div>
 
+                    <div className="flex items-center space-x-6">
+                        <label className="flex items-center space-x-2">
+                            <input
+                                type="checkbox"
+                                checked={isFeatured}
+                                onChange={(e) => setIsFeatured(e.target.checked)}
+                                className="w-4 h-4"
+                            />
+                            <span className="text-sm text-neutral-700">대표 컨텐츠</span>
+                        </label>
+                        <label className="flex items-center space-x-2">
+                            <input
+                                type="checkbox"
+                                checked={isRecommended}
+                                onChange={(e) => setIsRecommended(e.target.checked)}
+                                className="w-4 h-4"
+                            />
+                            <span className="text-sm text-neutral-700">추천 컨텐츠</span>
+                        </label>
+                    </div>
+
                     <div>
                         <label className="block text-sm font-medium text-neutral-600 mb-1">이미지 업로드</label>
                         <input
                             type="file"
                             ref={fileInputRef}
-                            onChange={handleFileChange} // Handle file input change
+                            onChange={handleFileChange}
                             className="w-full border border-neutral-300 rounded-lg p-2 bg-white"
                             accept="image/*"
                         />
                         {imagePreview && (
                             <div className="mt-4">
-                                <img
+                                <Image
                                     src={imagePreview}
                                     alt="Image preview"
+                                    width={500} // You can adjust the width
+                                    height={300} // You can adjust the height
                                     className="w-full max-h-64 object-cover rounded-lg"
                                 />
                             </div>

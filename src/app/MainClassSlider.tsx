@@ -1,53 +1,84 @@
 'use client';
 
-import React from 'react';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/app/lib/supabase';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
 import 'swiper/css';
-import Image from 'next/image'; // Import Image component from Next.js
+import Image from 'next/image';
 
 interface SlideItem {
+    id: number;
     title: string;
-    image: string;
+    image_url: string;
 }
 
-const slides: SlideItem[] = [
-    { title: '탐험 로퍼', image: '/card01.png' },
-    { title: '탑티커 클래스', image: '/card02.png' },
-    { title: 'mimorian 특강', image: '/card03.png' },
-    { title: '나 브랜딩', image: '/card04.png' },
-    { title: '로비앙랜드', image: '/card05.png' },
-    { title: '아나브 클래스', image: '/card06.png' },
-    { title: '감성 에세이', image: '/card07.png' },
-];
-
 const MainClassSlider = () => {
+    const [slides, setSlides] = useState<SlideItem[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchFeaturedContents = async () => {
+            const { data, error } = await supabase
+                .from('contents')
+                .select('id, title, image_url')
+                .eq('is_featured', true)
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('대표 컨텐츠 로딩 실패:', error.message);
+            } else {
+                setSlides(data);
+            }
+
+            setLoading(false);
+        };
+
+        fetchFeaturedContents();
+    }, []);
+
+    if (loading) {
+        return <section className="py-20 bg-white text-center text-neutral-500">대표 컨텐츠 불러오는 중...</section>;
+    }
+
+    if (slides.length === 0) {
+        return (
+            <section className="py-20 bg-white text-center text-neutral-500">
+                현재 설정된 대표 컨텐츠가 없습니다.
+            </section>
+        );
+    }
+
     return (
         <section className="py-20 bg-white">
             <div className="container mx-auto px-6">
                 <Swiper
-                    slidesPerView={1.5}
-                    spaceBetween={20}
+                    slidesPerView={1.2}
+                    spaceBetween={24}
                     loop={true}
                     autoplay={{ delay: 3000, disableOnInteraction: false }}
                     breakpoints={{
                         640: { slidesPerView: 2.5 },
-                        1024: { slidesPerView: 4.5 },
+                        1024: { slidesPerView: 4.2 },
                     }}
                     modules={[Autoplay]}
                 >
-                    {slides.map((card, i) => (
-                        <SwiperSlide key={i}>
-                            <div className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 text-center">
-                                <Image
-                                    src={card.image}
-                                    alt={card.title}
-                                    className="w-full h-[280px] object-cover"
-                                    width={500} // Add a width for better optimization
-                                    height={280} // Add a height for better optimization
-                                />
-                                <div className="p-4">
-                                    <h3 className="text-lg font-semibold">{card.title}</h3>
+                    {slides.map((card) => (
+                        <SwiperSlide key={card.id}>
+                            <div className="bg-white border border-gray-300 rounded-3xl overflow-hidden shadow-[0_6px_20px_rgba(0,0,0,0.08)] transition-transform hover:scale-[1.02] duration-300">
+                                <div className="relative w-full h-[260px]">
+                                    <Image
+                                        src={card.image_url}
+                                        alt={card.title}
+                                        layout="fill"
+                                        objectFit="cover"
+                                        className="rounded-t-3xl"
+                                    />
+                                </div>
+                                <div className="p-4 sm:p-5 text-center">
+                                    <h3 className="text-base sm:text-lg font-semibold text-neutral-800 truncate">
+                                        {card.title}
+                                    </h3>
                                 </div>
                             </div>
                         </SwiperSlide>

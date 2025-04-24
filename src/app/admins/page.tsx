@@ -12,9 +12,22 @@ export default function AdminPage() {
                 </div>
 
                 <div className="grid sm:grid-cols-3 gap-4">
-                    <AdminButton href="/admins/counselors" label="상담사 명단 확인" />
-                    <AdminButton href="/admins/create-counselor" label="계정 생성" />
-                    <AdminButton href="/admins/create-content" label="컨텐츠 추가" />
+                    <AdminButton
+                        href="/admins/counselors"
+                        label="상담사 명단 확인"
+                    />
+                    <AdminButton
+                        href="/admins/create-counselor"
+                        label="계정 생성"
+                    />
+                    <AdminButton
+                        href="/admins/create-content"
+                        label="컨텐츠 추가"
+                    />
+                    <AdminButton
+                        href="/admins/view-content"
+                        label="컨텐츠 보기"
+                    />
                 </div>
             </div>
         </div>
@@ -23,7 +36,10 @@ export default function AdminPage() {
 
 function AdminButton({ href, label }: { href: string; label: string }) {
     return (
-        <Link href={href} className="w-full">
+        <Link
+            href={href}
+            className="w-full"
+        >
             <button className="w-full py-4 px-6 bg-neutral-800 text-white rounded-xl text-base font-medium shadow-sm hover:bg-neutral-700 transition duration-200">
                 {label}
             </button>

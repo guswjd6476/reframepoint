@@ -21,7 +21,7 @@ type Patient = {
 
 export default function CounselorDetailPage() {
     const params = useParams();
-    const user_id = String(params?.id); // 문자열로 명시적 캐스팅
+    const user_id = String(params?.id);
 
     const [counselor, setCounselor] = useState<Counselor | null>(null);
     const [patients, setPatients] = useState<Patient[]>([]);
@@ -32,7 +32,6 @@ export default function CounselorDetailPage() {
             if (!user_id) return;
 
             try {
-                // 상담사 정보 가져오기
                 const { data: counselorData, error: counselorError } = await supabase
                     .from('counselors')
                     .select('id, name, email, user_id')
