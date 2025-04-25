@@ -6,6 +6,7 @@ import Image from 'next/image';
 import MainClassSlider from './MainClassSlider';
 import Brandintro from './Brandintro';
 import MainStatistics from './MainStatistics';
+import MainFeatures from './MainFeatures';
 
 export default function Home() {
     return (
@@ -47,8 +48,7 @@ export default function Home() {
             <MainClassSlider />
 
             <Brandintro />
-
-            {/* 대표 콘텐츠 섹션 */}
+            {/* 
             <section id="features" className="py-24 bg-[#f5f5f5]">
                 <div className="container mx-auto px-6 text-center">
                     <h2 className="text-3xl font-bold mb-12">추천 콘텐츠</h2>
@@ -91,7 +91,9 @@ export default function Home() {
                         ))}
                     </div>
                 </div>
-            </section>
+            </section> */}
+
+            <MainFeatures />
 
             {/* 푸터 */}
             <footer className="bg-gray-900 text-white py-10 mt-10">

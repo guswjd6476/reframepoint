@@ -51,6 +51,7 @@ const MainClassSlider = () => {
 
     return (
         <section className="py-20 bg-white">
+            <h2 className="text-3xl font-bold text-neutral-800 mb-8 text-center">대표 컨텐츠</h2>
             <div className="container mx-auto px-6">
                 <Swiper
                     slidesPerView={1.2}

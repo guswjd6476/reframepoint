@@ -61,10 +61,16 @@ export default function ViewContent() {
     };
 
     const toggleRecommended = async (id: number) => {
+        const recommendedCount = contents.filter((c) => c.is_recommended).length;
         const target = contents.find((c) => c.id === id);
         if (!target) return;
 
         const willBeRecommended = !target.is_recommended;
+
+        if (willBeRecommended && recommendedCount >= 3) {
+            alert('추천 컨텐츠는 최대 3개까지 설정할 수 있습니다.');
+            return;
+        }
 
         setUpdatingId(id);
 
@@ -74,6 +80,23 @@ export default function ViewContent() {
             alert('추천 설정 실패: ' + error.message);
         } else {
             setContents((prev) => prev.map((c) => (c.id === id ? { ...c, is_recommended: willBeRecommended } : c)));
+        }
+
+        setUpdatingId(null);
+    };
+
+    const deleteContent = async (id: number) => {
+        const confirmed = confirm('정말 이 컨텐츠를 삭제하시겠습니까?');
+        if (!confirmed) return;
+
+        setUpdatingId(id);
+
+        const { error } = await supabase.from('contents').delete().eq('id', id);
+
+        if (error) {
+            alert('삭제 실패: ' + error.message);
+        } else {
+            setContents((prev) => prev.filter((c) => c.id !== id));
         }
 
         setUpdatingId(null);
@@ -101,8 +124,8 @@ export default function ViewContent() {
                                     <Image
                                         src={content.image_url}
                                         alt={content.title}
-                                        width={500} // You can adjust the width
-                                        height={300} // You can adjust the height
+                                        width={500}
+                                        height={300}
                                         className="w-full h-48 object-cover"
                                     />
                                 )}
@@ -138,6 +161,13 @@ export default function ViewContent() {
                                                 : content.is_recommended
                                                 ? '추천 취소'
                                                 : '추천 컨텐츠로 설정'}
+                                        </button>
+                                        <button
+                                            onClick={() => deleteContent(content.id)}
+                                            disabled={updatingId === content.id}
+                                            className="text-sm font-semibold text-red-600 hover:underline"
+                                        >
+                                            {updatingId === content.id ? '삭제 중...' : '삭제'}
                                         </button>
                                     </div>
                                 </div>
