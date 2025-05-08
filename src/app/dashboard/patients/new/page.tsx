@@ -6,14 +6,15 @@ import dynamic from 'next/dynamic';
 import domtoimage from 'dom-to-image';
 import { uploadSignature, addNewPatient } from '@/app/api/supabaseApi';
 import Image from 'next/image';
-
-// Type import for ref
 import type SignatureCanvasType from 'react-signature-canvas';
+import type { SignatureCanvasProps } from 'react-signature-canvas';
 
-// Dynamic import with proper typing for ref usage
-const SignatureCanvas = dynamic(() => import('react-signature-canvas'), {
+// SignatureCanvas를 타입 안전하게 dynamic import
+const SignatureCanvas = dynamic(() => import('react-signature-canvas').then((mod) => mod.default), {
     ssr: false,
-}) as typeof SignatureCanvasType;
+}) as unknown as React.ForwardRefExoticComponent<
+    React.PropsWithoutRef<SignatureCanvasProps> & React.RefAttributes<SignatureCanvasType>
+>;
 
 export default function NewPatientPage() {
     const router = useRouter();
