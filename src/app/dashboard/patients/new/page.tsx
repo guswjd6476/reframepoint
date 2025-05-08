@@ -23,7 +23,7 @@ export default function NewPatientPage() {
         phone: '',
     });
 
-    const signatureRef = useRef<any>(null);
+    const signatureRef = useRef<SignatureCanvas | null>(null);
     const agreementRef = useRef<HTMLDivElement | null>(null);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -107,13 +107,11 @@ export default function NewPatientPage() {
 
     return (
         <div className="p-6 max-w-2xl mx-auto">
-            {/* 서약서 입력 단계 */}
             {step === 1 && (
                 <>
-                    {/* Signature 캡처용 Canvas (숨김 처리) */}
                     <div className="hidden">
                         <SignatureCanvas
-                            ref={signatureRef as React.MutableRefObject<any>}
+                            ref={signatureRef}
                             penColor="black"
                             canvasProps={{ width: 500, height: 200 }}
                         />
@@ -208,7 +206,7 @@ export default function NewPatientPage() {
                     <div className="mt-6">
                         <p className="mb-2">서명 입력:</p>
                         <SignatureCanvas
-                            ref={signatureRef as React.MutableRefObject<any>}
+                            ref={signatureRef}
                             penColor="black"
                             canvasProps={{ width: 500, height: 200, className: 'border p-2 rounded' }}
                         />
