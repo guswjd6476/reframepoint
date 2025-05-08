@@ -23,7 +23,7 @@ export default function NewPatientPage() {
         phone: '',
     });
 
-    const signatureRef = useRef<SignatureCanvas | null>(null);
+    const signatureRef = useRef<any>(null);
     const agreementRef = useRef<HTMLDivElement | null>(null);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -110,10 +110,10 @@ export default function NewPatientPage() {
             {/* 서약서 입력 단계 */}
             {step === 1 && (
                 <>
-                    {/* Signature 캡처용 Canvas (화면에 안보이게 숨김) */}
+                    {/* Signature 캡처용 Canvas (숨김 처리) */}
                     <div className="hidden">
                         <SignatureCanvas
-                            ref={signatureRef}
+                            ref={signatureRef as React.MutableRefObject<any>}
                             penColor="black"
                             canvasProps={{ width: 500, height: 200 }}
                         />
@@ -162,11 +162,7 @@ export default function NewPatientPage() {
                                         strokeWidth="3"
                                         viewBox="0 0 24 24"
                                     >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            d="M5 13l4 4L19 7"
-                                        />
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                                     </svg>
                                 </div>
                                 <span className="text-sm text-gray-800">
@@ -212,7 +208,7 @@ export default function NewPatientPage() {
                     <div className="mt-6">
                         <p className="mb-2">서명 입력:</p>
                         <SignatureCanvas
-                            ref={signatureRef}
+                            ref={signatureRef as React.MutableRefObject<any>}
                             penColor="black"
                             canvasProps={{ width: 500, height: 200, className: 'border p-2 rounded' }}
                         />
@@ -253,66 +249,34 @@ export default function NewPatientPage() {
                 <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
                     <h3 className="text-xl font-semibold mb-6 text-gray-800 border-b pb-2">상담 대상자 정보</h3>
                     <div className="grid gap-5 mb-6">
-                        <div>
-                            <label
-                                htmlFor="name"
-                                className="block text-sm font-medium text-gray-700 mb-1"
-                            >
-                                이름
-                            </label>
-                            <input
-                                id="name"
-                                name="name"
-                                placeholder="이름을 입력하세요"
-                                onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                            />
-                        </div>
-                        <div>
-                            <label
-                                htmlFor="birth_date"
-                                className="block text-sm font-medium text-gray-700 mb-1"
-                            >
-                                생년월일
-                            </label>
-                            <input
-                                id="birth_date"
-                                name="birth_date"
-                                type="date"
-                                onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                            />
-                        </div>
-                        <div>
-                            <label
-                                htmlFor="email"
-                                className="block text-sm font-medium text-gray-700 mb-1"
-                            >
-                                이메일
-                            </label>
-                            <input
-                                id="email"
-                                name="email"
-                                placeholder="example@example.com"
-                                onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                            />
-                        </div>
-                        <div>
-                            <label
-                                htmlFor="phone"
-                                className="block text-sm font-medium text-gray-700 mb-1"
-                            >
-                                전화번호
-                            </label>
-                            <input
-                                id="phone"
-                                name="phone"
-                                placeholder="010-1234-5678"
-                                onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                            />
-                        </div>
+                        {['name', 'birth_date', 'email', 'phone'].map((field) => (
+                            <div key={field}>
+                                <label htmlFor={field} className="block text-sm font-medium text-gray-700 mb-1">
+                                    {
+                                        {
+                                            name: '이름',
+                                            birth_date: '생년월일',
+                                            email: '이메일',
+                                            phone: '전화번호',
+                                        }[field]
+                                    }
+                                </label>
+                                <input
+                                    id={field}
+                                    name={field}
+                                    type={field === 'birth_date' ? 'date' : 'text'}
+                                    placeholder={
+                                        {
+                                            name: '이름을 입력하세요',
+                                            email: 'example@example.com',
+                                            phone: '010-1234-5678',
+                                        }[field] ?? ''
+                                    }
+                                    onChange={handleChange}
+                                    className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                                />
+                            </div>
+                        ))}
                     </div>
 
                     <button
