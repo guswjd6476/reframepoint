@@ -23,8 +23,8 @@ export default function NewPatientPage() {
         phone: '',
     });
 
-    const signatureRef = useRef<SignatureCanvas | null>(null);
-    const agreementRef = useRef<HTMLDivElement | null>(null);
+    const signatureRef = useRef<SignatureCanvas>(null);
+    const agreementRef = useRef<HTMLDivElement>(null);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -32,13 +32,14 @@ export default function NewPatientPage() {
     };
 
     const handleAgreementSubmit = async () => {
-        if (!agreed || !signatureRef.current || signatureRef.current.isEmpty()) {
+        const canvas = signatureRef.current;
+        if (!agreed || !canvas || canvas.isEmpty()) {
             alert('보안 각서에 동의하고 서명란에 서명해주세요.');
             return;
         }
 
         try {
-            const sigDataUrl = signatureRef.current.getTrimmedCanvas().toDataURL('image/png');
+            const sigDataUrl = canvas.getTrimmedCanvas().toDataURL('image/png');
             setSignatureImg(sigDataUrl);
 
             setTimeout(async () => {
@@ -109,22 +110,12 @@ export default function NewPatientPage() {
         <div className="p-6 max-w-2xl mx-auto">
             {step === 1 && (
                 <>
-                    <div className="hidden">
-                        <SignatureCanvas
-                            ref={signatureRef}
-                            penColor="black"
-                            canvasProps={{ width: 500, height: 200 }}
-                        />
-                    </div>
-
                     <div
                         ref={agreementRef}
                         className="border rounded-md p-10 bg-white text-sm leading-relaxed text-gray-800 space-y-6 shadow-lg font-serif"
                     >
                         <h2 className="text-2xl font-bold text-center underline mb-8">비밀 유지 서약서</h2>
-
                         <p>본인은 아래의 조항을 충분히 이해하고 이에 동의하며 서명합니다.</p>
-
                         <ol className="space-y-3 list-decimal list-inside">
                             <li>
                                 <strong>[계약 목적]</strong> 상담사는 내담자의 동의 없이는 상담 내용을 외부에 공개하지
@@ -190,19 +181,6 @@ export default function NewPatientPage() {
                         </div>
                     </div>
 
-                    <button
-                        onClick={() => {
-                            if (signatureRef.current?.isEmpty()) {
-                                alert('서명란에 서명해주세요.');
-                            } else {
-                                handleAgreementSubmit();
-                            }
-                        }}
-                        className="bg-blue-600 hover:bg-blue-700 text-white w-full py-2 rounded mt-6"
-                    >
-                        서약서 동의 및 다음
-                    </button>
-
                     <div className="mt-6">
                         <p className="mb-2">서명 입력:</p>
                         <SignatureCanvas
@@ -217,6 +195,13 @@ export default function NewPatientPage() {
                             서명 초기화
                         </button>
                     </div>
+
+                    <button
+                        onClick={handleAgreementSubmit}
+                        className="bg-blue-600 hover:bg-blue-700 text-white w-full py-2 rounded mt-6"
+                    >
+                        서약서 동의 및 다음
+                    </button>
                 </>
             )}
 
