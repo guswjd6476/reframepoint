@@ -23,8 +23,8 @@ export default function ResultsPage() {
     const [loading, setLoading] = useState(true);
     const [type, setType] = useState('');
     const [wing, setWing] = useState('');
-    const integration = '통합 방향 예시';
-    const disintegration = '분열 방향 예시';
+    const [integration, setIntegration] = useState('');
+    const [disintegration, setDisintegration] = useState('');
 
     useEffect(() => {
         const fetchResults = async () => {
@@ -58,8 +58,7 @@ export default function ResultsPage() {
             setLoading(false);
 
             const sortedScores = Object.entries(scores).sort((a, b) => b[1] - a[1]);
-            const primaryType = sortedScores[0][0];
-            const secondaryType = sortedScores[1][0];
+
             const enneagramMapping: Record<string, string> = {
                 D: '2',
                 E: '3',
@@ -71,8 +70,51 @@ export default function ResultsPage() {
                 H: '9',
                 I: '1',
             };
-            setType(enneagramMapping[primaryType]);
-            setWing(enneagramMapping[secondaryType]);
+
+            const integrationMap: Record<string, string> = {
+                '1': '7',
+                '2': '4',
+                '3': '6',
+                '4': '1',
+                '5': '8',
+                '6': '9',
+                '7': '5',
+                '8': '2',
+                '9': '3',
+            };
+
+            const disintegrationMap: Record<string, string> = {
+                '1': '4',
+                '2': '8',
+                '3': '9',
+                '4': '2',
+                '5': '7',
+                '6': '3',
+                '7': '1',
+                '8': '5',
+                '9': '6',
+            };
+
+            const primaryTypeLetter = sortedScores[0][0];
+            const primaryType = enneagramMapping[primaryTypeLetter];
+
+            // 후보 날개: 양 옆 숫자 (ex: 5 => 4, 6)
+            const wingCandidates = [
+                ((parseInt(primaryType) + 8) % 9 || 9).toString(),
+                ((parseInt(primaryType) % 9) + 1).toString(),
+            ];
+
+            // 날개 점수가 더 높은 쪽을 선택
+            const wingType =
+                sortedScores
+                    .map(([letter, score]) => [enneagramMapping[letter], score] as [string, number])
+                    .filter(([type]) => wingCandidates.includes(type))
+                    .sort((a, b) => b[1] - a[1])[0]?.[0] ?? '';
+
+            setType(primaryType);
+            setWing(wingType);
+            setIntegration(integrationMap[primaryType]);
+            setDisintegration(disintegrationMap[primaryType]);
         };
 
         fetchResults();
@@ -154,8 +196,8 @@ export default function ResultsPage() {
                     <tr>
                         <td className="border border-gray-300 px-4 py-2">{type} 유형</td>
                         <td className="border border-gray-300 px-4 py-2">{wing} 유형</td>
-                        <td className="border border-gray-300 px-4 py-2">{integration}</td>
-                        <td className="border border-gray-300 px-4 py-2">{disintegration}</td>
+                        <td className="border border-gray-300 px-4 py-2">{integration} 유형</td>
+                        <td className="border border-gray-300 px-4 py-2">{disintegration} 유형</td>
                     </tr>
                 </tbody>
             </table>
