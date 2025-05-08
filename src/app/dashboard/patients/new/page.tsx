@@ -1,11 +1,19 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import SignatureCanvas from 'react-signature-canvas';
+import dynamic from 'next/dynamic';
 import domtoimage from 'dom-to-image';
 import { uploadSignature, addNewPatient } from '@/app/api/supabaseApi';
 import Image from 'next/image';
+
+// Type import for ref
+import type SignatureCanvasType from 'react-signature-canvas';
+
+// Dynamic import with proper typing for ref usage
+const SignatureCanvas = dynamic(() => import('react-signature-canvas'), {
+    ssr: false,
+}) as typeof SignatureCanvasType;
 
 export default function NewPatientPage() {
     const router = useRouter();
@@ -23,23 +31,22 @@ export default function NewPatientPage() {
         phone: '',
     });
 
-    const signatureRef = useRef<SignatureCanvas>(null);
-    const agreementRef = useRef<HTMLDivElement>(null);
+    const signatureRef = useRef<SignatureCanvasType | null>(null);
+    const agreementRef = useRef<HTMLDivElement | null>(null);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setForm((prev) => ({ ...prev, [name]: value }));
     };
 
     const handleAgreementSubmit = async () => {
-        const canvas = signatureRef.current;
-        if (!agreed || !canvas || canvas.isEmpty()) {
+        if (!agreed || !signatureRef.current || signatureRef.current.isEmpty()) {
             alert('보안 각서에 동의하고 서명란에 서명해주세요.');
             return;
         }
 
         try {
-            const sigDataUrl = canvas.getTrimmedCanvas().toDataURL('image/png');
+            const sigDataUrl = signatureRef.current.getTrimmedCanvas().toDataURL('image/png');
             setSignatureImg(sigDataUrl);
 
             setTimeout(async () => {
@@ -181,6 +188,19 @@ export default function NewPatientPage() {
                         </div>
                     </div>
 
+                    <button
+                        onClick={() => {
+                            if (signatureRef.current?.isEmpty()) {
+                                alert('서명란에 서명해주세요.');
+                            } else {
+                                handleAgreementSubmit();
+                            }
+                        }}
+                        className="bg-blue-600 hover:bg-blue-700 text-white w-full py-2 rounded mt-6"
+                    >
+                        서약서 동의 및 다음
+                    </button>
+
                     <div className="mt-6">
                         <p className="mb-2">서명 입력:</p>
                         <SignatureCanvas
@@ -195,13 +215,6 @@ export default function NewPatientPage() {
                             서명 초기화
                         </button>
                     </div>
-
-                    <button
-                        onClick={handleAgreementSubmit}
-                        className="bg-blue-600 hover:bg-blue-700 text-white w-full py-2 rounded mt-6"
-                    >
-                        서약서 동의 및 다음
-                    </button>
                 </>
             )}
 
@@ -261,7 +274,6 @@ export default function NewPatientPage() {
                             </div>
                         ))}
                     </div>
-
                     <button
                         onClick={handleSubmit}
                         disabled={loading}
