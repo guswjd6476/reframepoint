@@ -50,22 +50,25 @@ export default function NewPatientPage() {
             const sigDataUrl = signatureRef.current.getTrimmedCanvas().toDataURL('image/png');
             setSignatureImg(sigDataUrl);
 
-            setTimeout(async () => {
-                if (!agreementRef.current) {
-                    alert('서약서 영역이 올바르게 렌더링되지 않았습니다.');
-                    return;
-                }
+            // 클라이언트 환경에서만 실행
+            if (typeof window !== 'undefined') {
+                setTimeout(async () => {
+                    if (!agreementRef.current) {
+                        alert('서약서 영역이 올바르게 렌더링되지 않았습니다.');
+                        return;
+                    }
 
-                try {
-                    const dataUrl = await domtoimage.toPng(agreementRef.current);
-                    setSignatureData(dataUrl);
-                    setPreviewData(dataUrl);
-                    setStep(3);
-                } catch (err) {
-                    console.error('domtoimage 오류:', err);
-                    alert('서약서 이미지를 저장하는 데 실패했습니다.');
-                }
-            }, 100);
+                    try {
+                        const dataUrl = await domtoimage.toPng(agreementRef.current);
+                        setSignatureData(dataUrl);
+                        setPreviewData(dataUrl);
+                        setStep(3);
+                    } catch (err) {
+                        console.error('domtoimage 오류:', err);
+                        alert('서약서 이미지를 저장하는 데 실패했습니다.');
+                    }
+                }, 100);
+            }
         } catch (error) {
             console.error('서명 처리 오류:', error);
             alert('서명 처리 중 오류가 발생했습니다.');
@@ -190,13 +193,7 @@ export default function NewPatientPage() {
                     </div>
 
                     <button
-                        onClick={() => {
-                            if (signatureRef.current?.isEmpty()) {
-                                alert('서명란에 서명해주세요.');
-                            } else {
-                                handleAgreementSubmit();
-                            }
-                        }}
+                        onClick={handleAgreementSubmit}
                         className="bg-blue-600 hover:bg-blue-700 text-white w-full py-2 rounded mt-6"
                     >
                         서약서 동의 및 다음
