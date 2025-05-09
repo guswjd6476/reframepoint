@@ -31,14 +31,14 @@ export default function NewPatientPage() {
         const canvas = canvasRef.current;
 
         if (canvas) {
-            const ratio = window.devicePixelRatio || 1;
+            const ratio = Math.max(window.devicePixelRatio || 1, 1);
             const width = 500;
             const height = 200;
 
-            canvas.width = width * ratio;
-            canvas.height = height * ratio;
             canvas.style.width = `${width}px`;
             canvas.style.height = `${height}px`;
+            canvas.width = width * ratio;
+            canvas.height = height * ratio;
 
             const ctx = canvas.getContext('2d');
             if (ctx) ctx.scale(ratio, ratio);
@@ -82,10 +82,13 @@ export default function NewPatientPage() {
                 return;
             }
 
-            const dataUrl = await domtoimage.toPng(agreementRef.current);
-            setSignatureData(dataUrl);
-            setPreviewData(dataUrl);
-            setStep(3);
+            // 지연을 줘서 캔버스 렌더링 안정화
+            setTimeout(async () => {
+                const dataUrl = await domtoimage.toPng(agreementRef.current!);
+                setSignatureData(dataUrl);
+                setPreviewData(dataUrl);
+                setStep(3);
+            }, 100);
         } catch (err) {
             console.error('서약서 이미지 생성 오류:', err);
             alert('서약서 이미지를 저장하는 데 실패했습니다.');
@@ -143,7 +146,6 @@ export default function NewPatientPage() {
                         className="border rounded-md p-10 bg-white text-sm leading-relaxed text-gray-800 space-y-6 shadow-lg font-serif"
                     >
                         <h2 className="text-2xl font-bold text-center underline mb-8">비밀 유지 서약서</h2>
-                        <p>본인은 아래의 조항을 충분히 이해하고 이에 동의하며 서명합니다.</p>
                         <ol className="space-y-3 list-decimal list-inside">
                             <li>
                                 <strong>[계약 목적]</strong> 상담사는 내담자의 동의 없이는 상담 내용을 외부에 공개하지
@@ -220,8 +222,8 @@ export default function NewPatientPage() {
                         <p className="mb-2">서명 입력:</p>
                         <canvas
                             ref={canvasRef}
-                            className="border p-2 rounded bg-white touch-none"
-                            style={{ touchAction: 'none' }}
+                            style={{ touchAction: 'none', width: '500px', height: '200px' }}
+                            className="border p-2 rounded bg-white"
                         />
                         <button
                             onClick={() => signaturePadRef.current?.clear()}
