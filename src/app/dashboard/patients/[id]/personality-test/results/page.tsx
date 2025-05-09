@@ -14,6 +14,7 @@ import {
     Tooltip,
     Legend,
 } from 'chart.js';
+import { typeData } from '@/app/lib/con';
 
 ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Title, Tooltip, Legend);
 
@@ -98,13 +99,11 @@ export default function ResultsPage() {
             const primaryTypeLetter = sortedScores[0][0];
             const primaryType = enneagramMapping[primaryTypeLetter];
 
-            // 후보 날개: 양 옆 숫자 (ex: 5 => 4, 6)
             const wingCandidates = [
                 ((parseInt(primaryType) + 8) % 9 || 9).toString(),
                 ((parseInt(primaryType) % 9) + 1).toString(),
             ];
 
-            // 날개 점수가 더 높은 쪽을 선택
             const wingType =
                 sortedScores
                     .map(([letter, score]) => [enneagramMapping[letter], score] as [string, number])
@@ -153,8 +152,11 @@ export default function ResultsPage() {
         ],
     };
 
+    // 사용자의 주요 유형에 해당하는 데이터 찾기
+    const typeInfo = typeData.find((data) => data.type === type);
+
     return (
-        <div className="max-w-3xl mx-auto p-8 bg-white shadow-md rounded-lg">
+        <div className="max-w-4xl mx-auto p-8 bg-white shadow-md rounded-lg">
             <header className="text-center border-b pb-4 mb-6">
                 <h1 className="text-2xl font-bold">에니어그램 성격 유형 검사 결과</h1>
                 <p className="text-sm text-gray-500">ID: {patientId}</p>
@@ -201,6 +203,74 @@ export default function ResultsPage() {
                     </tr>
                 </tbody>
             </table>
+
+            {/* 유형 설명 섹션 */}
+            {typeInfo ? (
+                <div className="mt-8 space-y-12">
+                    <section>
+                        <h2 className="text-2xl font-bold text-blue-700 mb-4">나의 유형: {typeInfo.name}</h2>
+
+                        <div className="bg-gray-50 border-l-4 border-blue-300 p-4 rounded">
+                            <h3 className="text-lg font-semibold text-blue-600 mb-2">핵심 특성</h3>
+                            <p className="text-gray-700 leading-relaxed">{typeInfo.core_traits.description}</p>
+                            <p className="text-gray-700 mt-2">
+                                <span className="font-semibold text-blue-600">동기:</span>{' '}
+                                {typeInfo.core_traits.motivation}
+                            </p>
+                            <p className="text-gray-700 mt-2">
+                                <span className="font-semibold text-blue-600">핵심 가치:</span>{' '}
+                                {typeInfo.core_traits.key_values.join(', ')}
+                            </p>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h3 className="text-xl font-semibold text-green-700 mb-3">상태별 성향</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="bg-green-50 border-l-4 border-green-400 p-4 rounded">
+                                <h4 className="text-md font-semibold text-green-600 mb-2">긍정적 상태</h4>
+                                <ul className="list-disc pl-5 text-gray-800 space-y-1">
+                                    {typeInfo.states.positive.map((state, idx) => (
+                                        <li key={idx}>{state}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                            <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded">
+                                <h4 className="text-md font-semibold text-red-600 mb-2">부정적 상태</h4>
+                                <ul className="list-disc pl-5 text-gray-800 space-y-1">
+                                    {typeInfo.states.negative.map((state, idx) => (
+                                        <li key={idx}>{state}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h3 className="text-xl font-semibold text-purple-700 mb-3">강점과 약점</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h4 className="text-md font-medium text-purple-600 mb-2">강점</h4>
+                                <ul className="list-disc pl-5 text-gray-800 space-y-1">
+                                    {typeInfo.strengths.map((item, idx) => (
+                                        <li key={idx}>{item}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 className="text-md font-medium text-purple-600 mb-2">약점</h4>
+                                <ul className="list-disc pl-5 text-gray-800 space-y-1">
+                                    {typeInfo.weaknesses.map((item, idx) => (
+                                        <li key={idx}>{item}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            ) : (
+                <p className="text-center text-gray-600 mt-8">유형 {type}에 대한 설명이 아직 준비되지 않았습니다.</p>
+            )}
         </div>
     );
 }

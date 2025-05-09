@@ -8,8 +8,8 @@ type Patient = {
     id: string;
     name: string;
     birth_date: string;
-    email: string;
-    phone: string;
+    stress: string;
+    religion: string;
 };
 
 export default function Dashboard() {
@@ -74,10 +74,7 @@ export default function Dashboard() {
                         </thead>
                         <tbody>
                             {patients.map((patient) => (
-                                <tr
-                                    key={patient.id}
-                                    className="border-t hover:bg-gray-50"
-                                >
+                                <tr key={patient.id} className="border-t hover:bg-gray-50">
                                     <td
                                         className="py-3 px-4 cursor-pointer"
                                         onClick={() => router.push(`/dashboard/patients/${patient.id}`)}
@@ -85,8 +82,8 @@ export default function Dashboard() {
                                         {patient.name}
                                     </td>
                                     <td className="py-3 px-4 hidden md:table-cell">{patient.birth_date}</td>
-                                    <td className="py-3 px-4 hidden md:table-cell">{patient.email}</td>
-                                    <td className="py-3 px-4 hidden md:table-cell">{patient.phone}</td>
+                                    <td className="py-3 px-4 hidden md:table-cell">{patient.stress}</td>
+                                    <td className="py-3 px-4 hidden md:table-cell">{patient.religion}</td>
                                     <td className="py-3 px-4 flex gap-2">
                                         <button
                                             onClick={() => router.push(`/dashboard/patients/${patient.id}`)}

@@ -19,8 +19,8 @@ export default function NewPatientPage() {
     const [form, setForm] = useState({
         name: '',
         birth_date: '',
-        email: '',
-        phone: '',
+        stress: '',
+        religion: '',
     });
 
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -67,8 +67,8 @@ export default function NewPatientPage() {
     };
 
     const handleSubmit = async () => {
-        const { name, birth_date, email, phone } = form;
-        if (!name || !birth_date || !email || !phone || !signatureData) {
+        const { name, birth_date, stress, religion } = form;
+        if (!name || !birth_date || !stress || !religion || !signatureData) {
             alert('모든 필드를 작성해주세요.');
             return;
         }
@@ -86,8 +86,8 @@ export default function NewPatientPage() {
         const { error } = await addNewPatient({
             name,
             birth_date,
-            email,
-            phone,
+            stress,
+            religion,
             signatureurl,
         });
 
@@ -230,15 +230,15 @@ export default function NewPatientPage() {
                 <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
                     <h3 className="text-xl font-semibold mb-6 text-gray-800 border-b pb-2">상담 대상자 정보</h3>
                     <div className="grid gap-5 mb-6">
-                        {['name', 'birth_date', 'email', 'phone'].map((field) => (
+                        {['name', 'birth_date', 'stress', 'religion'].map((field) => (
                             <div key={field}>
                                 <label htmlFor={field} className="block text-sm font-medium text-gray-700 mb-1">
                                     {
                                         {
                                             name: '이름',
                                             birth_date: '생년월일',
-                                            email: '이메일',
-                                            phone: '전화번호',
+                                            stress: '스트레스요인',
+                                            religion: '종교',
                                         }[field]
                                     }
                                 </label>
@@ -249,8 +249,8 @@ export default function NewPatientPage() {
                                     placeholder={
                                         {
                                             name: '이름을 입력하세요',
-                                            email: 'example@example.com',
-                                            phone: '010-1234-5678',
+                                            stress: '인간관계',
+                                            religion: '무교',
                                         }[field] ?? ''
                                     }
                                     onChange={handleChange}

@@ -7,7 +7,7 @@ import Link from 'next/link';
 type Counselor = {
     id: string;
     name: string;
-    email: string;
+    stress: string;
     user_id: string;
 };
 
@@ -19,7 +19,7 @@ export default function CounselorsPage() {
         const fetchCounselors = async () => {
             setLoading(true);
             try {
-                const { data, error } = await supabase.from('counselors').select('id, name, email, user_id'); // ✅ 여기!
+                const { data, error } = await supabase.from('counselors').select('id, name, stress, user_id'); // ✅ 여기!
 
                 if (error) throw error;
 
@@ -49,7 +49,7 @@ export default function CounselorsPage() {
                 <thead>
                     <tr className="bg-indigo-600 text-white">
                         <th className="py-3 px-6 text-left">이름</th>
-                        <th className="py-3 px-6 text-left">이메일</th>
+                        <th className="py-3 px-6 text-left">스트레스요인</th>
                         <th className="py-3 px-6 text-left">상세보기</th>
                     </tr>
                 </thead>
@@ -57,7 +57,7 @@ export default function CounselorsPage() {
                     {counselors.map((counselor) => (
                         <tr key={counselor.id} className="border-t hover:bg-indigo-100">
                             <td className="py-3 px-6">{counselor.name}</td>
-                            <td className="py-3 px-6">{counselor.email}</td>
+                            <td className="py-3 px-6">{counselor.stress}</td>
                             <td className="py-3 px-6">
                                 <Link href={`/admins/counselors/${counselor.user_id}`}>
                                     <button className="text-indigo-600 hover:text-indigo-800">상세보기</button>

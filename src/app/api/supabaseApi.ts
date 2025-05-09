@@ -58,8 +58,8 @@ export const getPatients = async () => {
 export const addNewPatient = async (patient: {
     name: string;
     birth_date: string;
-    email: string;
-    phone: string;
+    stress: string;
+    religion: string;
     signatureurl: string;
 }) => {
     const {
