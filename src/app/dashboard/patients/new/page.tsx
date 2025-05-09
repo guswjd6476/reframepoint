@@ -31,14 +31,14 @@ export default function NewPatientPage() {
         const canvas = canvasRef.current;
 
         if (canvas) {
-            const ratio = Math.max(window.devicePixelRatio || 1, 1);
+            const ratio = window.devicePixelRatio || 1;
             const width = 500;
             const height = 200;
 
-            canvas.style.width = `${width}px`;
-            canvas.style.height = `${height}px`;
             canvas.width = width * ratio;
             canvas.height = height * ratio;
+            canvas.style.width = `${width}px`;
+            canvas.style.height = `${height}px`;
 
             const ctx = canvas.getContext('2d');
             if (ctx) ctx.scale(ratio, ratio);
@@ -77,18 +77,33 @@ export default function NewPatientPage() {
             const sigDataUrl = signaturePadRef.current.toDataURL('image/png');
             setSignatureImg(sigDataUrl);
 
+            const canvas = canvasRef.current;
+            if (canvas && canvas.parentNode) {
+                canvas.parentNode.removeChild(canvas);
+            }
+
+            const sigImg = document.createElement('img');
+            sigImg.src = sigDataUrl;
+            sigImg.alt = '서명 이미지';
+            sigImg.style.width = '200px';
+            sigImg.style.height = 'auto';
+            sigImg.className = 'border rounded object-contain mt-1';
+
+            const container = agreementRef.current?.querySelector('.signature-container');
+            if (container) {
+                container.innerHTML = '';
+                container.appendChild(sigImg);
+            }
+
             if (!agreementRef.current) {
                 alert('서약서 영역이 올바르게 렌더링되지 않았습니다.');
                 return;
             }
 
-            // 지연을 줘서 캔버스 렌더링 안정화
-            setTimeout(async () => {
-                const dataUrl = await domtoimage.toPng(agreementRef.current!);
-                setSignatureData(dataUrl);
-                setPreviewData(dataUrl);
-                setStep(3);
-            }, 100);
+            const dataUrl = await domtoimage.toPng(agreementRef.current);
+            setSignatureData(dataUrl);
+            setPreviewData(dataUrl);
+            setStep(3);
         } catch (err) {
             console.error('서약서 이미지 생성 오류:', err);
             alert('서약서 이미지를 저장하는 데 실패했습니다.');
@@ -146,6 +161,7 @@ export default function NewPatientPage() {
                         className="border rounded-md p-10 bg-white text-sm leading-relaxed text-gray-800 space-y-6 shadow-lg font-serif"
                     >
                         <h2 className="text-2xl font-bold text-center underline mb-8">비밀 유지 서약서</h2>
+                        <p>본인은 아래의 조항을 충분히 이해하고 이에 동의하며 서명합니다.</p>
                         <ol className="space-y-3 list-decimal list-inside">
                             <li>
                                 <strong>[계약 목적]</strong> 상담사는 내담자의 동의 없이는 상담 내용을 외부에 공개하지
@@ -194,19 +210,13 @@ export default function NewPatientPage() {
                             <p>
                                 작성일: <strong>{today}</strong>
                             </p>
-                            <div>
+                            <div className="signature-container">
                                 <p>서명자:</p>
-                                {signatureImg ? (
-                                    <Image
-                                        src={signatureImg}
-                                        alt="서명 이미지"
-                                        width={200}
-                                        height={100}
-                                        className="border rounded object-contain mt-1"
-                                    />
-                                ) : (
-                                    <p className="text-gray-500">__________________</p>
-                                )}
+                                <canvas
+                                    ref={canvasRef}
+                                    className="border p-2 rounded bg-white touch-none"
+                                    style={{ touchAction: 'none', width: '200px', height: '100px' }}
+                                />
                             </div>
                         </div>
                     </div>
@@ -219,12 +229,6 @@ export default function NewPatientPage() {
                     </button>
 
                     <div className="mt-6">
-                        <p className="mb-2">서명 입력:</p>
-                        <canvas
-                            ref={canvasRef}
-                            style={{ touchAction: 'none', width: '500px', height: '200px' }}
-                            className="border p-2 rounded bg-white"
-                        />
                         <button
                             onClick={() => signaturePadRef.current?.clear()}
                             className="mt-2 text-sm text-gray-600 underline"
