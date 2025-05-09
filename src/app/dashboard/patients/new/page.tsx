@@ -28,11 +28,37 @@ export default function NewPatientPage() {
     const agreementRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
-        if (canvasRef.current) {
-            signaturePadRef.current = new SignaturePad(canvasRef.current, {
+        const canvas = canvasRef.current;
+
+        if (canvas) {
+            const ratio = window.devicePixelRatio || 1;
+            const width = 500;
+            const height = 200;
+
+            canvas.width = width * ratio;
+            canvas.height = height * ratio;
+            canvas.style.width = `${width}px`;
+            canvas.style.height = `${height}px`;
+
+            const ctx = canvas.getContext('2d');
+            if (ctx) ctx.scale(ratio, ratio);
+
+            signaturePadRef.current = new SignaturePad(canvas, {
                 penColor: 'black',
                 backgroundColor: 'rgba(255,255,255,0)',
             });
+
+            const preventDefault = (e: TouchEvent) => {
+                if (e.cancelable) e.preventDefault();
+            };
+
+            canvas.addEventListener('touchstart', preventDefault, { passive: false });
+            canvas.addEventListener('touchmove', preventDefault, { passive: false });
+
+            return () => {
+                canvas.removeEventListener('touchstart', preventDefault);
+                canvas.removeEventListener('touchmove', preventDefault);
+            };
         }
     }, []);
 
@@ -192,7 +218,11 @@ export default function NewPatientPage() {
 
                     <div className="mt-6">
                         <p className="mb-2">서명 입력:</p>
-                        <canvas ref={canvasRef} width={500} height={200} className="border p-2 rounded bg-white" />
+                        <canvas
+                            ref={canvasRef}
+                            className="border p-2 rounded bg-white touch-none"
+                            style={{ touchAction: 'none' }}
+                        />
                         <button
                             onClick={() => signaturePadRef.current?.clear()}
                             className="mt-2 text-sm text-gray-600 underline"

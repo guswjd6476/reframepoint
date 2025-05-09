@@ -8,7 +8,7 @@ import { supabase } from '@/app/lib/supabase';
 type Counselor = {
     id: string;
     name: string;
-    email: string;
+    stress: string;
     user_id: string;
 };
 
@@ -34,7 +34,7 @@ export default function CounselorDetailPage() {
             try {
                 const { data: counselorData, error: counselorError } = await supabase
                     .from('counselors')
-                    .select('id, name, email, user_id')
+                    .select('id, name, stress, user_id')
                     .eq('user_id', user_id)
                     .single();
 
@@ -71,7 +71,7 @@ export default function CounselorDetailPage() {
                 <strong>이름:</strong> {counselor.name}
             </p>
             <p>
-                <strong>이메일:</strong> {counselor.email}
+                <strong>스트레스요인:</strong> {counselor.stress}
             </p>
 
             <h2 className="text-2xl font-semibold mt-10">목록</h2>
@@ -79,10 +79,7 @@ export default function CounselorDetailPage() {
                 <ul className="list-disc list-inside space-y-2">
                     {patients.map((patient) => (
                         <li key={patient.id}>
-                            <Link
-                                href={`/dashboard/patients/${patient.id}`}
-                                className="text-blue-600 hover:underline"
-                            >
+                            <Link href={`/dashboard/patients/${patient.id}`} className="text-blue-600 hover:underline">
                                 {patient.name}
                             </Link>{' '}
                             ({patient.birth_date})

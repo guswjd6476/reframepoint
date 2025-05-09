@@ -67,8 +67,8 @@ export default function Dashboard() {
                             <tr className="text-left text-gray-600">
                                 <th className="py-3 px-4">이름</th>
                                 <th className="py-3 px-4 hidden md:table-cell">생년월일</th>
-                                <th className="py-3 px-4 hidden md:table-cell">이메일</th>
-                                <th className="py-3 px-4 hidden md:table-cell">전화번호</th>
+                                <th className="py-3 px-4 hidden md:table-cell">스트레스요인</th>
+                                <th className="py-3 px-4 hidden md:table-cell">종교</th>
                                 <th className="py-3 px-4">관리</th>
                             </tr>
                         </thead>
