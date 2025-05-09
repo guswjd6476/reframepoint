@@ -1,20 +1,11 @@
 'use client';
 
-import React, { useState, useRef, ChangeEvent } from 'react';
+import React, { useState, useRef, useEffect, ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import dynamic from 'next/dynamic';
 import domtoimage from 'dom-to-image';
-import { uploadSignature, addNewPatient } from '@/app/api/supabaseApi';
+import SignaturePad from 'signature_pad';
 import Image from 'next/image';
-import type SignatureCanvasType from 'react-signature-canvas';
-import type { SignatureCanvasProps } from 'react-signature-canvas';
-
-// SignatureCanvas를 타입 안전하게 dynamic import
-const SignatureCanvas = dynamic(() => import('react-signature-canvas').then((mod) => mod.default), {
-    ssr: false,
-}) as unknown as React.ForwardRefExoticComponent<
-    React.PropsWithoutRef<SignatureCanvasProps> & React.RefAttributes<SignatureCanvasType>
->;
+import { uploadSignature, addNewPatient } from '@/app/api/supabaseApi';
 
 export default function NewPatientPage() {
     const router = useRouter();
@@ -32,8 +23,18 @@ export default function NewPatientPage() {
         phone: '',
     });
 
-    const signatureRef = useRef<SignatureCanvasType | null>(null);
+    const canvasRef = useRef<HTMLCanvasElement | null>(null);
+    const signaturePadRef = useRef<SignaturePad | null>(null);
     const agreementRef = useRef<HTMLDivElement | null>(null);
+
+    useEffect(() => {
+        if (canvasRef.current) {
+            signaturePadRef.current = new SignaturePad(canvasRef.current, {
+                penColor: 'black',
+                backgroundColor: 'rgba(255,255,255,0)',
+            });
+        }
+    }, []);
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -41,43 +42,27 @@ export default function NewPatientPage() {
     };
 
     const handleAgreementSubmit = async () => {
-        if (!agreed || !signatureRef.current || signatureRef.current.isEmpty()) {
+        if (!agreed || !signaturePadRef.current || signaturePadRef.current.isEmpty()) {
             alert('보안 각서에 동의하고 서명란에 서명해주세요.');
             return;
         }
 
-        // 안전하게 메서드 존재 확인 후 호출
-        const getTrimmedCanvas = signatureRef.current.getTrimmedCanvas;
-        if (typeof getTrimmedCanvas !== 'function') {
-            alert('서명 캔버스를 불러올 수 없습니다.');
-            return;
-        }
-
         try {
-            const sigDataUrl = getTrimmedCanvas.call(signatureRef.current).toDataURL('image/png');
+            const sigDataUrl = signaturePadRef.current.toDataURL('image/png');
             setSignatureImg(sigDataUrl);
 
-            if (typeof window !== 'undefined') {
-                setTimeout(async () => {
-                    if (!agreementRef.current) {
-                        alert('서약서 영역이 올바르게 렌더링되지 않았습니다.');
-                        return;
-                    }
-
-                    try {
-                        const dataUrl = await domtoimage.toPng(agreementRef.current);
-                        setSignatureData(dataUrl);
-                        setPreviewData(dataUrl);
-                        setStep(3);
-                    } catch (err) {
-                        console.error('domtoimage 오류:', err);
-                        alert('서약서 이미지를 저장하는 데 실패했습니다.');
-                    }
-                }, 100);
+            if (!agreementRef.current) {
+                alert('서약서 영역이 올바르게 렌더링되지 않았습니다.');
+                return;
             }
-        } catch (error) {
-            console.error('서명 처리 오류:', error);
-            alert('서명 처리 중 오류가 발생했습니다.');
+
+            const dataUrl = await domtoimage.toPng(agreementRef.current);
+            setSignatureData(dataUrl);
+            setPreviewData(dataUrl);
+            setStep(3);
+        } catch (err) {
+            console.error('서약서 이미지 생성 오류:', err);
+            alert('서약서 이미지를 저장하는 데 실패했습니다.');
         }
     };
 
@@ -207,13 +192,9 @@ export default function NewPatientPage() {
 
                     <div className="mt-6">
                         <p className="mb-2">서명 입력:</p>
-                        <SignatureCanvas
-                            ref={signatureRef}
-                            penColor="black"
-                            canvasProps={{ width: 500, height: 200, className: 'border p-2 rounded' }}
-                        />
+                        <canvas ref={canvasRef} width={500} height={200} className="border p-2 rounded bg-white" />
                         <button
-                            onClick={() => signatureRef.current?.clear()}
+                            onClick={() => signaturePadRef.current?.clear()}
                             className="mt-2 text-sm text-gray-600 underline"
                         >
                             서명 초기화
