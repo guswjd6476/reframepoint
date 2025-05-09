@@ -46,11 +46,17 @@ export default function NewPatientPage() {
             return;
         }
 
+        // 안전하게 메서드 존재 확인 후 호출
+        const getTrimmedCanvas = signatureRef.current.getTrimmedCanvas;
+        if (typeof getTrimmedCanvas !== 'function') {
+            alert('서명 캔버스를 불러올 수 없습니다.');
+            return;
+        }
+
         try {
-            const sigDataUrl = signatureRef.current.getTrimmedCanvas().toDataURL('image/png');
+            const sigDataUrl = getTrimmedCanvas.call(signatureRef.current).toDataURL('image/png');
             setSignatureImg(sigDataUrl);
 
-            // 클라이언트 환경에서만 실행
             if (typeof window !== 'undefined') {
                 setTimeout(async () => {
                     if (!agreementRef.current) {
