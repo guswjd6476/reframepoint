@@ -11,7 +11,6 @@ export default function NewPatientPage() {
     const router = useRouter();
     const [step, setStep] = useState(1);
     const [agreed, setAgreed] = useState(false);
-    const [signatureImg, setSignatureImg] = useState<string | null>(null);
     const [previewData, setPreviewData] = useState<string | null>(null);
     const [signatureData, setSignatureData] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
@@ -75,7 +74,7 @@ export default function NewPatientPage() {
 
         try {
             const sigDataUrl = signaturePadRef.current.toDataURL('image/png');
-            setSignatureImg(sigDataUrl);
+            // setSignatureImg(sigDataUrl);
 
             const canvas = canvasRef.current;
             if (canvas && canvas.parentNode) {
