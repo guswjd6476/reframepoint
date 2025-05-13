@@ -9,6 +9,7 @@ import { uploadSignature, addNewPatient } from '@/app/api/supabaseApi';
 
 export default function NewPatientPage() {
     const router = useRouter();
+
     const [step, setStep] = useState(1);
     const [agreed, setAgreed] = useState(false);
     const [previewData, setPreviewData] = useState<string | null>(null);
@@ -26,39 +27,44 @@ export default function NewPatientPage() {
     const signaturePadRef = useRef<SignaturePad | null>(null);
     const agreementRef = useRef<HTMLDivElement | null>(null);
 
+    const today = new Date().toLocaleDateString('ko-KR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+    });
+
     useEffect(() => {
         const canvas = canvasRef.current;
+        if (!canvas) return;
 
-        if (canvas) {
-            const ratio = window.devicePixelRatio || 1;
-            const width = 500;
-            const height = 200;
+        const ratio = window.devicePixelRatio || 1;
+        const width = 500;
+        const height = 200;
 
-            canvas.width = width * ratio;
-            canvas.height = height * ratio;
-            canvas.style.width = `${width}px`;
-            canvas.style.height = `${height}px`;
+        canvas.width = width * ratio;
+        canvas.height = height * ratio;
+        canvas.style.width = `${width}px`;
+        canvas.style.height = `${height}px`;
 
-            const ctx = canvas.getContext('2d');
-            if (ctx) ctx.scale(ratio, ratio);
+        const ctx = canvas.getContext('2d');
+        if (ctx) ctx.scale(ratio, ratio);
 
-            signaturePadRef.current = new SignaturePad(canvas, {
-                penColor: 'black',
-                backgroundColor: 'rgba(255,255,255,0)',
-            });
+        signaturePadRef.current = new SignaturePad(canvas, {
+            penColor: 'black',
+            backgroundColor: 'rgba(255,255,255,0)',
+        });
 
-            const preventDefault = (e: TouchEvent) => {
-                if (e.cancelable) e.preventDefault();
-            };
+        const preventDefault = (e: TouchEvent) => {
+            if (e.cancelable) e.preventDefault();
+        };
 
-            canvas.addEventListener('touchstart', preventDefault, { passive: false });
-            canvas.addEventListener('touchmove', preventDefault, { passive: false });
+        canvas.addEventListener('touchstart', preventDefault, { passive: false });
+        canvas.addEventListener('touchmove', preventDefault, { passive: false });
 
-            return () => {
-                canvas.removeEventListener('touchstart', preventDefault);
-                canvas.removeEventListener('touchmove', preventDefault);
-            };
-        }
+        return () => {
+            canvas.removeEventListener('touchstart', preventDefault);
+            canvas.removeEventListener('touchmove', preventDefault);
+        };
     }, []);
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -74,23 +80,16 @@ export default function NewPatientPage() {
 
         try {
             const sigDataUrl = signaturePadRef.current.toDataURL('image/png');
-            // setSignatureImg(sigDataUrl);
 
-            const canvas = canvasRef.current;
-            if (canvas && canvas.parentNode) {
-                canvas.parentNode.removeChild(canvas);
-            }
-
-            const sigImg = document.createElement('img');
-            sigImg.src = sigDataUrl;
-            sigImg.alt = '서명 이미지';
-            sigImg.style.width = '200px';
-            sigImg.style.height = 'auto';
-            sigImg.className = 'border rounded object-contain mt-1';
+            canvasRef.current?.remove();
 
             const container = agreementRef.current?.querySelector('.signature-container');
             if (container) {
                 container.innerHTML = '';
+                const sigImg = document.createElement('img');
+                sigImg.src = sigDataUrl;
+                sigImg.alt = '서명 이미지';
+                sigImg.className = 'border rounded object-contain mt-1 w-[200px] h-auto';
                 container.appendChild(sigImg);
             }
 
@@ -117,6 +116,7 @@ export default function NewPatientPage() {
         }
 
         setLoading(true);
+
         const fileName = `agreement-${Date.now()}.png`;
         const { url: signatureurl, error: uploadError } = await uploadSignature(signatureData, fileName);
 
@@ -126,13 +126,7 @@ export default function NewPatientPage() {
             return;
         }
 
-        const { error } = await addNewPatient({
-            name,
-            birth_date,
-            stress,
-            religion,
-            signatureurl,
-        });
+        const { error } = await addNewPatient({ name, birth_date, stress, religion, signatureurl });
 
         setLoading(false);
 
@@ -145,19 +139,14 @@ export default function NewPatientPage() {
         }
     };
 
-    const today = new Date().toLocaleDateString('ko-KR', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-    });
-
     return (
         <div className="p-6 max-w-2xl mx-auto">
+            {/* Step 1: Agreement */}
             {step === 1 && (
                 <>
                     <div
                         ref={agreementRef}
-                        className="border rounded-md p-10 bg-white text-sm leading-relaxed text-gray-800 space-y-6 shadow-lg font-serif"
+                        className="border rounded-md p-10 bg-white text-sm text-gray-800 space-y-6 shadow-lg font-serif"
                     >
                         <h2 className="text-2xl font-bold text-center underline mb-8">비밀 유지 서약서</h2>
                         <p>본인은 아래의 조항을 충분히 이해하고 이에 동의하며 서명합니다.</p>
@@ -180,43 +169,40 @@ export default function NewPatientPage() {
                             </li>
                         </ol>
 
-                        <div className="pt-4">
-                            <label className="inline-flex items-center cursor-pointer select-none">
-                                <input
-                                    type="checkbox"
-                                    checked={agreed}
-                                    onChange={() => setAgreed(!agreed)}
-                                    className="peer hidden"
-                                />
-                                <div className="w-5 h-5 mr-2 border-2 border-gray-400 rounded-sm flex items-center justify-center peer-checked:bg-blue-600 peer-checked:border-blue-600 transition-all">
-                                    <svg
-                                        className="w-3 h-3 text-white hidden peer-checked:block"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="3"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                    </svg>
-                                </div>
-                                <span className="text-sm text-gray-800">
-                                    상기 내용을 충분히 읽고 이해하였으며 이에 동의합니다.
-                                </span>
-                            </label>
-                        </div>
+                        <label className="inline-flex items-center pt-4">
+                            <input
+                                type="checkbox"
+                                checked={agreed}
+                                onChange={() => setAgreed(!agreed)}
+                                className="hidden peer"
+                            />
+                            <div className="w-5 h-5 mr-2 border-2 border-gray-400 rounded-sm flex items-center justify-center peer-checked:bg-blue-600 peer-checked:border-blue-600">
+                                <svg
+                                    className="w-3 h-3 text-white hidden peer-checked:block"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="3"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                </svg>
+                            </div>
+                            <span>상기 내용을 충분히 읽고 이해하였으며 이에 동의합니다.</span>
+                        </label>
 
                         <div className="flex justify-between items-center pt-4 text-sm">
                             <p>
                                 작성일: <strong>{today}</strong>
                             </p>
-                            <div className="signature-container">
-                                <p>서명자:</p>
-                                <canvas
-                                    ref={canvasRef}
-                                    className="border p-2 rounded bg-white touch-none"
-                                    style={{ touchAction: 'none', width: '200px', height: '100px' }}
-                                />
-                            </div>
+                        </div>
+
+                        <div className="signature-container mt-4">
+                            <p>서명자:</p>
+                            <canvas
+                                ref={canvasRef}
+                                className="border p-2 rounded bg-white touch-none w-[200px] h-[100px]"
+                                style={{ touchAction: 'none' }}
+                            />
                         </div>
                     </div>
 
@@ -227,69 +213,64 @@ export default function NewPatientPage() {
                         서약서 동의 및 다음
                     </button>
 
-                    <div className="mt-6">
-                        <button
-                            onClick={() => signaturePadRef.current?.clear()}
-                            className="mt-2 text-sm text-gray-600 underline"
-                        >
-                            서명 초기화
-                        </button>
-                    </div>
-                </>
-            )}
-
-            {step === 3 && (
-                <>
-                    <h3 className="text-lg font-semibold mb-2">서약서 미리보기</h3>
-                    {previewData ? (
-                        <Image
-                            src={previewData}
-                            alt="서약서 미리보기"
-                            width={800}
-                            height={1000}
-                            className="w-full h-auto border p-2 rounded"
-                        />
-                    ) : (
-                        <p>서약서 미리보기를 준비 중입니다.</p>
-                    )}
                     <button
-                        onClick={() => setStep(2)}
-                        className="bg-blue-600 hover:bg-blue-700 text-white w-full py-2 rounded mt-4"
+                        onClick={() => signaturePadRef.current?.clear()}
+                        className="mt-2 text-sm text-gray-600 underline"
                     >
-                        확인 후 상담 정보 입력
+                        서명 초기화
                     </button>
                 </>
             )}
 
+            {/* Step 3: Preview */}
+            {step === 3 && (
+                <div className="text-center space-y-6">
+                    <h3 className="text-xl font-semibold">서약서 미리보기</h3>
+                    {previewData ? (
+                        <div className="flex justify-center">
+                            <Image
+                                src={previewData}
+                                alt="서약서 미리보기"
+                                width={0}
+                                height={0}
+                                sizes="100vw"
+                                className="w-full max-w-[600px] h-auto rounded shadow-lg border"
+                            />
+                        </div>
+                    ) : (
+                        <p className="text-gray-500">서약서 미리보기를 준비 중입니다.</p>
+                    )}
+                    <button
+                        onClick={() => setStep(2)}
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded font-semibold"
+                    >
+                        확인 후 상담 정보 입력
+                    </button>
+                </div>
+            )}
+
+            {/* Step 2: Patient Info */}
             {step === 2 && (
                 <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
                     <h3 className="text-xl font-semibold mb-6 text-gray-800 border-b pb-2">상담 대상자 정보</h3>
                     <div className="grid gap-5 mb-6">
-                        {['name', 'birth_date', 'stress', 'religion'].map((field) => (
-                            <div key={field}>
-                                <label htmlFor={field} className="block text-sm font-medium text-gray-700 mb-1">
-                                    {
-                                        {
-                                            name: '이름',
-                                            birth_date: '생년월일',
-                                            stress: '스트레스요인',
-                                            religion: '종교',
-                                        }[field]
-                                    }
+                        {[
+                            { name: 'name', label: '이름', placeholder: '이름을 입력하세요', type: 'text' },
+                            { name: 'birth_date', label: '생년월일', placeholder: '', type: 'date' },
+                            { name: 'stress', label: '스트레스요인', placeholder: '인간관계', type: 'text' },
+                            { name: 'religion', label: '종교', placeholder: '무교', type: 'text' },
+                        ].map(({ name, label, placeholder, type }) => (
+                            <div key={name}>
+                                <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
+                                    {label}
                                 </label>
                                 <input
-                                    id={field}
-                                    name={field}
-                                    type={field === 'birth_date' ? 'date' : 'text'}
-                                    placeholder={
-                                        {
-                                            name: '이름을 입력하세요',
-                                            stress: '인간관계',
-                                            religion: '무교',
-                                        }[field] ?? ''
-                                    }
+                                    id={name}
+                                    name={name}
+                                    type={type}
+                                    placeholder={placeholder}
                                     onChange={handleChange}
-                                    className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                                    className="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
                                 />
                             </div>
                         ))}
@@ -297,7 +278,7 @@ export default function NewPatientPage() {
                     <button
                         onClick={handleSubmit}
                         disabled={loading}
-                        className="bg-blue-600 hover:bg-blue-700 text-white w-full py-2 rounded-md text-sm font-semibold transition disabled:bg-gray-400"
+                        className="bg-blue-600 hover:bg-blue-700 text-white w-full py-2 rounded-md text-sm font-semibold disabled:bg-gray-400"
                     >
                         {loading ? '등록 중...' : '상담 등록'}
                     </button>
