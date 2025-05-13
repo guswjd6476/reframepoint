@@ -60,7 +60,6 @@ export default function NewPatientPage() {
             if (e.cancelable) e.preventDefault();
         };
 
-        // 터치 스크롤 방지 및 터치 이벤트 리스너 추가
         canvas.addEventListener('touchstart', preventDefault, { passive: false });
         canvas.addEventListener('touchmove', preventDefault, { passive: false });
 
@@ -87,13 +86,11 @@ export default function NewPatientPage() {
             const container = agreementRef.current?.querySelector('.signature-container');
             if (container) {
                 container.innerHTML = '';
-
                 const sigImg = document.createElement('img');
                 sigImg.src = sigDataUrl;
                 sigImg.alt = '서명 이미지';
                 sigImg.className = 'border rounded object-contain mt-1 w-[300px] h-auto';
 
-                // ✅ 이미지 로딩 완료 대기
                 await new Promise((resolve) => {
                     sigImg.onload = resolve;
                 });
@@ -236,7 +233,6 @@ export default function NewPatientPage() {
             {step === 3 && (
                 <div className="space-y-8 text-center">
                     <h3 className="text-2xl font-bold text-gray-800">서약서 미리보기</h3>
-
                     <div className="flex justify-center">
                         <div className="bg-white border-2 border-gray-200 rounded-lg shadow-md p-4">
                             {previewData ? (
