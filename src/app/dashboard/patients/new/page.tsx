@@ -60,6 +60,7 @@ export default function NewPatientPage() {
             if (e.cancelable) e.preventDefault();
         };
 
+        // 터치 스크롤 방지 및 터치 이벤트 리스너 추가
         canvas.addEventListener('touchstart', preventDefault, { passive: false });
         canvas.addEventListener('touchmove', preventDefault, { passive: false });
 
