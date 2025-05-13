@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect, ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import domtoimage from 'dom-to-image';
+import { toPng } from 'html-to-image';
 import SignaturePad from 'signature_pad';
 import Image from 'next/image';
 import { uploadSignature, addNewPatient } from '@/app/api/supabaseApi';
@@ -38,8 +38,8 @@ export default function NewPatientPage() {
         if (!canvas) return;
 
         const ratio = window.devicePixelRatio || 1;
-        const width = 500;
-        const height = 200;
+        const width = 300;
+        const height = 150;
 
         canvas.width = width * ratio;
         canvas.height = height * ratio;
@@ -52,6 +52,8 @@ export default function NewPatientPage() {
         signaturePadRef.current = new SignaturePad(canvas, {
             penColor: 'black',
             backgroundColor: 'rgba(255,255,255,0)',
+            minWidth: 1,
+            maxWidth: 2.5,
         });
 
         const preventDefault = (e: TouchEvent) => {
@@ -81,15 +83,20 @@ export default function NewPatientPage() {
         try {
             const sigDataUrl = signaturePadRef.current.toDataURL('image/png');
 
-            canvasRef.current?.remove();
-
             const container = agreementRef.current?.querySelector('.signature-container');
             if (container) {
                 container.innerHTML = '';
+
                 const sigImg = document.createElement('img');
                 sigImg.src = sigDataUrl;
                 sigImg.alt = '서명 이미지';
-                sigImg.className = 'border rounded object-contain mt-1 w-[200px] h-auto';
+                sigImg.className = 'border rounded object-contain mt-1 w-[300px] h-auto';
+
+                // ✅ 이미지 로딩 완료 대기
+                await new Promise((resolve) => {
+                    sigImg.onload = resolve;
+                });
+
                 container.appendChild(sigImg);
             }
 
@@ -98,7 +105,11 @@ export default function NewPatientPage() {
                 return;
             }
 
-            const dataUrl = await domtoimage.toPng(agreementRef.current);
+            const dataUrl = await toPng(agreementRef.current, {
+                cacheBust: true,
+                backgroundColor: 'white',
+            });
+
             setSignatureData(dataUrl);
             setPreviewData(dataUrl);
             setStep(3);
@@ -141,7 +152,6 @@ export default function NewPatientPage() {
 
     return (
         <div className="p-6 max-w-2xl mx-auto">
-            {/* Step 1: Agreement */}
             {step === 1 && (
                 <>
                     <div
@@ -200,7 +210,7 @@ export default function NewPatientPage() {
                             <p>서명자:</p>
                             <canvas
                                 ref={canvasRef}
-                                className="border p-2 rounded bg-white touch-none w-[200px] h-[100px]"
+                                className="border rounded bg-white touch-none w-[300px] h-[150px]"
                                 style={{ touchAction: 'none' }}
                             />
                         </div>
@@ -222,34 +232,37 @@ export default function NewPatientPage() {
                 </>
             )}
 
-            {/* Step 3: Preview */}
             {step === 3 && (
-                <div className="text-center space-y-6">
-                    <h3 className="text-xl font-semibold">서약서 미리보기</h3>
-                    {previewData ? (
-                        <div className="flex justify-center">
-                            <Image
-                                src={previewData}
-                                alt="서약서 미리보기"
-                                width={0}
-                                height={0}
-                                sizes="100vw"
-                                className="w-full max-w-[600px] h-auto rounded shadow-lg border"
-                            />
+                <div className="space-y-8 text-center">
+                    <h3 className="text-2xl font-bold text-gray-800">서약서 미리보기</h3>
+
+                    <div className="flex justify-center">
+                        <div className="bg-white border-2 border-gray-200 rounded-lg shadow-md p-4">
+                            {previewData ? (
+                                <Image
+                                    src={previewData}
+                                    alt="서약서 미리보기"
+                                    width={500}
+                                    height={500}
+                                    className="w-full max-w-[600px] h-auto rounded-md border shadow"
+                                />
+                            ) : (
+                                <div className="w-[300px] h-[400px] bg-gray-100 flex items-center justify-center text-gray-400">
+                                    미리보기 준비 중...
+                                </div>
+                            )}
                         </div>
-                    ) : (
-                        <p className="text-gray-500">서약서 미리보기를 준비 중입니다.</p>
-                    )}
+                    </div>
+
                     <button
                         onClick={() => setStep(2)}
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded font-semibold"
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md text-sm font-semibold"
                     >
                         확인 후 상담 정보 입력
                     </button>
                 </div>
             )}
 
-            {/* Step 2: Patient Info */}
             {step === 2 && (
                 <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
                     <h3 className="text-xl font-semibold mb-6 text-gray-800 border-b pb-2">상담 대상자 정보</h3>
