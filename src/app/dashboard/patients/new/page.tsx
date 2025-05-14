@@ -4,7 +4,6 @@ import React, { useState, useRef, useEffect, ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { toPng } from 'html-to-image';
 import SignaturePad from 'signature_pad';
-import Image from 'next/image';
 import { uploadSignature, addNewPatient } from '@/app/api/supabaseApi';
 
 export default function NewPatientPage() {
@@ -15,6 +14,7 @@ export default function NewPatientPage() {
     const [previewData, setPreviewData] = useState<string | null>(null);
     const [signatureData, setSignatureData] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
+    const [previewLoaded, setPreviewLoaded] = useState(false);
 
     const [form, setForm] = useState({
         name: '',
@@ -84,7 +84,6 @@ export default function NewPatientPage() {
             const sigDataUrl = signaturePadRef.current.toDataURL('image/png');
             setSignatureData(sigDataUrl);
 
-            // 이미지 렌더링을 기다려 미리보기 캡처
             setTimeout(async () => {
                 if (!agreementRef.current) {
                     alert('서약서 영역이 렌더링되지 않았습니다.');
@@ -97,8 +96,9 @@ export default function NewPatientPage() {
                 });
 
                 setPreviewData(dataUrl);
+                setPreviewLoaded(false); // 새로 로드됨
                 setStep(3);
-            }, 300); // 렌더링 대기
+            }, 300);
         } catch (err) {
             console.error('서약서 이미지 생성 오류:', err);
             alert('서약서 이미지를 저장하는 데 실패했습니다.');
@@ -232,13 +232,21 @@ export default function NewPatientPage() {
                     <div className="flex justify-center">
                         <div className="bg-white border-2 border-gray-200 rounded-lg shadow-md p-4">
                             {previewData ? (
-                                <Image
-                                    src={previewData}
-                                    alt="서약서 미리보기"
-                                    width={500}
-                                    height={500}
-                                    className="w-full max-w-[600px] h-auto rounded-md border shadow"
-                                />
+                                <>
+                                    <img
+                                        src={previewData}
+                                        alt="서약서 미리보기"
+                                        onLoad={() => setPreviewLoaded(true)}
+                                        className={`w-full max-w-[600px] h-auto rounded-md border shadow ${
+                                            previewLoaded ? '' : 'hidden'
+                                        }`}
+                                    />
+                                    {!previewLoaded && (
+                                        <div className="w-[300px] h-[400px] bg-gray-100 flex items-center justify-center text-gray-400">
+                                            미리보기 준비 중...
+                                        </div>
+                                    )}
+                                </>
                             ) : (
                                 <div className="w-[300px] h-[400px] bg-gray-100 flex items-center justify-center text-gray-400">
                                     미리보기 준비 중...
