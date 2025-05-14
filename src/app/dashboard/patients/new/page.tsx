@@ -51,7 +51,7 @@ export default function NewPatientPage() {
 
         signaturePadRef.current = new SignaturePad(canvas, {
             penColor: 'black',
-            backgroundColor: 'rgba(255,255,255,1)', // 흰색 배경으로 설정
+            backgroundColor: 'white',
             minWidth: 1,
             maxWidth: 2.5,
         });
@@ -70,53 +70,52 @@ export default function NewPatientPage() {
     }, []);
 
     useEffect(() => {
-        if (signatureData && step === 1) {
-            requestAnimationFrame(() => {
-                requestAnimationFrame(async () => {
-                    if (!agreementRef.current) {
-                        alert('서약서 영역이 렌더링되지 않았습니다.');
-                        return;
-                    }
+        if (!signatureData || step !== 1) return;
 
-                    try {
-                        const dataUrl = await toPng(agreementRef.current, {
-                            cacheBust: true,
-                            backgroundColor: 'white',
-                            pixelRatio: 2,
-                            width: agreementRef.current.offsetWidth,
-                            height: agreementRef.current.offsetHeight,
-                        });
-                        console.log(dataUrl, '?????');
-                        setPreviewData(dataUrl);
-                        setPreviewLoaded(false);
-                        setStep(3);
-                    } catch (err) {
-                        console.error('서약서 이미지 생성 오류:', err);
-                        alert('서약서 이미지를 저장하는 데 실패했습니다.');
-                    }
+        const generatePreview = async () => {
+            if (!agreementRef.current) {
+                alert('서약서 영역이 렌더링되지 않았습니다.');
+                return;
+            }
+
+            try {
+                const dataUrl = await toPng(agreementRef.current, {
+                    cacheBust: true,
+                    backgroundColor: 'white',
+                    pixelRatio: 2,
+                    width: agreementRef.current.offsetWidth,
+                    height: agreementRef.current.offsetHeight,
                 });
-            });
+                setPreviewData(dataUrl);
+                setPreviewLoaded(false);
+            } catch (err) {
+                console.error('서약서 이미지 생성 오류:', err);
+                alert('서약서 이미지를 저장하는 데 실패했습니다.');
+            }
+        };
+
+        setTimeout(generatePreview, 100);
+    }, [signatureData, step]);
+
+    useEffect(() => {
+        if (previewData && step === 1) {
+            setStep(3);
         }
-    }, [signatureData]);
+    }, [previewData]);
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setForm((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleAgreementSubmit = async () => {
+    const handleAgreementSubmit = () => {
         if (!agreed || !signaturePadRef.current || signaturePadRef.current.isEmpty()) {
             alert('보안 각서에 동의하고 서명해주세요.');
             return;
         }
 
-        try {
-            const sigDataUrl = signaturePadRef.current.toDataURL('image/png');
-            setSignatureData(sigDataUrl); // signatureData 설정 후 useEffect에서 toPng 호출
-        } catch (err) {
-            console.error('서명 데이터 생성 오류:', err);
-            alert('서명 데이터를 생성하는 데 실패했습니다.');
-        }
+        const sigDataUrl = signaturePadRef.current.toDataURL('image/png');
+        setSignatureData(sigDataUrl);
     };
 
     const handleSubmit = async () => {
@@ -156,27 +155,29 @@ export default function NewPatientPage() {
                 <>
                     <div
                         ref={agreementRef}
-                        className="border rounded-md p-10 bg-white text-sm text-gray-800 space-y-6 shadow-lg font-serif"
+                        className="border rounded-lg p-10 bg-white text-sm text-gray-800 space-y-6 shadow-lg font-serif"
                         style={{ width: '600px', minHeight: '400px' }}
                     >
-                        <h2 className="text-2xl font-bold text-center underline mb-8">비밀 유지 서약서</h2>
+                        <h2 className="text-2xl font-bold text-center underline mb-6 tracking-wide">
+                            비밀 유지 서약서
+                        </h2>
                         <p>본인은 아래의 조항을 충분히 이해하고 이에 동의하며 서명합니다.</p>
-                        <ol className="space-y-3 list-decimal list-inside">
+                        <ol className="space-y-3 list-decimal list-inside leading-relaxed">
                             <li>
-                                <strong>계약 목적</strong> 상담사는 내담자의 동의 없이는 상담 내용을 외부에 공개하지
+                                <strong>계약 목적</strong>: 상담사는 내담자의 동의 없이는 상담 내용을 외부에 공개하지
                                 않습니다.
                             </li>
                             <li>
-                                <strong>영업 비밀 정보</strong> 교육, 연구, 평가 중 알게 된 비밀 정보는 외부에 유출하지
+                                <strong>영업 비밀 정보</strong>: 교육, 연구, 평가 중 알게 된 비밀 정보는 외부에 유출하지
                                 않습니다.
                             </li>
                             <li>
-                                <strong>보유 정보 사용 제한</strong> 내담자 연구 시에는 참여 거부나 중단 시 해로운
+                                <strong>보유 정보 사용 제한</strong>: 내담자 연구 시에는 참여 거부나 중단 시 해로운
                                 결과가 없도록 보호합니다.
                             </li>
                             <li>
-                                <strong>비밀 유지 기간</strong> 본 프로그램의 내용을 외부에 누설하지 않으며, 저작권 침해
-                                시 법적 책임을 집니다.
+                                <strong>비밀 유지 기간</strong>: 본 프로그램의 내용을 외부에 누설하지 않으며, 저작권
+                                침해 시 법적 책임을 집니다.
                             </li>
                         </ol>
 
@@ -201,11 +202,9 @@ export default function NewPatientPage() {
                             <span>상기 내용을 충분히 읽고 이해하였으며 이에 동의합니다.</span>
                         </label>
 
-                        <div className="flex justify-between items-center pt-4 text-sm">
-                            <p>
-                                작성일: <strong>{today}</strong>
-                            </p>
-                        </div>
+                        <p className="pt-4 text-sm">
+                            작성일: <strong>{today}</strong>
+                        </p>
 
                         <div className="pt-6">
                             <p className="text-sm mb-1">서명:</p>
@@ -219,18 +218,16 @@ export default function NewPatientPage() {
                                 />
                             )}
                         </div>
-                    </div>
 
-                    {!signatureData && (
-                        <div className="mt-4">
+                        {!signatureData && (
                             <button
                                 onClick={() => signaturePadRef.current?.clear()}
                                 className="mt-2 text-sm text-gray-600 underline"
                             >
                                 서명 초기화
                             </button>
-                        </div>
-                    )}
+                        )}
+                    </div>
 
                     <button
                         onClick={handleAgreementSubmit}
