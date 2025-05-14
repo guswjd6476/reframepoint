@@ -51,7 +51,7 @@ export default function NewPatientPage() {
 
         signaturePadRef.current = new SignaturePad(canvas, {
             penColor: 'black',
-            backgroundColor: 'rgba(255,255,255,0)',
+            backgroundColor: 'rgba(255,255,255,1)', // 흰색 배경으로 설정
             minWidth: 1,
             maxWidth: 2.5,
         });
@@ -69,6 +69,38 @@ export default function NewPatientPage() {
         };
     }, []);
 
+    // signatureData가 변경될 때 DOM 업데이트 후 toPng 호출
+    useEffect(() => {
+        if (signatureData && step === 1) {
+            // DOM 업데이트를 보장하기 위해 requestAnimationFrame 사용
+            requestAnimationFrame(() => {
+                requestAnimationFrame(async () => {
+                    if (!agreementRef.current) {
+                        alert('서약서 영역이 렌더링되지 않았습니다.');
+                        return;
+                    }
+
+                    try {
+                        const dataUrl = await toPng(agreementRef.current, {
+                            cacheBust: true,
+                            backgroundColor: 'white',
+                            pixelRatio: 2,
+                            width: agreementRef.current.offsetWidth,
+                            height: agreementRef.current.offsetHeight,
+                        });
+
+                        setPreviewData(dataUrl);
+                        setPreviewLoaded(false);
+                        setStep(3);
+                    } catch (err) {
+                        console.error('서약서 이미지 생성 오류:', err);
+                        alert('서약서 이미지를 저장하는 데 실패했습니다.');
+                    }
+                });
+            });
+        }
+    }, [signatureData]);
+
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setForm((prev) => ({ ...prev, [name]: value }));
@@ -82,26 +114,10 @@ export default function NewPatientPage() {
 
         try {
             const sigDataUrl = signaturePadRef.current.toDataURL('image/png');
-            setSignatureData(sigDataUrl);
-
-            setTimeout(async () => {
-                if (!agreementRef.current) {
-                    alert('서약서 영역이 렌더링되지 않았습니다.');
-                    return;
-                }
-
-                const dataUrl = await toPng(agreementRef.current, {
-                    cacheBust: true,
-                    backgroundColor: 'white',
-                });
-
-                setPreviewData(dataUrl);
-                setPreviewLoaded(false); // 새로 로드됨
-                setStep(3);
-            }, 300);
+            setSignatureData(sigDataUrl); // signatureData 설정 후 useEffect에서 toPng 호출
         } catch (err) {
-            console.error('서약서 이미지 생성 오류:', err);
-            alert('서약서 이미지를 저장하는 데 실패했습니다.');
+            console.error('서명 데이터 생성 오류:', err);
+            alert('서명 데이터를 생성하는 데 실패했습니다.');
         }
     };
 
@@ -143,6 +159,7 @@ export default function NewPatientPage() {
                     <div
                         ref={agreementRef}
                         className="border rounded-md p-10 bg-white text-sm text-gray-800 space-y-6 shadow-lg font-serif"
+                        style={{ width: '600px', minHeight: '400px' }}
                     >
                         <h2 className="text-2xl font-bold text-center underline mb-8">비밀 유지 서약서</h2>
                         <p>본인은 아래의 조항을 충분히 이해하고 이에 동의하며 서명합니다.</p>
@@ -192,22 +209,22 @@ export default function NewPatientPage() {
                             </p>
                         </div>
 
-                        {signatureData && (
-                            <div className="pt-6">
-                                <p className="text-sm mb-1">서명:</p>
+                        <div className="pt-6">
+                            <p className="text-sm mb-1">서명:</p>
+                            {signatureData ? (
                                 <img src={signatureData} alt="서명 이미지" className="w-[300px] h-[150px] border" />
-                            </div>
-                        )}
+                            ) : (
+                                <canvas
+                                    ref={canvasRef}
+                                    className="border rounded bg-white touch-none w-[300px] h-[150px]"
+                                    style={{ touchAction: 'none' }}
+                                />
+                            )}
+                        </div>
                     </div>
 
                     {!signatureData && (
                         <div className="mt-4">
-                            <p className="mb-1">서명자:</p>
-                            <canvas
-                                ref={canvasRef}
-                                className="border rounded bg-white touch-none w-[300px] h-[150px]"
-                                style={{ touchAction: 'none' }}
-                            />
                             <button
                                 onClick={() => signaturePadRef.current?.clear()}
                                 className="mt-2 text-sm text-gray-600 underline"
@@ -232,23 +249,23 @@ export default function NewPatientPage() {
                     <div className="flex justify-center">
                         <div className="bg-white border-2 border-gray-200 rounded-lg shadow-md p-4">
                             {previewData ? (
-                                <>
+                                <div className="relative w-[600px] h-auto">
                                     <img
                                         src={previewData}
                                         alt="서약서 미리보기"
                                         onLoad={() => setPreviewLoaded(true)}
-                                        className={`w-full max-w-[600px] h-auto rounded-md border shadow ${
-                                            previewLoaded ? '' : 'hidden'
+                                        className={`w-full h-auto rounded-md border shadow transition-opacity duration-300 ${
+                                            previewLoaded ? 'opacity-100' : 'opacity-0'
                                         }`}
                                     />
                                     {!previewLoaded && (
-                                        <div className="w-[300px] h-[400px] bg-gray-100 flex items-center justify-center text-gray-400">
+                                        <div className="absolute inset-0 w-[600px] h-[400px] bg-gray-100 flex items-center justify-center text-gray-400">
                                             미리보기 준비 중...
                                         </div>
                                     )}
-                                </>
+                                </div>
                             ) : (
-                                <div className="w-[300px] h-[400px] bg-gray-100 flex items-center justify-center text-gray-400">
+                                <div className="w-[600px] h-[400px] bg-gray-100 flex items-center justify-center text-gray-400">
                                     미리보기 준비 중...
                                 </div>
                             )}
