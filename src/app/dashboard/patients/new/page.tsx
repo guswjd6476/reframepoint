@@ -76,7 +76,7 @@ export default function NewPatientPage() {
 
     const handleAgreementSubmit = async () => {
         if (!agreed || !signaturePadRef.current || signaturePadRef.current.isEmpty()) {
-            alert('보안 각서에 동의하고 서명란에 서명해주세요.');
+            alert('보안 각서에 동의하고 서명해주세요.');
             return;
         }
 
@@ -84,29 +84,21 @@ export default function NewPatientPage() {
             const sigDataUrl = signaturePadRef.current.toDataURL('image/png');
             setSignatureData(sigDataUrl);
 
-            if (!agreementRef.current) {
-                alert('서약서 영역이 올바르게 렌더링되지 않았습니다.');
-                return;
-            }
+            // 이미지 렌더링을 기다려 미리보기 캡처
+            setTimeout(async () => {
+                if (!agreementRef.current) {
+                    alert('서약서 영역이 렌더링되지 않았습니다.');
+                    return;
+                }
 
-            // 서명 이미지를 서약서 내부에 임시 삽입
-            const sigImg = document.createElement('img');
-            sigImg.src = sigDataUrl;
-            sigImg.alt = '서명 이미지';
-            sigImg.style.width = '300px';
-            sigImg.style.height = '150px';
-            sigImg.style.marginTop = '24px';
-            agreementRef.current.appendChild(sigImg);
+                const dataUrl = await toPng(agreementRef.current, {
+                    cacheBust: true,
+                    backgroundColor: 'white',
+                });
 
-            const dataUrl = await toPng(agreementRef.current, {
-                cacheBust: true,
-                backgroundColor: 'white',
-            });
-
-            agreementRef.current.removeChild(sigImg);
-
-            setPreviewData(dataUrl);
-            setStep(3);
+                setPreviewData(dataUrl);
+                setStep(3);
+            }, 300); // 렌더링 대기
         } catch (err) {
             console.error('서약서 이미지 생성 오류:', err);
             alert('서약서 이미지를 저장하는 데 실패했습니다.');
@@ -199,22 +191,31 @@ export default function NewPatientPage() {
                                 작성일: <strong>{today}</strong>
                             </p>
                         </div>
+
+                        {signatureData && (
+                            <div className="pt-6">
+                                <p className="text-sm mb-1">서명:</p>
+                                <img src={signatureData} alt="서명 이미지" className="w-[300px] h-[150px] border" />
+                            </div>
+                        )}
                     </div>
 
-                    <div className="mt-4">
-                        <p className="mb-1">서명자:</p>
-                        <canvas
-                            ref={canvasRef}
-                            className="border rounded bg-white touch-none w-[300px] h-[150px]"
-                            style={{ touchAction: 'none' }}
-                        />
-                        <button
-                            onClick={() => signaturePadRef.current?.clear()}
-                            className="mt-2 text-sm text-gray-600 underline"
-                        >
-                            서명 초기화
-                        </button>
-                    </div>
+                    {!signatureData && (
+                        <div className="mt-4">
+                            <p className="mb-1">서명자:</p>
+                            <canvas
+                                ref={canvasRef}
+                                className="border rounded bg-white touch-none w-[300px] h-[150px]"
+                                style={{ touchAction: 'none' }}
+                            />
+                            <button
+                                onClick={() => signaturePadRef.current?.clear()}
+                                className="mt-2 text-sm text-gray-600 underline"
+                            >
+                                서명 초기화
+                            </button>
+                        </div>
+                    )}
 
                     <button
                         onClick={handleAgreementSubmit}
