@@ -89,10 +89,21 @@ export default function NewPatientPage() {
                 return;
             }
 
+            // 서명 이미지를 서약서 내부에 임시 삽입
+            const sigImg = document.createElement('img');
+            sigImg.src = sigDataUrl;
+            sigImg.alt = '서명 이미지';
+            sigImg.style.width = '300px';
+            sigImg.style.height = '150px';
+            sigImg.style.marginTop = '24px';
+            agreementRef.current.appendChild(sigImg);
+
             const dataUrl = await toPng(agreementRef.current, {
                 cacheBust: true,
                 backgroundColor: 'white',
             });
+
+            agreementRef.current.removeChild(sigImg);
 
             setPreviewData(dataUrl);
             setStep(3);
@@ -188,15 +199,21 @@ export default function NewPatientPage() {
                                 작성일: <strong>{today}</strong>
                             </p>
                         </div>
+                    </div>
 
-                        <div className="signature-container mt-4">
-                            <p>서명자:</p>
-                            <canvas
-                                ref={canvasRef}
-                                className="border rounded bg-white touch-none w-[300px] h-[150px]"
-                                style={{ touchAction: 'none' }}
-                            />
-                        </div>
+                    <div className="mt-4">
+                        <p className="mb-1">서명자:</p>
+                        <canvas
+                            ref={canvasRef}
+                            className="border rounded bg-white touch-none w-[300px] h-[150px]"
+                            style={{ touchAction: 'none' }}
+                        />
+                        <button
+                            onClick={() => signaturePadRef.current?.clear()}
+                            className="mt-2 text-sm text-gray-600 underline"
+                        >
+                            서명 초기화
+                        </button>
                     </div>
 
                     <button
@@ -204,13 +221,6 @@ export default function NewPatientPage() {
                         className="bg-blue-600 hover:bg-blue-700 text-white w-full py-2 rounded mt-6"
                     >
                         서약서 동의 및 다음
-                    </button>
-
-                    <button
-                        onClick={() => signaturePadRef.current?.clear()}
-                        className="mt-2 text-sm text-gray-600 underline"
-                    >
-                        서명 초기화
                     </button>
                 </>
             )}
