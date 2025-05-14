@@ -14,7 +14,7 @@ import {
     Tooltip,
     Legend,
 } from 'chart.js';
-import { typeData } from '@/app/lib/con';
+import { typeData } from '@/app/lib/context';
 
 ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Title, Tooltip, Legend);
 
