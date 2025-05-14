@@ -82,21 +82,7 @@ export default function NewPatientPage() {
 
         try {
             const sigDataUrl = signaturePadRef.current.toDataURL('image/png');
-
-            const container = agreementRef.current?.querySelector('.signature-container');
-            if (container) {
-                container.innerHTML = '';
-                const sigImg = document.createElement('img');
-                sigImg.src = sigDataUrl;
-                sigImg.alt = '서명 이미지';
-                sigImg.className = 'border rounded object-contain mt-1 w-[300px] h-auto';
-
-                await new Promise((resolve) => {
-                    sigImg.onload = resolve;
-                });
-
-                container.appendChild(sigImg);
-            }
+            setSignatureData(sigDataUrl);
 
             if (!agreementRef.current) {
                 alert('서약서 영역이 올바르게 렌더링되지 않았습니다.');
@@ -108,7 +94,6 @@ export default function NewPatientPage() {
                 backgroundColor: 'white',
             });
 
-            setSignatureData(dataUrl);
             setPreviewData(dataUrl);
             setStep(3);
         } catch (err) {
@@ -160,20 +145,20 @@ export default function NewPatientPage() {
                         <p>본인은 아래의 조항을 충분히 이해하고 이에 동의하며 서명합니다.</p>
                         <ol className="space-y-3 list-decimal list-inside">
                             <li>
-                                <strong>[계약 목적]</strong> 상담사는 내담자의 동의 없이는 상담 내용을 외부에 공개하지
+                                <strong>계약 목적</strong> 상담사는 내담자의 동의 없이는 상담 내용을 외부에 공개하지
                                 않습니다.
                             </li>
                             <li>
-                                <strong>[영업 비밀 정보]</strong> 교육, 연구, 평가 중 알게 된 비밀 정보는 외부에
-                                유출하지 않습니다.
+                                <strong>영업 비밀 정보</strong> 교육, 연구, 평가 중 알게 된 비밀 정보는 외부에 유출하지
+                                않습니다.
                             </li>
                             <li>
-                                <strong>[보유 정보 사용 제한]</strong> 내담자 연구 시에는 참여 거부나 중단 시 해로운
+                                <strong>보유 정보 사용 제한</strong> 내담자 연구 시에는 참여 거부나 중단 시 해로운
                                 결과가 없도록 보호합니다.
                             </li>
                             <li>
-                                <strong>[비밀 유지 기간]</strong> 본 프로그램의 내용을 외부에 누설하지 않으며, 저작권
-                                침해 시 법적 책임을 집니다.
+                                <strong>비밀 유지 기간</strong> 본 프로그램의 내용을 외부에 누설하지 않으며, 저작권 침해
+                                시 법적 책임을 집니다.
                             </li>
                         </ol>
 
