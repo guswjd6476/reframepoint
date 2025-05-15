@@ -60,6 +60,30 @@ export default function PatientPage() {
             <h2 className="text-3xl font-bold text-center text-indigo-700">검사 목록</h2>
 
             <ul className="space-y-4">
+                <li className="flex items-center justify-between bg-gray-50 border p-4 rounded-xl shadow-sm">
+                    <div className="flex flex-col">
+                        <span className="text-blue-600 font-medium">6도형 검사</span>
+                        <span className="text-sm mt-1 text-gray-500">진행 전</span>
+                    </div>
+                    <button
+                        onClick={() => patientId && router.push(`/dashboard/patients/${patientId}/sixtypes`)}
+                        className="py-1 px-4 rounded-md font-semibold bg-indigo-500 hover:bg-indigo-600 text-white transition"
+                    >
+                        이동
+                    </button>
+                </li>
+                <li className="flex items-center justify-between bg-gray-50 border p-4 rounded-xl shadow-sm">
+                    <div className="flex flex-col">
+                        <span className="text-blue-600 font-medium">인생그래프</span>
+                        <span className="text-sm mt-1 text-gray-500">진행 전</span>
+                    </div>
+                    <button
+                        onClick={() => patientId && router.push(`/dashboard/patients/${patientId}/lifegraph`)}
+                        className="py-1 px-4 rounded-md font-semibold bg-indigo-500 hover:bg-indigo-600 text-white transition"
+                    >
+                        이동
+                    </button>
+                </li>
                 {/* 성격유형 검사 */}
                 <li className="flex items-center justify-between bg-gray-50 border p-4 rounded-xl shadow-sm">
                     <div className="flex flex-col">
@@ -86,7 +110,18 @@ export default function PatientPage() {
                         {isPersonalityDone ? '결과 보기' : '이동'}
                     </button>
                 </li>
-
+                <li className="flex items-center justify-between bg-gray-50 border p-4 rounded-xl shadow-sm">
+                    <div className="flex flex-col">
+                        <span className="text-blue-600 font-medium">4도형 검사</span>
+                        <span className="text-sm mt-1 text-gray-500">진행 전</span>
+                    </div>
+                    <button
+                        onClick={() => patientId && router.push(`/dashboard/patients/${patientId}/fourtypes`)}
+                        className="py-1 px-4 rounded-md font-semibold bg-indigo-500 hover:bg-indigo-600 text-white transition"
+                    >
+                        이동
+                    </button>
+                </li>
                 {/* 핵심감정 검사 */}
                 <li className="flex items-center justify-between bg-gray-50 border p-4 rounded-xl shadow-sm">
                     <div className="flex flex-col">

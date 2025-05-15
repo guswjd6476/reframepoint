@@ -8,8 +8,8 @@ type Patient = {
     id: string;
     name: string;
     birth_date: string;
-    email: string;
-    phone: string;
+    stress: string;
+    religion: string;
 };
 
 export default function Dashboard() {
@@ -67,8 +67,8 @@ export default function Dashboard() {
                             <tr className="text-left text-gray-600">
                                 <th className="py-3 px-4">이름</th>
                                 <th className="py-3 px-4 hidden md:table-cell">생년월일</th>
-                                <th className="py-3 px-4 hidden md:table-cell">이메일</th>
-                                <th className="py-3 px-4 hidden md:table-cell">전화번호</th>
+                                <th className="py-3 px-4 hidden md:table-cell">스트레스요인</th>
+                                <th className="py-3 px-4 hidden md:table-cell">종교</th>
                                 <th className="py-3 px-4">관리</th>
                             </tr>
                         </thead>
@@ -85,8 +85,8 @@ export default function Dashboard() {
                                         {patient.name}
                                     </td>
                                     <td className="py-3 px-4 hidden md:table-cell">{patient.birth_date}</td>
-                                    <td className="py-3 px-4 hidden md:table-cell">{patient.email}</td>
-                                    <td className="py-3 px-4 hidden md:table-cell">{patient.phone}</td>
+                                    <td className="py-3 px-4 hidden md:table-cell">{patient.stress}</td>
+                                    <td className="py-3 px-4 hidden md:table-cell">{patient.religion}</td>
                                     <td className="py-3 px-4 flex gap-2">
                                         <button
                                             onClick={() => router.push(`/dashboard/patients/${patient.id}`)}

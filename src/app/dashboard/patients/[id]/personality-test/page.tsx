@@ -54,7 +54,7 @@ export default function PersonalityTest() {
     };
 
     return (
-        <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
+        <div className="max-w-5xl mx-auto p-6 bg-white shadow-md rounded-lg">
             <h2 className="text-3xl font-bold text-center mb-6">성격 유형 검사</h2>
             <div className="overflow-x-auto">
                 <table className="w-full border-collapse border border-gray-300 text-center">
@@ -64,17 +64,24 @@ export default function PersonalityTest() {
                             <th className="border border-gray-300 px-4 py-2">문항</th>
                             <th className="border border-gray-300 px-4 py-2 w-24">매우 그렇다</th>
                             <th className="border border-gray-300 px-4 py-2 w-24">그렇다</th>
+                            <th className="border border-gray-300 px-4 py-2 w-24">보통이다</th>
                             <th className="border border-gray-300 px-4 py-2 w-24">아니다</th>
                             <th className="border border-gray-300 px-4 py-2 w-24">전혀 아니다</th>
                         </tr>
                     </thead>
                     <tbody>
                         {questions.map((question, index) => (
-                            <tr key={question.id} className="border border-gray-300">
+                            <tr
+                                key={question.id}
+                                className="border border-gray-300"
+                            >
                                 <td className="border border-gray-300 px-4 py-2">{index + 1}</td>
                                 <td className="border border-gray-300 px-4 py-2 text-left">{question.text}</td>
-                                {[4, 3, 2, 1].map((value) => (
-                                    <td key={value} className="border border-gray-300 px-4 py-2">
+                                {[5, 4, 3, 2, 1].map((value) => (
+                                    <td
+                                        key={value}
+                                        className="border border-gray-300 px-4 py-2"
+                                    >
                                         <input
                                             type="radio"
                                             name={`question-${question.id}`}

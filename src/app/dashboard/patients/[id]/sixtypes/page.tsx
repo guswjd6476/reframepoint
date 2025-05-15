@@ -1,7 +1,9 @@
 'use client';
 
-import { supabase } from '@/app/lib/supabase';
 import React, { useRef, useState, useEffect, useCallback } from 'react';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
 
 const LifeGraphCanvas = () => {
     const bgCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -19,7 +21,7 @@ const LifeGraphCanvas = () => {
 
     useEffect(() => {
         const image = new Image();
-        image.src = '/lifegraphs.jpg';
+        image.src = '/sixtypes.png';
         image.onload = () => {
             setImg(image);
             setAspectRatio(image.width / image.height);
