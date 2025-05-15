@@ -1,11 +1,9 @@
 'use client';
 
+import { supabase } from '@/app/lib/supabase';
 import React, { useRef, useState, useEffect, useCallback } from 'react';
-import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
-
-const LifeGraphCanvas = () => {
+const Sixtypes = () => {
     const bgCanvasRef = useRef<HTMLCanvasElement>(null);
     const drawCanvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -130,8 +128,8 @@ const LifeGraphCanvas = () => {
 
         tempCanvas.toBlob(async (blob) => {
             if (!blob) return;
-            const filename = `lifegraph-${Date.now()}.png`;
-            const { error } = await supabase.storage.from('lifegraph').upload(filename, blob, {
+            const filename = `sixtypes-${Date.now()}.png`;
+            const { error } = await supabase.storage.from('sixtypes').upload(filename, blob, {
                 contentType: 'image/png',
             });
 
@@ -240,4 +238,4 @@ const LifeGraphCanvas = () => {
     );
 };
 
-export default LifeGraphCanvas;
+export default Sixtypes;
