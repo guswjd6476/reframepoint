@@ -1,9 +1,11 @@
 'use client';
 
-import { supabase } from '@/app/lib/supabase';
 import React, { useRef, useState, useEffect, useCallback } from 'react';
+import { createClient } from '@supabase/supabase-js';
 
-const LifeGraphCanvas = () => {
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+
+const Fourshape = () => {
     const bgCanvasRef = useRef<HTMLCanvasElement>(null);
     const drawCanvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -11,7 +13,7 @@ const LifeGraphCanvas = () => {
     const [drawing, setDrawing] = useState(false);
     const [lastPos, setLastPos] = useState<{ x: number; y: number } | null>(null);
     const [img, setImg] = useState<HTMLImageElement | null>(null);
-    const [aspectRatio, setAspectRatio] = useState(2);
+
     const [isErasing, setIsErasing] = useState(false);
     const [lineColor, setLineColor] = useState('#000000');
     const [eraserSize, setEraserSize] = useState(20);
@@ -19,11 +21,8 @@ const LifeGraphCanvas = () => {
 
     useEffect(() => {
         const image = new Image();
-        image.src = '/lifegraphs.jpg';
-        image.onload = () => {
-            setImg(image);
-            setAspectRatio(image.width / image.height);
-        };
+        image.src = '/fourshape.png';
+        image.onload = () => setImg(image);
     }, []);
 
     const resizeCanvas = useCallback(() => {
@@ -34,21 +33,30 @@ const LifeGraphCanvas = () => {
         if (!container || !bgCanvas || !drawCanvas || !img) return;
 
         const width = container.clientWidth;
-        const height = width / aspectRatio;
+        const height = width;
 
-        [bgCanvas, drawCanvas].forEach((canvas) => {
-            canvas.width = width;
-            canvas.height = height;
-            canvas.style.width = '100%';
-            canvas.style.height = 'auto';
-        });
+        drawCanvas.width = width;
+        drawCanvas.height = height;
+        drawCanvas.style.width = '100%';
+        drawCanvas.style.height = '100%';
+
+        bgCanvas.width = width;
+        bgCanvas.height = height;
+        bgCanvas.style.width = '100%';
+        bgCanvas.style.height = '100%';
+
+        const bgScale = 0.8;
+        const bgWidth = width * bgScale;
+        const bgHeight = height * bgScale;
+        const offsetX = (width - bgWidth) / 2;
+        const offsetY = (height - bgHeight) / 2;
 
         const bgCtx = bgCanvas.getContext('2d');
         if (bgCtx) {
             bgCtx.clearRect(0, 0, width, height);
-            bgCtx.drawImage(img, 0, 0, width, height);
+            bgCtx.drawImage(img, offsetX, offsetY, bgWidth, bgHeight);
         }
-    }, [img, aspectRatio]);
+    }, [img]);
 
     useEffect(() => {
         if (img) {
@@ -68,6 +76,17 @@ const LifeGraphCanvas = () => {
         };
     };
 
+    const getTouchPos = (e: React.TouchEvent) => {
+        const canvas = drawCanvasRef.current;
+        if (!canvas) return { x: 0, y: 0 };
+        const rect = canvas.getBoundingClientRect();
+        const touch = e.touches[0];
+        return {
+            x: touch.clientX - rect.left,
+            y: touch.clientY - rect.top,
+        };
+    };
+
     const startDrawing = (e: React.MouseEvent) => {
         setDrawing(true);
         setLastPos(getMousePos(e));
@@ -81,14 +100,10 @@ const LifeGraphCanvas = () => {
     const draw = (e: React.MouseEvent) => {
         const pos = getMousePos(e);
         setCursorPos(pos);
-
         if (!drawing || !lastPos) return;
 
-        const canvas = drawCanvasRef.current;
-        const ctx = canvas?.getContext('2d');
+        const ctx = drawCanvasRef.current?.getContext('2d');
         if (!ctx) return;
-
-        const { x, y } = pos;
 
         ctx.lineJoin = 'round';
         ctx.lineCap = 'round';
@@ -98,10 +113,46 @@ const LifeGraphCanvas = () => {
 
         ctx.beginPath();
         ctx.moveTo(lastPos.x, lastPos.y);
-        ctx.lineTo(x, y);
+        ctx.lineTo(pos.x, pos.y);
         ctx.stroke();
 
-        setLastPos({ x, y });
+        setLastPos(pos);
+    };
+
+    // Touch events
+    const startTouchDrawing = (e: React.TouchEvent) => {
+        e.preventDefault();
+        setDrawing(true);
+        setLastPos(getTouchPos(e));
+    };
+
+    const endTouchDrawing = (e: React.TouchEvent) => {
+        e.preventDefault();
+        setDrawing(false);
+        setLastPos(null);
+    };
+
+    const drawTouch = (e: React.TouchEvent) => {
+        e.preventDefault();
+        const pos = getTouchPos(e);
+        setCursorPos(pos);
+        if (!drawing || !lastPos) return;
+
+        const ctx = drawCanvasRef.current?.getContext('2d');
+        if (!ctx) return;
+
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        ctx.lineWidth = isErasing ? eraserSize : 2;
+        ctx.strokeStyle = isErasing ? 'rgba(0,0,0,1)' : lineColor;
+        ctx.globalCompositeOperation = isErasing ? 'destination-out' : 'source-over';
+
+        ctx.beginPath();
+        ctx.moveTo(lastPos.x, lastPos.y);
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+
+        setLastPos(pos);
     };
 
     const handleClear = () => {
@@ -142,14 +193,7 @@ const LifeGraphCanvas = () => {
     };
 
     return (
-        <div
-            style={{
-                maxWidth: '1024px',
-                margin: '0 auto',
-                padding: '12px',
-                boxSizing: 'border-box',
-            }}
-        >
+        <div style={{ maxWidth: '768px', margin: '0 auto', padding: '16px', boxSizing: 'border-box' }}>
             <div
                 style={{
                     display: 'flex',
@@ -163,13 +207,7 @@ const LifeGraphCanvas = () => {
                 <button onClick={() => setIsErasing(true)}>🧽 지우개</button>
                 <button onClick={handleClear}>🗑 전체 지우기</button>
                 <button onClick={handleSave}>💾 저장</button>
-                {!isErasing && (
-                    <input
-                        type="color"
-                        value={lineColor}
-                        onChange={(e) => setLineColor(e.target.value)}
-                    />
-                )}
+                {!isErasing && <input type="color" value={lineColor} onChange={(e) => setLineColor(e.target.value)} />}
                 {isErasing && (
                     <label>
                         <input
@@ -183,14 +221,8 @@ const LifeGraphCanvas = () => {
                     </label>
                 )}
             </div>
-            <div
-                ref={containerRef}
-                style={{
-                    width: '100%',
-                    position: 'relative',
-                    aspectRatio: aspectRatio.toString(),
-                }}
-            >
+
+            <div ref={containerRef} style={{ width: '100%', position: 'relative', aspectRatio: '1 / 1' }}>
                 <canvas
                     ref={bgCanvasRef}
                     style={{
@@ -205,16 +237,21 @@ const LifeGraphCanvas = () => {
                     ref={drawCanvasRef}
                     style={{
                         width: '100%',
-                        height: 'auto',
+                        height: '100%',
                         border: '1px solid #ccc',
                         cursor: isErasing ? 'none' : 'crosshair',
                         position: 'relative',
                         zIndex: 1,
+                        touchAction: 'none',
                     }}
                     onMouseDown={startDrawing}
                     onMouseUp={endDrawing}
                     onMouseLeave={endDrawing}
                     onMouseMove={draw}
+                    onTouchStart={startTouchDrawing}
+                    onTouchEnd={endTouchDrawing}
+                    onTouchCancel={endTouchDrawing}
+                    onTouchMove={drawTouch}
                 />
                 {isErasing && (
                     <div
@@ -238,4 +275,4 @@ const LifeGraphCanvas = () => {
     );
 };
 
-export default LifeGraphCanvas;
+export default Fourshape;

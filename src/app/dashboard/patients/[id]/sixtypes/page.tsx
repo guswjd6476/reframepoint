@@ -3,7 +3,7 @@
 import { supabase } from '@/app/lib/supabase';
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 
-const LifeGraphCanvas = () => {
+const Sixtypes = () => {
     const bgCanvasRef = useRef<HTMLCanvasElement>(null);
     const drawCanvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -19,7 +19,7 @@ const LifeGraphCanvas = () => {
 
     useEffect(() => {
         const image = new Image();
-        image.src = '/lifegraphs.jpg';
+        image.src = '/sixtypes.png';
         image.onload = () => {
             setImg(image);
             setAspectRatio(image.width / image.height);
@@ -128,8 +128,8 @@ const LifeGraphCanvas = () => {
 
         tempCanvas.toBlob(async (blob) => {
             if (!blob) return;
-            const filename = `lifegraph-${Date.now()}.png`;
-            const { error } = await supabase.storage.from('lifegraph').upload(filename, blob, {
+            const filename = `sixtypes-${Date.now()}.png`;
+            const { error } = await supabase.storage.from('sixtypes').upload(filename, blob, {
                 contentType: 'image/png',
             });
 
@@ -238,4 +238,4 @@ const LifeGraphCanvas = () => {
     );
 };
 
-export default LifeGraphCanvas;
+export default Sixtypes;

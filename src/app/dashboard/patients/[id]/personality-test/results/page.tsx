@@ -163,14 +163,20 @@ export default function ResultsPage() {
             </header>
 
             <div className="mb-6">
-                <Line data={chartData} options={{ responsive: true }} />
+                <Line
+                    data={chartData}
+                    options={{ responsive: true }}
+                />
             </div>
 
             <table className="w-full text-center border-collapse border border-gray-300 mb-6">
                 <thead>
                     <tr className="bg-gray-100">
                         {chartLabels.map((label, idx) => (
-                            <th key={idx} className="border border-gray-300 px-4 py-2">
+                            <th
+                                key={idx}
+                                className="border border-gray-300 px-4 py-2"
+                            >
                                 유형 {label}
                             </th>
                         ))}
@@ -179,7 +185,10 @@ export default function ResultsPage() {
                 <tbody>
                     <tr>
                         {chartValues.map((value, idx) => (
-                            <td key={idx} className="border border-gray-300 px-4 py-2">
+                            <td
+                                key={idx}
+                                className="border border-gray-300 px-4 py-2"
+                            >
                                 {value}
                             </td>
                         ))}
