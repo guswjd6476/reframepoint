@@ -15,7 +15,7 @@ const Sixtypes = () => {
     const [isErasing, setIsErasing] = useState(false);
     const [lineColor, setLineColor] = useState('#000000');
     const [eraserSize, setEraserSize] = useState(20);
-    const [cursorPos, setCursorPos] = useState<{ x: number; y: number }>({ x: -100, y: -100 });
+    const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 });
 
     useEffect(() => {
         const image = new Image();
@@ -58,19 +58,28 @@ const Sixtypes = () => {
         }
     }, [img, resizeCanvas]);
 
-    const getMousePos = (e: React.MouseEvent) => {
+    const getPos = (e: React.MouseEvent | React.TouchEvent) => {
         const canvas = drawCanvasRef.current;
         if (!canvas) return { x: 0, y: 0 };
         const rect = canvas.getBoundingClientRect();
-        return {
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
-        };
+
+        if ('touches' in e) {
+            return {
+                x: e.touches[0].clientX - rect.left,
+                y: e.touches[0].clientY - rect.top,
+            };
+        } else {
+            return {
+                x: e.clientX - rect.left,
+                y: e.clientY - rect.top,
+            };
+        }
     };
 
-    const startDrawing = (e: React.MouseEvent) => {
+    const startDrawing = (e: React.MouseEvent | React.TouchEvent) => {
+        e.preventDefault();
         setDrawing(true);
-        setLastPos(getMousePos(e));
+        setLastPos(getPos(e));
     };
 
     const endDrawing = () => {
@@ -78,17 +87,15 @@ const Sixtypes = () => {
         setLastPos(null);
     };
 
-    const draw = (e: React.MouseEvent) => {
-        const pos = getMousePos(e);
+    const draw = (e: React.MouseEvent | React.TouchEvent) => {
+        e.preventDefault();
+        const pos = getPos(e);
         setCursorPos(pos);
-
         if (!drawing || !lastPos) return;
 
         const canvas = drawCanvasRef.current;
         const ctx = canvas?.getContext('2d');
         if (!ctx) return;
-
-        const { x, y } = pos;
 
         ctx.lineJoin = 'round';
         ctx.lineCap = 'round';
@@ -98,10 +105,10 @@ const Sixtypes = () => {
 
         ctx.beginPath();
         ctx.moveTo(lastPos.x, lastPos.y);
-        ctx.lineTo(x, y);
+        ctx.lineTo(pos.x, pos.y);
         ctx.stroke();
 
-        setLastPos({ x, y });
+        setLastPos(pos);
     };
 
     const handleClear = () => {
@@ -142,14 +149,7 @@ const Sixtypes = () => {
     };
 
     return (
-        <div
-            style={{
-                maxWidth: '1024px',
-                margin: '0 auto',
-                padding: '12px',
-                boxSizing: 'border-box',
-            }}
-        >
+        <div style={{ maxWidth: '1024px', margin: '0 auto', padding: '12px' }}>
             <div
                 style={{
                     display: 'flex',
@@ -163,13 +163,7 @@ const Sixtypes = () => {
                 <button onClick={() => setIsErasing(true)}>🧽 지우개</button>
                 <button onClick={handleClear}>🗑 전체 지우기</button>
                 <button onClick={handleSave}>💾 저장</button>
-                {!isErasing && (
-                    <input
-                        type="color"
-                        value={lineColor}
-                        onChange={(e) => setLineColor(e.target.value)}
-                    />
-                )}
+                {!isErasing && <input type="color" value={lineColor} onChange={(e) => setLineColor(e.target.value)} />}
                 {isErasing && (
                     <label>
                         <input
@@ -210,11 +204,16 @@ const Sixtypes = () => {
                         cursor: isErasing ? 'none' : 'crosshair',
                         position: 'relative',
                         zIndex: 1,
+                        touchAction: 'none',
                     }}
                     onMouseDown={startDrawing}
                     onMouseUp={endDrawing}
                     onMouseLeave={endDrawing}
                     onMouseMove={draw}
+                    onTouchStart={startDrawing}
+                    onTouchEnd={endDrawing}
+                    onTouchCancel={endDrawing}
+                    onTouchMove={draw}
                 />
                 {isErasing && (
                     <div
