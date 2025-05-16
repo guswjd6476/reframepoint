@@ -1,9 +1,7 @@
 'use client';
 
+import { supabase } from '@/app/lib/supabase';
 import React, { useRef, useState, useEffect, useCallback } from 'react';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
 
 const Fourshape = () => {
     const bgCanvasRef = useRef<HTMLCanvasElement>(null);

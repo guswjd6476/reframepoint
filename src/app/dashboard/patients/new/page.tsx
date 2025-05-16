@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect, ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { toPng } from 'html-to-image';
 import SignaturePad from 'signature_pad';
+import Image from 'next/image';
 import { uploadSignature, addNewPatient } from '@/app/api/supabaseApi';
 
 export default function NewPatientPage() {
@@ -95,13 +96,13 @@ export default function NewPatientPage() {
         };
 
         setTimeout(generatePreview, 100);
-    }, [signatureData, step]);
+    }, [signatureData, step]); // ✅ step 추가
 
     useEffect(() => {
         if (previewData && step === 1) {
             setStep(3);
         }
-    }, [previewData]);
+    }, [previewData, step]);
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -196,15 +197,7 @@ export default function NewPatientPage() {
                                     strokeWidth="3"
                                     viewBox="0 0 24 24"
                                 >
-<<<<<<< HEAD
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-=======
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        d="M5 13l4 4L19 7"
-                                    />
->>>>>>> b0b29e707d0ce7232c8198393f90870deac43b4f
                                 </svg>
                             </div>
                             <span>상기 내용을 충분히 읽고 이해하였으며 이에 동의합니다.</span>
@@ -217,19 +210,12 @@ export default function NewPatientPage() {
                         <div className="pt-6">
                             <p className="text-sm mb-1">서명:</p>
                             {signatureData ? (
-<<<<<<< HEAD
-                                <img src={signatureData} alt="서명 이미지" className="w-[300px] h-[150px] border" />
-                            ) : (
-                                <canvas
-                                    ref={canvasRef}
-                                    className="border rounded bg-white touch-none w-[300px] h-[150px]"
-                                    style={{ touchAction: 'none' }}
-                                />
-=======
-                                <img
+                                <Image
                                     src={signatureData}
                                     alt="서명 이미지"
-                                    className="w-[300px] h-[150px] border"
+                                    width={300}
+                                    height={150}
+                                    className="border"
                                 />
                             ) : (
                                 <canvas
@@ -237,7 +223,6 @@ export default function NewPatientPage() {
                                     className="border rounded bg-white touch-none w-[300px] h-[150px]"
                                     style={{ touchAction: 'none' }}
                                 />
->>>>>>> b0b29e707d0ce7232c8198393f90870deac43b4f
                             )}
                         </div>
 
@@ -267,9 +252,11 @@ export default function NewPatientPage() {
                         <div className="bg-white border-2 border-gray-200 rounded-lg shadow-md p-4">
                             {previewData ? (
                                 <div className="relative w-[600px] h-auto">
-                                    <img
+                                    <Image
                                         src={previewData}
                                         alt="서약서 미리보기"
+                                        width={600}
+                                        height={400}
                                         onLoad={() => setPreviewLoaded(true)}
                                         className={`w-full h-auto rounded-md border shadow transition-opacity duration-300 ${
                                             previewLoaded ? 'opacity-100' : 'opacity-0'
@@ -309,14 +296,7 @@ export default function NewPatientPage() {
                             { name: 'religion', label: '종교', placeholder: '무교', type: 'text' },
                         ].map(({ name, label, placeholder, type }) => (
                             <div key={name}>
-<<<<<<< HEAD
                                 <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
-=======
-                                <label
-                                    htmlFor={name}
-                                    className="block text-sm font-medium text-gray-700 mb-1"
-                                >
->>>>>>> b0b29e707d0ce7232c8198393f90870deac43b4f
                                     {label}
                                 </label>
                                 <input

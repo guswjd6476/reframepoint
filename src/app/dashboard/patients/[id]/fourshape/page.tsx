@@ -35,6 +35,7 @@ const ShapeDrawingTest = () => {
             if (error) throw error;
             setMessage('✅ 성공적으로 저장되었습니다!');
         } catch (e) {
+            console.error(e);
             setMessage('❌ 저장 중 오류가 발생했습니다.');
         }
     };
