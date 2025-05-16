@@ -104,9 +104,20 @@ function Navigation() {
                         컨텐츠
                     </Link>
                     {session ? (
-                        <button onClick={logout} className="text-gray-200 hover:text-blue-500">
-                            로그아웃
-                        </button>
+                        <>
+                            <Link className="text-gray-200 hover:text-blue-500" href="/dashboard" onClick={toggleMenu}>
+                                대시보드
+                            </Link>
+                            <button
+                                onClick={() => {
+                                    logout();
+                                    toggleMenu();
+                                }}
+                                className="text-gray-200 hover:text-blue-500"
+                            >
+                                로그아웃
+                            </button>
+                        </>
                     ) : (
                         <Link className="text-gray-200 hover:text-blue-500" href="/login" onClick={toggleMenu}>
                             로그인
@@ -123,7 +134,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AuthProvider>
             <html lang="ko">
                 <body>
-                    {/* AuthProvider 내부에 Navigation 컴포넌트를 배치 */}
                     <Navigation />
                     <main className="mt-[60px]">{children}</main>
                 </body>
