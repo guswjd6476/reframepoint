@@ -49,7 +49,10 @@ export default function TeamMembers() {
                         </thead>
                         <tbody>
                             {teamData.map((member) => (
-                                <tr key={member.id} className="hover:bg-gray-50 cursor-pointer">
+                                <tr
+                                    key={member.id}
+                                    className="hover:bg-gray-50 cursor-pointer"
+                                >
                                     <td className="px-6 py-4 text-gray-800">{member.name}</td>
                                 </tr>
                             ))}

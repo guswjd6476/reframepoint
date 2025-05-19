@@ -1,13 +1,15 @@
 'use client';
 
 import { supabase } from '@/app/lib/supabase';
+import { useParams } from 'next/navigation';
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 
 const LifeGraphCanvas = () => {
     const bgCanvasRef = useRef<HTMLCanvasElement>(null);
     const drawCanvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
-
+    const params = useParams();
+    const patientId = params?.id as string;
     const [drawing, setDrawing] = useState(false);
     const [lastPos, setLastPos] = useState<{ x: number; y: number } | null>(null);
     const [img, setImg] = useState<HTMLImageElement | null>(null);
@@ -58,7 +60,7 @@ const LifeGraphCanvas = () => {
         }
     }, [img, resizeCanvas]);
 
-    const getMousePos = (e: React.MouseEvent) => {
+    const getMousePos = (e: React.MouseEvent | MouseEvent) => {
         const canvas = drawCanvasRef.current;
         if (!canvas) return { x: 0, y: 0 };
         const rect = canvas.getBoundingClientRect();
@@ -68,9 +70,19 @@ const LifeGraphCanvas = () => {
         };
     };
 
-    const startDrawing = (e: React.MouseEvent) => {
+    const getTouchPos = (touch: Touch) => {
+        const canvas = drawCanvasRef.current;
+        if (!canvas) return { x: 0, y: 0 };
+        const rect = canvas.getBoundingClientRect();
+        return {
+            x: touch.clientX - rect.left,
+            y: touch.clientY - rect.top,
+        };
+    };
+
+    const startDrawing = (pos: { x: number; y: number }) => {
         setDrawing(true);
-        setLastPos(getMousePos(e));
+        setLastPos(pos);
     };
 
     const endDrawing = () => {
@@ -78,17 +90,13 @@ const LifeGraphCanvas = () => {
         setLastPos(null);
     };
 
-    const draw = (e: React.MouseEvent) => {
-        const pos = getMousePos(e);
+    const drawLine = (pos: { x: number; y: number }) => {
         setCursorPos(pos);
-
         if (!drawing || !lastPos) return;
 
         const canvas = drawCanvasRef.current;
         const ctx = canvas?.getContext('2d');
         if (!ctx) return;
-
-        const { x, y } = pos;
 
         ctx.lineJoin = 'round';
         ctx.lineCap = 'round';
@@ -98,11 +106,48 @@ const LifeGraphCanvas = () => {
 
         ctx.beginPath();
         ctx.moveTo(lastPos.x, lastPos.y);
-        ctx.lineTo(x, y);
+        ctx.lineTo(pos.x, pos.y);
         ctx.stroke();
 
-        setLastPos({ x, y });
+        setLastPos(pos);
     };
+
+    // Touch event handlers
+    useEffect(() => {
+        const canvas = drawCanvasRef.current;
+        if (!canvas) return;
+
+        const handleTouchStart = (e: TouchEvent) => {
+            e.preventDefault();
+            if (e.touches.length > 0) {
+                const pos = getTouchPos(e.touches[0]);
+                startDrawing(pos);
+            }
+        };
+
+        const handleTouchMove = (e: TouchEvent) => {
+            e.preventDefault();
+            if (e.touches.length > 0) {
+                const pos = getTouchPos(e.touches[0]);
+                drawLine(pos);
+            }
+        };
+
+        const handleTouchEnd = (e: TouchEvent) => {
+            e.preventDefault();
+            endDrawing();
+        };
+
+        canvas.addEventListener('touchstart', handleTouchStart);
+        canvas.addEventListener('touchmove', handleTouchMove);
+        canvas.addEventListener('touchend', handleTouchEnd);
+
+        return () => {
+            canvas.removeEventListener('touchstart', handleTouchStart);
+            canvas.removeEventListener('touchmove', handleTouchMove);
+            canvas.removeEventListener('touchend', handleTouchEnd);
+        };
+    }, [drawing, lastPos, isErasing, lineColor, eraserSize]);
 
     const handleClear = () => {
         const canvas = drawCanvasRef.current;
@@ -129,27 +174,34 @@ const LifeGraphCanvas = () => {
         tempCanvas.toBlob(async (blob) => {
             if (!blob) return;
             const filename = `lifegraph-${Date.now()}.png`;
-            const { error } = await supabase.storage.from('lifegraph').upload(filename, blob, {
-                contentType: 'image/png',
-            });
 
-            if (error) {
-                alert('업로드 실패: ' + error.message);
+            const { error: uploadError } = await supabase.storage
+                .from('lifegraph')
+                .upload(filename, blob, { contentType: 'image/png' });
+
+            if (uploadError) {
+                alert('업로드 실패: ' + uploadError.message);
+                return;
+            }
+
+            const {
+                data: { publicUrl },
+            } = supabase.storage.from('lifegraph').getPublicUrl(filename);
+
+            const { error: insertError } = await supabase
+                .from('lifegraphs')
+                .insert([{ patient_id: patientId, image_url: publicUrl }]);
+
+            if (insertError) {
+                alert('DB 저장 실패: ' + insertError.message);
             } else {
-                alert('업로드 성공!');
+                alert('저장 성공!');
             }
         }, 'image/png');
     };
 
     return (
-        <div
-            style={{
-                maxWidth: '1024px',
-                margin: '0 auto',
-                padding: '12px',
-                boxSizing: 'border-box',
-            }}
-        >
+        <div style={{ maxWidth: '1024px', margin: '0 auto', padding: '12px', boxSizing: 'border-box' }}>
             <div
                 style={{
                     display: 'flex',
@@ -183,23 +235,14 @@ const LifeGraphCanvas = () => {
                     </label>
                 )}
             </div>
+
             <div
                 ref={containerRef}
-                style={{
-                    width: '100%',
-                    position: 'relative',
-                    aspectRatio: aspectRatio.toString(),
-                }}
+                style={{ width: '100%', position: 'relative', aspectRatio: aspectRatio.toString() }}
             >
                 <canvas
                     ref={bgCanvasRef}
-                    style={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        zIndex: 0,
-                        pointerEvents: 'none',
-                    }}
+                    style={{ position: 'absolute', top: 0, left: 0, zIndex: 0, pointerEvents: 'none' }}
                 />
                 <canvas
                     ref={drawCanvasRef}
@@ -211,10 +254,10 @@ const LifeGraphCanvas = () => {
                         position: 'relative',
                         zIndex: 1,
                     }}
-                    onMouseDown={startDrawing}
+                    onMouseDown={(e) => startDrawing(getMousePos(e))}
                     onMouseUp={endDrawing}
                     onMouseLeave={endDrawing}
-                    onMouseMove={draw}
+                    onMouseMove={(e) => drawLine(getMousePos(e))}
                 />
                 {isErasing && (
                     <div
@@ -227,7 +270,7 @@ const LifeGraphCanvas = () => {
                             background: 'rgba(255,255,255,0.5)',
                             width: eraserSize,
                             height: eraserSize,
-                            transform: `translate(-50%, -50%)`,
+                            transform: 'translate(-50%, -50%)',
                             left: `${cursorPos.x}px`,
                             top: `${cursorPos.y}px`,
                         }}

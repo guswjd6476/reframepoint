@@ -1,13 +1,15 @@
 'use client';
 
 import { supabase } from '@/app/lib/supabase';
-import React, { useRef, useState, useEffect, useCallback } from 'react';
+import { useParams } from 'next/navigation';
+import React, { useRef, useState, useEffect, useCallback, MouseEvent, TouchEvent } from 'react';
 
 const Sixtypes = () => {
     const bgCanvasRef = useRef<HTMLCanvasElement>(null);
     const drawCanvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
-
+    const params = useParams();
+    const patientId = params?.id as string;
     const [drawing, setDrawing] = useState(false);
     const [lastPos, setLastPos] = useState<{ x: number; y: number } | null>(null);
     const [img, setImg] = useState<HTMLImageElement | null>(null);
@@ -51,14 +53,13 @@ const Sixtypes = () => {
     }, [img, aspectRatio]);
 
     useEffect(() => {
-        if (img) {
-            resizeCanvas();
-            window.addEventListener('resize', resizeCanvas);
-            return () => window.removeEventListener('resize', resizeCanvas);
-        }
+        if (!img) return;
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        return () => window.removeEventListener('resize', resizeCanvas);
     }, [img, resizeCanvas]);
 
-    const getPos = (e: React.MouseEvent | React.TouchEvent) => {
+    const getPos = (e: MouseEvent | TouchEvent): { x: number; y: number } => {
         const canvas = drawCanvasRef.current;
         if (!canvas) return { x: 0, y: 0 };
         const rect = canvas.getBoundingClientRect();
@@ -76,7 +77,7 @@ const Sixtypes = () => {
         }
     };
 
-    const startDrawing = (e: React.MouseEvent | React.TouchEvent) => {
+    const startDrawing = (e: MouseEvent | TouchEvent) => {
         e.preventDefault();
         setDrawing(true);
         setLastPos(getPos(e));
@@ -87,10 +88,11 @@ const Sixtypes = () => {
         setLastPos(null);
     };
 
-    const draw = (e: React.MouseEvent | React.TouchEvent) => {
+    const draw = (e: MouseEvent | TouchEvent) => {
         e.preventDefault();
         const pos = getPos(e);
         setCursorPos(pos);
+
         if (!drawing || !lastPos) return;
 
         const canvas = drawCanvasRef.current;
@@ -125,8 +127,8 @@ const Sixtypes = () => {
         if (!bgCanvas || !drawCanvas) return;
 
         const tempCanvas = document.createElement('canvas');
-        tempCanvas.width = drawCanvas.width;
-        tempCanvas.height = drawCanvas.height;
+        tempCanvas.width = bgCanvas.width;
+        tempCanvas.height = bgCanvas.height;
         const tempCtx = tempCanvas.getContext('2d');
         if (!tempCtx) return;
 
@@ -135,15 +137,33 @@ const Sixtypes = () => {
 
         tempCanvas.toBlob(async (blob) => {
             if (!blob) return;
+
             const filename = `sixtypes-${Date.now()}.png`;
-            const { error } = await supabase.storage.from('sixtypes').upload(filename, blob, {
+            const { error: uploadError } = await supabase.storage.from('sixtypes').upload(filename, blob, {
                 contentType: 'image/png',
             });
 
-            if (error) {
-                alert('업로드 실패: ' + error.message);
+            if (uploadError) {
+                alert('업로드 실패: ' + uploadError.message);
+                return;
+            }
+
+            const { data: urlData } = supabase.storage.from('sixtypes').getPublicUrl(filename);
+
+            const imageUrl = urlData?.publicUrl;
+            if (!imageUrl) {
+                alert('URL 생성 실패');
+                return;
+            }
+
+            const { error: insertError } = await supabase
+                .from('sixtypes')
+                .insert([{ patient_id: patientId, image_url: imageUrl }]);
+
+            if (insertError) {
+                alert('DB 저장 실패: ' + insertError.message);
             } else {
-                alert('업로드 성공!');
+                alert('업로드 및 저장 성공!');
             }
         }, 'image/png');
     };
@@ -163,7 +183,13 @@ const Sixtypes = () => {
                 <button onClick={() => setIsErasing(true)}>🧽 지우개</button>
                 <button onClick={handleClear}>🗑 전체 지우기</button>
                 <button onClick={handleSave}>💾 저장</button>
-                {!isErasing && <input type="color" value={lineColor} onChange={(e) => setLineColor(e.target.value)} />}
+                {!isErasing && (
+                    <input
+                        type="color"
+                        value={lineColor}
+                        onChange={(e) => setLineColor(e.target.value)}
+                    />
+                )}
                 {isErasing && (
                     <label>
                         <input
@@ -177,6 +203,7 @@ const Sixtypes = () => {
                     </label>
                 )}
             </div>
+
             <div
                 ref={containerRef}
                 style={{
@@ -226,7 +253,7 @@ const Sixtypes = () => {
                             background: 'rgba(255,255,255,0.5)',
                             width: eraserSize,
                             height: eraserSize,
-                            transform: `translate(-50%, -50%)`,
+                            transform: 'translate(-50%, -50%)',
                             left: `${cursorPos.x}px`,
                             top: `${cursorPos.y}px`,
                         }}

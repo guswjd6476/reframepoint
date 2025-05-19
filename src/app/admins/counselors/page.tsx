@@ -55,7 +55,10 @@ export default function CounselorsPage() {
                 </thead>
                 <tbody>
                     {counselors.map((counselor) => (
-                        <tr key={counselor.id} className="border-t hover:bg-indigo-100">
+                        <tr
+                            key={counselor.id}
+                            className="border-t hover:bg-indigo-100"
+                        >
                             <td className="py-3 px-6">{counselor.name}</td>
                             <td className="py-3 px-6">{counselor.stress}</td>
                             <td className="py-3 px-6">

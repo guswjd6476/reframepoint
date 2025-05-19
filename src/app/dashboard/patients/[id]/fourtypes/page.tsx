@@ -1,6 +1,7 @@
 'use client';
 
 import { supabase } from '@/app/lib/supabase';
+import { useParams } from 'next/navigation';
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 
 const Fourshape = () => {
@@ -11,7 +12,8 @@ const Fourshape = () => {
     const [drawing, setDrawing] = useState(false);
     const [lastPos, setLastPos] = useState<{ x: number; y: number } | null>(null);
     const [img, setImg] = useState<HTMLImageElement | null>(null);
-
+    const params = useParams();
+    const patientId = params?.id as string;
     const [isErasing, setIsErasing] = useState(false);
     const [lineColor, setLineColor] = useState('#000000');
     const [eraserSize, setEraserSize] = useState(20);
@@ -117,7 +119,6 @@ const Fourshape = () => {
         setLastPos(pos);
     };
 
-    // Touch events
     const startTouchDrawing = (e: React.TouchEvent) => {
         e.preventDefault();
         setDrawing(true);
@@ -160,15 +161,14 @@ const Fourshape = () => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
     };
-
     const handleSave = async () => {
         const bgCanvas = bgCanvasRef.current;
         const drawCanvas = drawCanvasRef.current;
         if (!bgCanvas || !drawCanvas) return;
 
         const tempCanvas = document.createElement('canvas');
-        tempCanvas.width = drawCanvas.width;
-        tempCanvas.height = drawCanvas.height;
+        tempCanvas.width = bgCanvas.width;
+        tempCanvas.height = bgCanvas.height;
         const tempCtx = tempCanvas.getContext('2d');
         if (!tempCtx) return;
 
@@ -177,15 +177,33 @@ const Fourshape = () => {
 
         tempCanvas.toBlob(async (blob) => {
             if (!blob) return;
-            const filename = `lifegraph-${Date.now()}.png`;
-            const { error } = await supabase.storage.from('lifegraph').upload(filename, blob, {
+
+            const filename = `fourtypes-${Date.now()}.png`;
+            const { error: uploadError } = await supabase.storage.from('fourtypes').upload(filename, blob, {
                 contentType: 'image/png',
             });
 
-            if (error) {
-                alert('업로드 실패: ' + error.message);
+            if (uploadError) {
+                alert('업로드 실패: ' + uploadError.message);
+                return;
+            }
+
+            const { data: urlData } = supabase.storage.from('fourtypes').getPublicUrl(filename);
+
+            const imageUrl = urlData?.publicUrl;
+            if (!imageUrl) {
+                alert('URL 생성 실패');
+                return;
+            }
+
+            const { error: insertError } = await supabase
+                .from('fourtypes')
+                .insert([{ patient_id: patientId, image_url: imageUrl }]);
+
+            if (insertError) {
+                alert('DB 저장 실패: ' + insertError.message);
             } else {
-                alert('업로드 성공!');
+                alert('업로드 및 저장 성공!');
             }
         }, 'image/png');
     };
@@ -205,7 +223,13 @@ const Fourshape = () => {
                 <button onClick={() => setIsErasing(true)}>🧽 지우개</button>
                 <button onClick={handleClear}>🗑 전체 지우기</button>
                 <button onClick={handleSave}>💾 저장</button>
-                {!isErasing && <input type="color" value={lineColor} onChange={(e) => setLineColor(e.target.value)} />}
+                {!isErasing && (
+                    <input
+                        type="color"
+                        value={lineColor}
+                        onChange={(e) => setLineColor(e.target.value)}
+                    />
+                )}
                 {isErasing && (
                     <label>
                         <input
@@ -220,7 +244,10 @@ const Fourshape = () => {
                 )}
             </div>
 
-            <div ref={containerRef} style={{ width: '100%', position: 'relative', aspectRatio: '1 / 1' }}>
+            <div
+                ref={containerRef}
+                style={{ width: '100%', position: 'relative', aspectRatio: '1 / 1' }}
+            >
                 <canvas
                     ref={bgCanvasRef}
                     style={{
