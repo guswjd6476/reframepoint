@@ -64,19 +64,13 @@ export const addNewPatient = async (patient: {
     stress: string;
     religion: string;
     signatureurl: string;
+    counselorId: string;
 }) => {
-    const {
-        data: { user },
-        error: userError,
-    } = await supabase.auth.getUser();
-
-    if (userError || !user) {
-        return { data: null, error: userError };
-    }
+    const { counselorId, ...rest } = patient;
 
     const { data, error } = await supabase
         .from('patients')
-        .insert([{ ...patient, counselors: user.id }])
+        .insert([{ ...rest, counselors: counselorId }])
         .select();
 
     return { data, error };

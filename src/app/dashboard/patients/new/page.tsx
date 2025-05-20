@@ -6,6 +6,7 @@ import { toPng } from 'html-to-image';
 import SignaturePad from 'signature_pad';
 import Image from 'next/image';
 import { uploadSignature, addNewPatient } from '@/app/api/supabaseApi';
+import { useAuth } from '@/app/context/AuthContext';
 
 export default function NewPatientPage() {
     const router = useRouter();
@@ -16,7 +17,7 @@ export default function NewPatientPage() {
     const [signatureData, setSignatureData] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [previewLoaded, setPreviewLoaded] = useState(false);
-
+    const { session } = useAuth();
     const [form, setForm] = useState({
         name: '',
         birth_date: '',
@@ -137,7 +138,14 @@ export default function NewPatientPage() {
             return;
         }
 
-        const { error } = await addNewPatient({ name, birth_date, stress, religion, signatureurl });
+        const { error } = await addNewPatient({
+            name,
+            birth_date,
+            stress,
+            religion,
+            signatureurl,
+            counselorId: session?.user?.user_id ?? '',
+        });
 
         setLoading(false);
 
