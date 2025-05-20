@@ -1,10 +1,13 @@
 import { supabase } from '../lib/supabase';
 import { Session } from '@supabase/auth-helpers-nextjs';
 
-export const getSession = async (): Promise<Session | null> => {
+export const getSession = async () => {
     const { data, error } = await supabase.auth.getSession();
-    if (error) return null;
-    return data.session ?? null;
+    if (error) {
+        console.error('getSession error:', error.message);
+        return null;
+    }
+    return data.session;
 };
 
 export const signIn = async (email: string, password: string) => {
