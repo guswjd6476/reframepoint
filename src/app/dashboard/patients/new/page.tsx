@@ -144,7 +144,7 @@ export default function NewPatientPage() {
             stress,
             religion,
             signatureurl,
-            counselorId: session?.user?.user_id ?? '',
+            counselorId: session?.user?.id ?? '',
         });
 
         setLoading(false);
