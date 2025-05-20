@@ -12,7 +12,6 @@ function Navigation() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const { session, logout } = useAuth();
 
-    console.log(session, '?sesion');
     useEffect(() => {
         const handleScroll = () => {
             setScrolling(window.scrollY > 100);
@@ -27,7 +26,6 @@ function Navigation() {
 
     return (
         <>
-            {/* 데스크탑 네비게이션 바 */}
             <motion.header
                 className={`fixed h-[60px] top-0 left-0 w-full z-40 transition-all duration-300 ease-in-out ${
                     scrolling ? 'bg-white/80 backdrop-blur-md shadow-lg' : 'bg-white'
@@ -56,7 +54,6 @@ function Navigation() {
                         <div className="w-8 h-1 bg-gray-800"></div>
                     </div>
 
-                    {/* 데스크탑 메뉴 */}
                     <nav className="hidden lg:flex space-x-6">
                         <Link className="text-gray-600 hover:text-blue-500" href="/about">
                             소개

@@ -8,6 +8,7 @@ export default function ReframePoint() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
     const { session, login, logout } = useAuth();
     const router = useRouter();
 
@@ -23,7 +24,12 @@ export default function ReframePoint() {
 
     const handleLogin = async () => {
         setLoading(true);
-        await login(email, password);
+        setError('');
+        try {
+            await login(email, password);
+        } catch (err: any) {
+            setError('이메일 또는 비밀번호가 잘못되었습니다.');
+        }
         setLoading(false);
     };
 
@@ -31,7 +37,6 @@ export default function ReframePoint() {
         <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center">
             {session ? (
                 <>
-                    {/* 로그인된 경우 AboutPage 내용 표시 */}
                     <section className="py-20 container mx-auto px-4 text-center">
                         <h2 className="text-3xl font-bold text-gray-800 mb-4">우리의 미션</h2>
                         <p className="text-lg text-gray-600">
@@ -44,7 +49,6 @@ export default function ReframePoint() {
                 </>
             ) : (
                 <>
-                    {/* 로그인 UI */}
                     <h1 className="text-2xl font-bold mb-4">상담사 로그인</h1>
                     <input
                         className="border p-2 mb-2 w-64"
@@ -54,12 +58,13 @@ export default function ReframePoint() {
                         onChange={(e) => setEmail(e.target.value)}
                     />
                     <input
-                        className="border p-2 mb-4 w-64"
+                        className="border p-2 mb-2 w-64"
                         type="password"
                         placeholder="비밀번호"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                     />
+                    {error && <p className="text-red-500 mb-2">{error}</p>}
                     <button
                         className="bg-blue-500 text-white px-4 py-2 rounded-md w-64"
                         onClick={handleLogin}
