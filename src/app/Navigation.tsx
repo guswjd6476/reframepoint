@@ -65,11 +65,11 @@ export default function Navigation() {
                                 <Link className="text-gray-600 hover:text-blue-500" href="/dashboard">
                                     대시보드
                                 </Link>
-                                {/* {session.user?.admin && (
+                                {session.user?.email === 'seouljdb@jdb.com' && (
                                     <Link className="text-gray-600 hover:text-blue-500" href="/admins">
                                         관리자
                                     </Link>
-                                )} */}
+                                )}
                                 <button onClick={logout} className="text-gray-600 hover:text-blue-500">
                                     로그아웃
                                 </button>
@@ -109,11 +109,12 @@ export default function Navigation() {
                             <Link className="text-gray-200 hover:text-blue-500" href="/dashboard" onClick={toggleMenu}>
                                 대시보드
                             </Link>
-                            {/* {session.user?.admin && (
+                            {session.user?.email === 'seouljdb@jcb.com' && (
                                 <Link className="text-gray-200 hover:text-blue-500" href="/admins" onClick={toggleMenu}>
                                     관리자
                                 </Link>
-                            )} */}
+                            )}
+
                             <button
                                 onClick={() => {
                                     logout();
