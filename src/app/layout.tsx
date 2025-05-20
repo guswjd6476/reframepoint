@@ -7,12 +7,12 @@ import './globals.css';
 import Image from 'next/image';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
-// 네비게이션 바를 별도 컴포넌트로 분리
 function Navigation() {
     const [scrolling, setScrolling] = useState(false);
-    const [isMenuOpen, setIsMenuOpen] = useState(false); // 메뉴 열기/닫기 상태
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
     const { session, logout } = useAuth();
 
+    console.log(session, '?sesion');
     useEffect(() => {
         const handleScroll = () => {
             setScrolling(window.scrollY > 100);
@@ -69,6 +69,11 @@ function Navigation() {
                                 <Link className="text-gray-600 hover:text-blue-500" href="/dashboard">
                                     대시보드
                                 </Link>
+                                {session.user?.admin && (
+                                    <Link className="text-gray-600 hover:text-blue-500" href="/admins">
+                                        관리자
+                                    </Link>
+                                )}
                                 <button onClick={logout} className="text-gray-600 hover:text-blue-500">
                                     로그아웃
                                 </button>
@@ -108,6 +113,11 @@ function Navigation() {
                             <Link className="text-gray-200 hover:text-blue-500" href="/dashboard" onClick={toggleMenu}>
                                 대시보드
                             </Link>
+                            {session.user?.admin && (
+                                <Link className="text-gray-200 hover:text-blue-500" href="/admins" onClick={toggleMenu}>
+                                    관리자
+                                </Link>
+                            )}
                             <button
                                 onClick={() => {
                                     logout();

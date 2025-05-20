@@ -21,7 +21,7 @@ const LifeGraphCanvas = () => {
 
     useEffect(() => {
         const image = new Image();
-        image.src = '/lifegraphs.jpg';
+        image.src = '/lifegraph.png';
         image.onload = () => {
             setImg(image);
             setAspectRatio(image.width / image.height);
@@ -215,13 +215,7 @@ const LifeGraphCanvas = () => {
                 <button onClick={() => setIsErasing(true)}>🧽 지우개</button>
                 <button onClick={handleClear}>🗑 전체 지우기</button>
                 <button onClick={handleSave}>💾 저장</button>
-                {!isErasing && (
-                    <input
-                        type="color"
-                        value={lineColor}
-                        onChange={(e) => setLineColor(e.target.value)}
-                    />
-                )}
+                {!isErasing && <input type="color" value={lineColor} onChange={(e) => setLineColor(e.target.value)} />}
                 {isErasing && (
                     <label>
                         <input

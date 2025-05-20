@@ -9,15 +9,15 @@ export async function POST(req: Request) {
         return NextResponse.json({ success: false, message: '모든 필드를 입력하세요.' }, { status: 400 });
     }
 
-    const { data: user, error: signUpError } = await supabase.auth.signUp({ email, password });
+    const { data, error: signUpError } = await supabase.auth.signUp({ email, password });
 
-    if (signUpError) {
-        return NextResponse.json({ success: false, message: signUpError.message }, { status: 400 });
+    if (signUpError || !data?.user) {
+        return NextResponse.json({ success: false, message: signUpError?.message || '회원가입 실패' }, { status: 400 });
     }
 
-    const { error: insertError } = await supabase
-        .from('counselors')
-        .insert([{ user_id: user.user?.email, name, email }]);
+    const userId = data.user.id;
+
+    const { error: insertError } = await supabase.from('counselors').insert([{ user_id: userId, name, email }]);
 
     if (insertError) {
         return NextResponse.json({ success: false, message: insertError.message }, { status: 400 });
