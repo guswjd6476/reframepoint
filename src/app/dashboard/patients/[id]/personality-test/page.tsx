@@ -1,12 +1,13 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { questions } from '@/app/lib/question';
 import { savePersonalityTest } from '@/app/api/supabaseApi';
 
 export default function PersonalityTest() {
     const params = useParams();
+    const router = useRouter();
     const patientId = params?.id as string;
     const storageKey = `personality_test_${patientId}`;
 
@@ -42,7 +43,7 @@ export default function PersonalityTest() {
             return;
         }
 
-        const { error } = await savePersonalityTest(patientId, answers); // ✅ Supabase 직접 호출 제거
+        const { error } = await savePersonalityTest(patientId, answers);
 
         if (error) {
             console.error(error);
@@ -50,18 +51,19 @@ export default function PersonalityTest() {
         } else {
             alert('검사 결과가 저장되었습니다.');
             localStorage.removeItem(storageKey);
+            router.back();
         }
     };
 
     return (
-        <div className="max-w-5xl mx-auto p-6 bg-white shadow-md rounded-lg">
+        <div className="max-w-6xl mx-auto p-6 bg-white shadow-md rounded-lg">
             <h2 className="text-3xl font-bold text-center mb-6">성격 유형 검사</h2>
             <div className="overflow-x-auto">
                 <table className="w-full border-collapse border border-gray-300 text-center">
                     <thead>
                         <tr className="bg-gray-100">
                             <th className="border border-gray-300 px-4 py-2 w-10">번호</th>
-                            <th className="border border-gray-300 px-4 py-2">문항</th>
+                            <th className="border border-gray-300 px-4 py-2 w-2/5 text-left">문항</th>
                             <th className="border border-gray-300 px-4 py-2 w-24">매우 그렇다</th>
                             <th className="border border-gray-300 px-4 py-2 w-24">그렇다</th>
                             <th className="border border-gray-300 px-4 py-2 w-24">보통이다</th>
@@ -73,7 +75,9 @@ export default function PersonalityTest() {
                         {questions.map((question, index) => (
                             <tr key={question.id} className="border border-gray-300">
                                 <td className="border border-gray-300 px-4 py-2">{index + 1}</td>
-                                <td className="border border-gray-300 px-4 py-2 text-left">{question.text}</td>
+                                <td className="border border-gray-300 px-4 py-2 text-left w-2/5 whitespace-normal break-words">
+                                    {question.text}
+                                </td>
                                 {[5, 4, 3, 2, 1].map((value) => (
                                     <td key={value} className="border border-gray-300 px-4 py-2">
                                         <input
