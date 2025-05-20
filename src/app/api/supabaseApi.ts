@@ -1,7 +1,7 @@
 import { supabase } from '../lib/supabase';
 import { Session } from '@supabase/auth-helpers-nextjs';
 
-export const getSession = async () => {
+export const getSession = async (): Promise<Session | null> => {
     const { data, error } = await supabase.auth.getSession();
     if (error) {
         console.error('getSession error:', error.message);
@@ -9,7 +9,6 @@ export const getSession = async () => {
     }
     return data.session;
 };
-
 export const signIn = async (email: string, password: string) => {
     return await supabase.auth.signInWithPassword({ email, password });
 };

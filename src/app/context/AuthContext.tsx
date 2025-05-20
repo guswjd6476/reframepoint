@@ -3,8 +3,8 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Session } from '@supabase/auth-helpers-nextjs';
-import { getSession, signIn, signOut } from '../api/supabaseApi';
 import { supabase } from '../lib/supabase';
+import { getSession } from '../api/supabaseApi';
 
 type AuthContextType = {
     session: SessionWithUserData | null | undefined;
@@ -30,6 +30,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [session, setSession] = useState<SessionWithUserData | null | undefined>(undefined);
     const router = useRouter();
 
+    // 세션에 상담사 정보 보강
     const enrichSession = async (session: Session | null): Promise<SessionWithUserData | null> => {
         if (!session) return null;
 
@@ -41,7 +42,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
         if (error) {
             console.error('Error fetching counselor data:', error.message);
-            return session;
+            return null;
         }
 
         return {
@@ -66,7 +67,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
         initAuth();
 
-        const { data: subscription } = supabase.auth.onAuthStateChange(async (event, newSession) => {
+        const { data } = supabase.auth.onAuthStateChange(async (event, newSession) => {
             const enriched = await enrichSession(newSession);
             if (mounted) setSession(enriched);
 
@@ -77,12 +78,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
         return () => {
             mounted = false;
-            subscription.subscription.unsubscribe();
+            data.subscription.unsubscribe();
         };
     }, [router]);
 
     const login = async (email: string, password: string) => {
-        const { data, error } = await signIn(email, password);
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) {
             alert('로그인 실패: ' + error.message);
         } else {
@@ -93,7 +94,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     const logout = async () => {
-        await signOut();
+        await supabase.auth.signOut();
         setSession(null);
         router.replace('/login');
     };
