@@ -54,17 +54,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     useEffect(() => {
-        const checkSession = async () => {
+        let mounted = true;
+
+        const initAuth = async () => {
             const rawSession = await getSession();
+            if (!mounted) return;
             const enriched = await enrichSession(rawSession);
+            if (!mounted) return;
             setSession(enriched);
         };
 
-        checkSession();
+        initAuth();
 
-        const { data: authListener } = onAuthStateChange(async (event, newSession) => {
+        const { data: subscription } = supabase.auth.onAuthStateChange(async (event, newSession) => {
             const enriched = await enrichSession(newSession);
-            setSession(enriched);
+            if (mounted) setSession(enriched);
 
             if (event === 'SIGNED_OUT') {
                 router.replace('/login');
@@ -72,7 +76,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         });
 
         return () => {
-            authListener?.subscription.unsubscribe();
+            mounted = false;
+            subscription.subscription.unsubscribe();
         };
     }, [router]);
 
