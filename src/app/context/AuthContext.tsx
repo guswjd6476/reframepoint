@@ -18,7 +18,6 @@ type CounselorData = {
     admin?: boolean;
     name?: string;
     photo_url?: string;
-    // 필요한 필드 추가
 };
 
 type SessionWithUserData = Session & {

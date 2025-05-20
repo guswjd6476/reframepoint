@@ -28,7 +28,6 @@ export default function ReframePoint() {
         try {
             await login(email, password);
         } catch {
-            // 에러 메시지 출력
             setError('이메일 또는 비밀번호가 잘못되었습니다.');
         }
         setLoading(false);
