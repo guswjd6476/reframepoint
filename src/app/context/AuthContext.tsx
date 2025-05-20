@@ -3,7 +3,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Session } from '@supabase/auth-helpers-nextjs';
-import { getSession, signIn, signOut, onAuthStateChange } from '../api/supabaseApi';
+import { getSession, signIn, signOut } from '../api/supabaseApi';
 import { supabase } from '../lib/supabase';
 
 type AuthContextType = {
