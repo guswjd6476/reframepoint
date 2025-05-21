@@ -71,7 +71,7 @@ const Sixtypes = () => {
         return () => window.removeEventListener('resize', resizeCanvas);
     }, [img, resizeCanvas]);
 
-    const getPos = (e: MouseEvent | TouchEvent): { x: number; y: number } => {
+    const getPos = (e: MouseEvent<HTMLCanvasElement> | TouchEvent<HTMLCanvasElement>): { x: number; y: number } => {
         const canvas = drawCanvasRef.current;
         if (!canvas) return { x: 0, y: 0 };
         const rect = canvas.getBoundingClientRect();
@@ -88,20 +88,22 @@ const Sixtypes = () => {
         }
     };
 
-    const startDrawing = (e: MouseEvent | TouchEvent) => {
+    const startDrawing = (e: MouseEvent<HTMLCanvasElement> | TouchEvent<HTMLCanvasElement>) => {
         if ('touches' in e && e.touches.length > 1) return;
         e.preventDefault();
         drawingRef.current = true;
         lastPosRef.current = getPos(e);
     };
 
-    const endDrawing = () => {
+    // 여기서 오류 발생하던 부분, e 매개변수 타입 명확히 지정 (필수로 받고 처리)
+    const endDrawing = (e: MouseEvent<HTMLCanvasElement> | TouchEvent<HTMLCanvasElement>) => {
+        e.preventDefault();
         drawingRef.current = false;
         lastPosRef.current = null;
         nextPosRef.current = null;
     };
 
-    const updatePos = (e: MouseEvent | TouchEvent) => {
+    const updatePos = (e: MouseEvent<HTMLCanvasElement> | TouchEvent<HTMLCanvasElement>) => {
         if (!drawingRef.current) return;
         e.preventDefault();
         const pos = getPos(e);
@@ -241,6 +243,8 @@ const Sixtypes = () => {
                         cursor: isErasing ? 'none' : 'crosshair',
                         position: 'relative',
                         zIndex: 1,
+                        touchAction: 'none',
+                        userSelect: 'none',
                     }}
                     onMouseDown={startDrawing}
                     onMouseUp={endDrawing}
@@ -256,15 +260,15 @@ const Sixtypes = () => {
                         style={{
                             position: 'absolute',
                             pointerEvents: 'none',
-                            zIndex: 2,
-                            borderRadius: '50%',
-                            border: '2px solid #999',
-                            background: 'rgba(255,255,255,0.5)',
+                            zIndex: 10,
+                            left: cursorPos.x - eraserSize / 2,
+                            top: cursorPos.y - eraserSize / 2,
                             width: eraserSize,
                             height: eraserSize,
-                            transform: 'translate(-50%, -50%)',
-                            left: `${cursorPos.x}px`,
-                            top: `${cursorPos.y}px`,
+                            borderRadius: '50%',
+                            backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                            border: '1px solid #000',
+                            boxSizing: 'border-box',
                         }}
                     />
                 )}
