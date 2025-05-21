@@ -89,8 +89,10 @@ const Sixtypes = () => {
     };
 
     const startDrawing = (e: MouseEvent | TouchEvent) => {
-        if ('touches' in e && e.touches.length > 1) return; // 손바닥 무시
-        e.preventDefault();
+        if ('touches' in e) {
+            if (e.touches.length > 1) return; // 멀티터치 무시
+            e.preventDefault(); // 기본 동작 차단
+        }
         setDrawing(true);
         setLastPos(getPos(e));
     };
@@ -101,8 +103,10 @@ const Sixtypes = () => {
     };
 
     const draw = (e: MouseEvent | TouchEvent) => {
-        if ('touches' in e && e.touches.length > 1) return; // 손바닥 무시
-        e.preventDefault();
+        if ('touches' in e) {
+            if (e.touches.length > 1) return; // 멀티터치 무시
+            e.preventDefault(); // 기본 동작 차단
+        }
         const pos = getPos(e);
         setCursorPos(pos);
 
@@ -217,7 +221,12 @@ const Sixtypes = () => {
                     width: '100%',
                     position: 'relative',
                     aspectRatio: aspectRatio.toString(),
+                    touchAction: 'none',
+                    userSelect: 'none',
+                    WebkitUserSelect: 'none',
+                    WebkitTouchCallout: 'none',
                 }}
+                onContextMenu={(e) => e.preventDefault()}
             >
                 <canvas
                     ref={bgCanvasRef}
@@ -239,6 +248,9 @@ const Sixtypes = () => {
                         position: 'relative',
                         zIndex: 1,
                         touchAction: 'none',
+                        userSelect: 'none',
+                        WebkitUserSelect: 'none',
+                        WebkitTouchCallout: 'none',
                     }}
                     onMouseDown={startDrawing}
                     onMouseUp={endDrawing}
@@ -248,6 +260,7 @@ const Sixtypes = () => {
                     onTouchEnd={endDrawing}
                     onTouchCancel={endDrawing}
                     onTouchMove={draw}
+                    onContextMenu={(e) => e.preventDefault()}
                 />
                 {isErasing && (
                     <div
