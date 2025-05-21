@@ -42,26 +42,23 @@ export default function FourTypeResultsPage() {
     if (error) return <p className="text-center mt-10 text-red-500">{error}</p>;
 
     return (
-        <div className="max-w-2xl mx-auto mt-10 p-6 bg-white rounded-2xl shadow-md space-y-6">
-            <h1 className="text-3xl font-bold text-center text-indigo-700">4도형 검사 결과</h1>
+        <div className="max-w-5xl mx-auto mt-10 px-4 sm:px-6 lg:px-8 py-10 bg-white rounded-3xl shadow-lg space-y-10">
+            <h1 className="text-4xl font-extrabold text-center text-indigo-700">4도형 검사 결과</h1>
 
-            {imageUrl && (
+            {imageUrl ? (
                 <div className="w-full flex justify-center">
-                    <div className="relative w-full max-w-md h-[400px]">
-                        <Image
-                            src={imageUrl}
-                            alt="4도형 이미지"
-                            fill
-                            className="rounded-xl object-contain border shadow"
-                        />
+                    <div className="relative w-full aspect-[1/1.414] max-w-3xl bg-gray-50 rounded-2xl border border-indigo-200 shadow-xl overflow-hidden">
+                        <Image src={imageUrl} alt="4도형 이미지" fill className="object-contain" priority />
                     </div>
                 </div>
+            ) : (
+                <p className="text-center text-gray-400 italic">이미지 결과가 없습니다.</p>
             )}
 
-            <div className="text-center pt-6">
+            <div className="text-center">
                 <button
                     onClick={() => router.back()}
-                    className="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-6 rounded-xl transition"
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-8 rounded-2xl shadow-md transition duration-300"
                 >
                     돌아가기
                 </button>

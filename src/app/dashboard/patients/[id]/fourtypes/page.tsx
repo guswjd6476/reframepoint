@@ -2,148 +2,140 @@
 
 import { supabase } from '@/app/lib/supabase';
 import { useParams } from 'next/navigation';
-import React, { useRef, useState, useEffect, useCallback } from 'react';
+import React, { useRef, useState, useEffect, useCallback, MouseEvent, TouchEvent } from 'react';
 
-const Fourshape = () => {
+const Fourtypes = () => {
     const bgCanvasRef = useRef<HTMLCanvasElement>(null);
     const drawCanvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
-
-    const [drawing, setDrawing] = useState(false);
-    const [lastPos, setLastPos] = useState<{ x: number; y: number } | null>(null);
-    const [img, setImg] = useState<HTMLImageElement | null>(null);
     const params = useParams();
     const patientId = params?.id as string;
+
+    const [img, setImg] = useState<HTMLImageElement | null>(null);
+    const [aspectRatio, setAspectRatio] = useState(2);
     const [isErasing, setIsErasing] = useState(false);
     const [lineColor, setLineColor] = useState('#000000');
     const [eraserSize, setEraserSize] = useState(20);
-    const [cursorPos, setCursorPos] = useState<{ x: number; y: number } | null>(null);
+    const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 });
+
+    const drawingRef = useRef(false);
+    const lastPosRef = useRef<{ x: number; y: number } | null>(null);
+    const nextPosRef = useRef<{ x: number; y: number } | null>(null);
 
     useEffect(() => {
         const image = new Image();
-        image.src = '/fourshape.png';
-        image.onload = () => setImg(image);
-        image.onerror = () => alert('이미지 로드 실패');
+        image.src = '/fourtypes.jpg';
+        image.onload = () => {
+            setImg(image);
+            setAspectRatio(image.width / image.height);
+        };
     }, []);
 
     const resizeCanvas = useCallback(() => {
         const container = containerRef.current;
         const bgCanvas = bgCanvasRef.current;
         const drawCanvas = drawCanvasRef.current;
-
         if (!container || !bgCanvas || !drawCanvas || !img) return;
 
+        const drawImage = new Image();
+        drawImage.src = drawCanvas.toDataURL();
+
         const width = container.clientWidth;
-        const height = width;
+        const height = width / aspectRatio;
 
-        drawCanvas.width = width;
-        drawCanvas.height = height;
-        drawCanvas.style.width = '100%';
-        drawCanvas.style.height = '100%';
-
-        bgCanvas.width = width;
-        bgCanvas.height = height;
-        bgCanvas.style.width = '100%';
-        bgCanvas.style.height = '100%';
-
-        const bgScale = 0.8;
-        const bgWidth = width * bgScale;
-        const bgHeight = height * bgScale;
-        const offsetX = (width - bgWidth) / 2;
-        const offsetY = (height - bgHeight) / 2;
+        [bgCanvas, drawCanvas].forEach((canvas) => {
+            canvas.width = width;
+            canvas.height = height;
+            canvas.style.width = '100%';
+            canvas.style.height = 'auto';
+        });
 
         const bgCtx = bgCanvas.getContext('2d');
         if (bgCtx) {
             bgCtx.clearRect(0, 0, width, height);
-            bgCtx.drawImage(img, offsetX, offsetY, bgWidth, bgHeight);
+            bgCtx.drawImage(img, 0, 0, width, height);
         }
-    }, [img]);
+
+        drawImage.onload = () => {
+            const ctx = drawCanvas.getContext('2d');
+            if (ctx) {
+                ctx.drawImage(drawImage, 0, 0, width, height);
+            }
+        };
+    }, [img, aspectRatio]);
 
     useEffect(() => {
-        if (img) {
-            resizeCanvas();
-            window.addEventListener('resize', resizeCanvas);
-            return () => window.removeEventListener('resize', resizeCanvas);
-        }
+        if (!img) return;
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        return () => window.removeEventListener('resize', resizeCanvas);
     }, [img, resizeCanvas]);
 
-    const getPos = (clientX: number, clientY: number) => {
+    const getPos = (e: MouseEvent<HTMLCanvasElement> | TouchEvent<HTMLCanvasElement>): { x: number; y: number } => {
         const canvas = drawCanvasRef.current;
         if (!canvas) return { x: 0, y: 0 };
         const rect = canvas.getBoundingClientRect();
-        return {
-            x: clientX - rect.left,
-            y: clientY - rect.top,
-        };
+        if ('touches' in e) {
+            return {
+                x: e.touches[0].clientX - rect.left,
+                y: e.touches[0].clientY - rect.top,
+            };
+        } else {
+            return {
+                x: e.clientX - rect.left,
+                y: e.clientY - rect.top,
+            };
+        }
     };
 
-    // 공통 그리기 함수
-    const drawLine = (from: { x: number; y: number }, to: { x: number; y: number }) => {
-        const ctx = drawCanvasRef.current?.getContext('2d');
+    const startDrawing = (e: MouseEvent<HTMLCanvasElement> | TouchEvent<HTMLCanvasElement>) => {
+        if ('touches' in e && e.touches.length > 1) return;
+        e.preventDefault();
+        drawingRef.current = true;
+        lastPosRef.current = getPos(e);
+    };
+
+    // 여기서 오류 발생하던 부분, e 매개변수 타입 명확히 지정 (필수로 받고 처리)
+    const endDrawing = (e: MouseEvent<HTMLCanvasElement> | TouchEvent<HTMLCanvasElement>) => {
+        e.preventDefault();
+        drawingRef.current = false;
+        lastPosRef.current = null;
+        nextPosRef.current = null;
+    };
+
+    const updatePos = (e: MouseEvent<HTMLCanvasElement> | TouchEvent<HTMLCanvasElement>) => {
+        if (!drawingRef.current) return;
+        e.preventDefault();
+        const pos = getPos(e);
+        setCursorPos(pos);
+        nextPosRef.current = pos;
+    };
+
+    useEffect(() => {
+        const canvas = drawCanvasRef.current;
+        const ctx = canvas?.getContext('2d');
         if (!ctx) return;
 
-        ctx.lineJoin = 'round';
-        ctx.lineCap = 'round';
-        ctx.lineWidth = isErasing ? eraserSize : 2;
-        ctx.globalCompositeOperation = isErasing ? 'destination-out' : 'source-over';
-        ctx.strokeStyle = isErasing ? 'rgba(0,0,0,1)' : lineColor;
+        const drawLoop = () => {
+            if (drawingRef.current && lastPosRef.current && nextPosRef.current) {
+                ctx.lineJoin = 'round';
+                ctx.lineCap = 'round';
+                ctx.lineWidth = isErasing ? eraserSize : 2;
+                ctx.strokeStyle = isErasing ? 'rgba(0,0,0,1)' : lineColor;
+                ctx.globalCompositeOperation = isErasing ? 'destination-out' : 'source-over';
 
-        ctx.beginPath();
-        ctx.moveTo(from.x, from.y);
-        ctx.lineTo(to.x, to.y);
-        ctx.stroke();
-    };
+                ctx.beginPath();
+                ctx.moveTo(lastPosRef.current.x, lastPosRef.current.y);
+                ctx.lineTo(nextPosRef.current.x, nextPosRef.current.y);
+                ctx.stroke();
 
-    // 마우스 이벤트
-    const startDrawing = (e: React.MouseEvent) => {
-        const pos = getPos(e.clientX, e.clientY);
-        setDrawing(true);
-        setLastPos(pos);
-        setCursorPos(pos);
-    };
+                lastPosRef.current = nextPosRef.current;
+            }
+            requestAnimationFrame(drawLoop);
+        };
 
-    const endDrawing = () => {
-        setDrawing(false);
-        setLastPos(null);
-        setCursorPos(null);
-    };
-
-    const draw = (e: React.MouseEvent) => {
-        if (!drawing || !lastPos) return;
-        const pos = getPos(e.clientX, e.clientY);
-        drawLine(lastPos, pos);
-        setLastPos(pos);
-        setCursorPos(pos);
-    };
-
-    // 터치 이벤트
-    const startTouchDrawing = (e: React.TouchEvent) => {
-        e.preventDefault();
-        if (e.touches.length === 0) return;
-        const touch = e.touches[0];
-        const pos = getPos(touch.clientX, touch.clientY);
-        setDrawing(true);
-        setLastPos(pos);
-        setCursorPos(pos);
-    };
-
-    const endTouchDrawing = (e: React.TouchEvent) => {
-        e.preventDefault();
-        setDrawing(false);
-        setLastPos(null);
-        setCursorPos(null);
-    };
-
-    const drawTouch = (e: React.TouchEvent) => {
-        e.preventDefault();
-        if (!drawing || !lastPos) return;
-        if (e.touches.length === 0) return;
-        const touch = e.touches[0];
-        const pos = getPos(touch.clientX, touch.clientY);
-        drawLine(lastPos, pos);
-        setLastPos(pos);
-        setCursorPos(pos);
-    };
+        drawLoop();
+    }, [isErasing, eraserSize, lineColor]);
 
     const handleClear = () => {
         const canvas = drawCanvasRef.current;
@@ -152,12 +144,6 @@ const Fourshape = () => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
     };
-
-    // toBlob을 Promise 기반으로 래핑
-    const canvasToBlob = (canvas: HTMLCanvasElement): Promise<Blob | null> =>
-        new Promise((resolve) => {
-            canvas.toBlob((blob) => resolve(blob), 'image/png');
-        });
 
     const handleSave = async () => {
         const bgCanvas = bgCanvasRef.current;
@@ -173,66 +159,48 @@ const Fourshape = () => {
         tempCtx.drawImage(bgCanvas, 0, 0);
         tempCtx.drawImage(drawCanvas, 0, 0);
 
-        const blob = await canvasToBlob(tempCanvas);
-        if (!blob) {
-            alert('이미지 변환 실패');
-            console.error('Blob 변환 실패: toBlob 결과가 null입니다.');
-            return;
-        }
+        tempCanvas.toBlob(async (blob) => {
+            if (!blob) return;
 
-        const filename = `fourtypes-${Date.now()}.png`;
-        const { error: uploadError } = await supabase.storage.from('fourtypes').upload(filename, blob, {
-            contentType: 'image/png',
-            upsert: true,
-        });
+            const filename = `fourtypes-${Date.now()}.jpg`;
+            const { error: uploadError } = await supabase.storage.from('fourtypes').upload(filename, blob, {
+                contentType: 'image/jpg',
+            });
 
-        if (uploadError) {
-            alert('업로드 실패: ' + uploadError.message);
-            console.error('Supabase 업로드 에러:', uploadError);
-            return;
-        }
+            if (uploadError) {
+                alert('업로드 실패: ' + uploadError.message);
+                return;
+            }
 
-        const { data: urlData } = supabase.storage.from('fourtypes').getPublicUrl(filename);
-        if (!urlData?.publicUrl) {
-            alert('URL 생성 실패');
-            console.error('Public URL 생성 실패: urlData.publicUrl 없음');
-            return;
-        }
+            const { data: urlData } = supabase.storage.from('fourtypes').getPublicUrl(filename);
+            const imageUrl = urlData?.publicUrl;
+            if (!imageUrl) {
+                alert('URL 생성 실패');
+                return;
+            }
 
-        const imageUrl = urlData.publicUrl;
+            const { error: insertError } = await supabase
+                .from('fourtypes')
+                .insert([{ patient_id: patientId, image_url: imageUrl }]);
 
-        const { error: insertError } = await supabase
-            .from('fourtypes')
-            .insert([{ patient_id: patientId, image_url: imageUrl }]);
-
-        if (insertError) {
-            alert('DB 저장 실패: ' + insertError.message);
-            console.error('Supabase DB insert 에러:', insertError);
-        } else {
-            alert('업로드 및 저장 성공!');
-            console.log('이미지 URL:', imageUrl);
-        }
+            if (insertError) {
+                alert('DB 저장 실패: ' + insertError.message);
+            } else {
+                alert('업로드 및 저장 성공!');
+            }
+        }, 'image/jpg');
     };
 
     return (
-        <div style={{ maxWidth: '768px', margin: '0 auto', padding: 16, boxSizing: 'border-box' }}>
-            <div
-                style={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    gap: 8,
-                    justifyContent: 'center',
-                    marginBottom: 12,
-                    alignItems: 'center',
-                }}
-            >
+        <div style={{ maxWidth: '1024px', margin: '0 auto', padding: '12px' }}>
+            <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginBottom: '12px' }}>
                 <button onClick={() => setIsErasing(false)}>✏️ 그리기</button>
                 <button onClick={() => setIsErasing(true)}>🧽 지우개</button>
                 <button onClick={handleClear}>🗑 전체 지우기</button>
                 <button onClick={handleSave}>💾 저장</button>
                 {!isErasing && <input type="color" value={lineColor} onChange={(e) => setLineColor(e.target.value)} />}
                 {isErasing && (
-                    <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <label>
                         <input
                             type="range"
                             min={5}
@@ -245,7 +213,17 @@ const Fourshape = () => {
                 )}
             </div>
 
-            <div ref={containerRef} style={{ width: '100%', position: 'relative', aspectRatio: '1 / 1' }}>
+            <div
+                ref={containerRef}
+                style={{
+                    width: '100%',
+                    position: 'relative',
+                    aspectRatio: aspectRatio.toString(),
+                    touchAction: 'none',
+                    userSelect: 'none',
+                }}
+                onContextMenu={(e) => e.preventDefault()}
+            >
                 <canvas
                     ref={bgCanvasRef}
                     style={{
@@ -260,36 +238,37 @@ const Fourshape = () => {
                     ref={drawCanvasRef}
                     style={{
                         width: '100%',
-                        height: '100%',
+                        height: 'auto',
                         border: '1px solid #ccc',
                         cursor: isErasing ? 'none' : 'crosshair',
                         position: 'relative',
                         zIndex: 1,
                         touchAction: 'none',
+                        userSelect: 'none',
                     }}
                     onMouseDown={startDrawing}
                     onMouseUp={endDrawing}
                     onMouseLeave={endDrawing}
-                    onMouseMove={draw}
-                    onTouchStart={startTouchDrawing}
-                    onTouchEnd={endTouchDrawing}
-                    onTouchCancel={endTouchDrawing}
-                    onTouchMove={drawTouch}
+                    onMouseMove={updatePos}
+                    onTouchStart={startDrawing}
+                    onTouchEnd={endDrawing}
+                    onTouchCancel={endDrawing}
+                    onTouchMove={updatePos}
                 />
-                {isErasing && cursorPos && (
+                {isErasing && (
                     <div
                         style={{
                             position: 'absolute',
                             pointerEvents: 'none',
-                            zIndex: 2,
-                            borderRadius: '50%',
-                            border: '2px solid #999',
-                            background: 'rgba(255,255,255,0.5)',
+                            zIndex: 10,
+                            left: cursorPos.x - eraserSize / 2,
+                            top: cursorPos.y - eraserSize / 2,
                             width: eraserSize,
                             height: eraserSize,
-                            transform: `translate(-50%, -50%)`,
-                            left: `${cursorPos.x}px`,
-                            top: `${cursorPos.y}px`,
+                            borderRadius: '50%',
+                            backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                            border: '1px solid #000',
+                            boxSizing: 'border-box',
                         }}
                     />
                 )}
@@ -298,4 +277,4 @@ const Fourshape = () => {
     );
 };
 
-export default Fourshape;
+export default Fourtypes;
