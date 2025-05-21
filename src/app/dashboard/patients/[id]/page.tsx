@@ -63,6 +63,8 @@ export default function PatientPage() {
                     .eq('patient_id', id)
                     .maybeSingle();
                 if (lError) throw lError;
+
+                console.log(lifeGraph, '?lifeGraphlifeGraphlifeGraphlifeGraph');
                 setIsLifeGraphDone(!!lifeGraph);
             } catch (err) {
                 console.error('검사 상태 조회 오류:', err);
