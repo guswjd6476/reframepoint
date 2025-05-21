@@ -176,27 +176,30 @@ const Fourshape = () => {
         const blob = await canvasToBlob(tempCanvas);
         if (!blob) {
             alert('이미지 변환 실패');
+            console.error('Blob 변환 실패: toBlob 결과가 null입니다.');
             return;
         }
 
         const filename = `fourtypes-${Date.now()}.png`;
         const { error: uploadError } = await supabase.storage.from('fourtypes').upload(filename, blob, {
             contentType: 'image/png',
-            upsert: true, // 중복시 덮어쓰기 옵션, 필요에 따라 제거하세요
+            upsert: true,
         });
 
         if (uploadError) {
             alert('업로드 실패: ' + uploadError.message);
+            console.error('Supabase 업로드 에러:', uploadError);
             return;
         }
 
         const { data: urlData } = supabase.storage.from('fourtypes').getPublicUrl(filename);
-
-        const imageUrl = urlData?.publicUrl;
-        if (!imageUrl) {
+        if (!urlData?.publicUrl) {
             alert('URL 생성 실패');
+            console.error('Public URL 생성 실패: urlData.publicUrl 없음');
             return;
         }
+
+        const imageUrl = urlData.publicUrl;
 
         const { error: insertError } = await supabase
             .from('fourtypes')
@@ -204,8 +207,10 @@ const Fourshape = () => {
 
         if (insertError) {
             alert('DB 저장 실패: ' + insertError.message);
+            console.error('Supabase DB insert 에러:', insertError);
         } else {
             alert('업로드 및 저장 성공!');
+            console.log('이미지 URL:', imageUrl);
         }
     };
 

@@ -20,7 +20,8 @@ export default function PatientPage() {
 
     useEffect(() => {
         if (!params?.id) return;
-        const id = params.id as string;
+
+        const id = Array.isArray(params.id) ? params.id[0] : params.id;
         setPatientId(id);
 
         const fetchStatuses = async () => {
@@ -64,7 +65,6 @@ export default function PatientPage() {
                     .maybeSingle();
                 if (lError) throw lError;
 
-                console.log(lifeGraph, '?lifeGraphlifeGraphlifeGraphlifeGraph');
                 setIsLifeGraphDone(!!lifeGraph);
             } catch (err) {
                 console.error('검사 상태 조회 오류:', err);
