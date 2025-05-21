@@ -60,7 +60,7 @@ const LifeGraphCanvas = () => {
         }
     }, [img, resizeCanvas]);
 
-    const getMousePos = (e: React.MouseEvent | MouseEvent) => {
+    const getMousePos = (e: React.MouseEvent<HTMLCanvasElement>): { x: number; y: number } => {
         const canvas = drawCanvasRef.current;
         if (!canvas) return { x: 0, y: 0 };
         const rect = canvas.getBoundingClientRect();
@@ -70,7 +70,7 @@ const LifeGraphCanvas = () => {
         };
     };
 
-    const getTouchPos = (touch: Touch) => {
+    const getTouchPos = (touch: Touch): { x: number; y: number } => {
         const canvas = drawCanvasRef.current;
         if (!canvas) return { x: 0, y: 0 };
         const rect = canvas.getBoundingClientRect();
@@ -148,6 +148,20 @@ const LifeGraphCanvas = () => {
             canvas.removeEventListener('touchend', handleTouchEnd);
         };
     }, [drawing, lastPos, isErasing, lineColor, eraserSize]);
+
+    // Mouse event handlers
+    const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
+        startDrawing(getMousePos(e));
+    };
+    const handleMouseUp = (e: React.MouseEvent<HTMLCanvasElement>) => {
+        endDrawing();
+    };
+    const handleMouseLeave = (e: React.MouseEvent<HTMLCanvasElement>) => {
+        endDrawing();
+    };
+    const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+        drawLine(getMousePos(e));
+    };
 
     const handleClear = () => {
         const canvas = drawCanvasRef.current;
@@ -248,10 +262,10 @@ const LifeGraphCanvas = () => {
                         position: 'relative',
                         zIndex: 1,
                     }}
-                    onMouseDown={(e) => startDrawing(getMousePos(e))}
-                    onMouseUp={endDrawing}
-                    onMouseLeave={endDrawing}
-                    onMouseMove={(e) => drawLine(getMousePos(e))}
+                    onMouseDown={handleMouseDown}
+                    onMouseUp={handleMouseUp}
+                    onMouseLeave={handleMouseLeave}
+                    onMouseMove={handleMouseMove}
                 />
                 {isErasing && (
                     <div
