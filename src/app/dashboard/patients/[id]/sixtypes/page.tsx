@@ -2,7 +2,7 @@
 
 import { supabase } from '@/app/lib/supabase';
 import { useParams } from 'next/navigation';
-import React, { useRef, useState, useEffect, useCallback } from 'react';
+import React, { useRef, useState, useEffect, useCallback, MouseEvent, TouchEvent } from 'react';
 
 const Sixtypes = () => {
     const bgCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -35,6 +35,10 @@ const Sixtypes = () => {
 
         if (!container || !bgCanvas || !drawCanvas || !img) return;
 
+        // 기존 드로잉 저장
+        const drawImage = new Image();
+        drawImage.src = drawCanvas.toDataURL();
+
         const width = container.clientWidth;
         const height = width / aspectRatio;
 
@@ -50,6 +54,13 @@ const Sixtypes = () => {
             bgCtx.clearRect(0, 0, width, height);
             bgCtx.drawImage(img, 0, 0, width, height);
         }
+
+        drawImage.onload = () => {
+            const ctx = drawCanvas.getContext('2d');
+            if (ctx) {
+                ctx.drawImage(drawImage, 0, 0, width, height);
+            }
+        };
     }, [img, aspectRatio]);
 
     useEffect(() => {
@@ -59,25 +70,39 @@ const Sixtypes = () => {
         return () => window.removeEventListener('resize', resizeCanvas);
     }, [img, resizeCanvas]);
 
-    const getPos = (e: PointerEvent): { x: number; y: number } => {
+    const getPos = (e: MouseEvent | TouchEvent): { x: number; y: number } => {
         const canvas = drawCanvasRef.current;
         if (!canvas) return { x: 0, y: 0 };
         const rect = canvas.getBoundingClientRect();
-        return {
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
-        };
+
+        if ('touches' in e) {
+            return {
+                x: e.touches[0].clientX - rect.left,
+                y: e.touches[0].clientY - rect.top,
+            };
+        } else {
+            return {
+                x: e.clientX - rect.left,
+                y: e.clientY - rect.top,
+            };
+        }
     };
 
-    const handlePointerDown = (e: PointerEvent) => {
-        if (e.pointerType !== 'pen' && e.pointerType !== 'mouse') return;
+    const startDrawing = (e: MouseEvent | TouchEvent) => {
+        if ('touches' in e && e.touches.length > 1) return; // 손바닥 무시
         e.preventDefault();
         setDrawing(true);
         setLastPos(getPos(e));
     };
 
-    const handlePointerMove = (e: PointerEvent) => {
-        if (e.pointerType !== 'pen' && e.pointerType !== 'mouse') return;
+    const endDrawing = () => {
+        setDrawing(false);
+        setLastPos(null);
+    };
+
+    const draw = (e: MouseEvent | TouchEvent) => {
+        if ('touches' in e && e.touches.length > 1) return; // 손바닥 무시
+        e.preventDefault();
         const pos = getPos(e);
         setCursorPos(pos);
 
@@ -99,12 +124,6 @@ const Sixtypes = () => {
         ctx.stroke();
 
         setLastPos(pos);
-    };
-
-    const handlePointerUp = (e: PointerEvent) => {
-        if (e.pointerType !== 'pen' && e.pointerType !== 'mouse') return;
-        setDrawing(false);
-        setLastPos(null);
     };
 
     const handleClear = () => {
@@ -143,6 +162,7 @@ const Sixtypes = () => {
             }
 
             const { data: urlData } = supabase.storage.from('sixtypes').getPublicUrl(filename);
+
             const imageUrl = urlData?.publicUrl;
             if (!imageUrl) {
                 alert('URL 생성 실패');
@@ -160,23 +180,6 @@ const Sixtypes = () => {
             }
         }, 'image/png');
     };
-
-    useEffect(() => {
-        const canvas = drawCanvasRef.current;
-        if (!canvas) return;
-
-        canvas.addEventListener('pointerdown', handlePointerDown);
-        canvas.addEventListener('pointermove', handlePointerMove);
-        canvas.addEventListener('pointerup', handlePointerUp);
-        canvas.addEventListener('pointerleave', handlePointerUp);
-
-        return () => {
-            canvas.removeEventListener('pointerdown', handlePointerDown);
-            canvas.removeEventListener('pointermove', handlePointerMove);
-            canvas.removeEventListener('pointerup', handlePointerUp);
-            canvas.removeEventListener('pointerleave', handlePointerUp);
-        };
-    }, [handlePointerDown, handlePointerMove, handlePointerUp]);
 
     return (
         <div style={{ maxWidth: '1024px', margin: '0 auto', padding: '12px' }}>
@@ -237,6 +240,14 @@ const Sixtypes = () => {
                         zIndex: 1,
                         touchAction: 'none',
                     }}
+                    onMouseDown={startDrawing}
+                    onMouseUp={endDrawing}
+                    onMouseLeave={endDrawing}
+                    onMouseMove={draw}
+                    onTouchStart={startDrawing}
+                    onTouchEnd={endDrawing}
+                    onTouchCancel={endDrawing}
+                    onTouchMove={draw}
                 />
                 {isErasing && (
                     <div
