@@ -10,14 +10,17 @@ const Sixtypes = () => {
     const containerRef = useRef<HTMLDivElement>(null);
     const params = useParams();
     const patientId = params?.id as string;
-    const [drawing, setDrawing] = useState(false);
-    const [lastPos, setLastPos] = useState<{ x: number; y: number } | null>(null);
+
     const [img, setImg] = useState<HTMLImageElement | null>(null);
     const [aspectRatio, setAspectRatio] = useState(2);
     const [isErasing, setIsErasing] = useState(false);
     const [lineColor, setLineColor] = useState('#000000');
     const [eraserSize, setEraserSize] = useState(20);
     const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 });
+
+    const drawingRef = useRef(false);
+    const lastPosRef = useRef<{ x: number; y: number } | null>(null);
+    const nextPosRef = useRef<{ x: number; y: number } | null>(null);
 
     useEffect(() => {
         const image = new Image();
@@ -32,10 +35,8 @@ const Sixtypes = () => {
         const container = containerRef.current;
         const bgCanvas = bgCanvasRef.current;
         const drawCanvas = drawCanvasRef.current;
-
         if (!container || !bgCanvas || !drawCanvas || !img) return;
 
-        // 기존 드로잉 저장
         const drawImage = new Image();
         drawImage.src = drawCanvas.toDataURL();
 
@@ -74,7 +75,6 @@ const Sixtypes = () => {
         const canvas = drawCanvasRef.current;
         if (!canvas) return { x: 0, y: 0 };
         const rect = canvas.getBoundingClientRect();
-
         if ('touches' in e) {
             return {
                 x: e.touches[0].clientX - rect.left,
@@ -89,46 +89,51 @@ const Sixtypes = () => {
     };
 
     const startDrawing = (e: MouseEvent | TouchEvent) => {
-        if ('touches' in e) {
-            if (e.touches.length > 1) return; // 멀티터치 무시
-            e.preventDefault(); // 기본 동작 차단
-        }
-        setDrawing(true);
-        setLastPos(getPos(e));
+        if ('touches' in e && e.touches.length > 1) return;
+        e.preventDefault();
+        drawingRef.current = true;
+        lastPosRef.current = getPos(e);
     };
 
     const endDrawing = () => {
-        setDrawing(false);
-        setLastPos(null);
+        drawingRef.current = false;
+        lastPosRef.current = null;
+        nextPosRef.current = null;
     };
 
-    const draw = (e: MouseEvent | TouchEvent) => {
-        if ('touches' in e) {
-            if (e.touches.length > 1) return; // 멀티터치 무시
-            e.preventDefault(); // 기본 동작 차단
-        }
+    const updatePos = (e: MouseEvent | TouchEvent) => {
+        if (!drawingRef.current) return;
+        e.preventDefault();
         const pos = getPos(e);
         setCursorPos(pos);
+        nextPosRef.current = pos;
+    };
 
-        if (!drawing || !lastPos) return;
-
+    useEffect(() => {
         const canvas = drawCanvasRef.current;
         const ctx = canvas?.getContext('2d');
         if (!ctx) return;
 
-        ctx.lineJoin = 'round';
-        ctx.lineCap = 'round';
-        ctx.lineWidth = isErasing ? eraserSize : 2;
-        ctx.strokeStyle = isErasing ? 'rgba(0,0,0,1)' : lineColor;
-        ctx.globalCompositeOperation = isErasing ? 'destination-out' : 'source-over';
+        const drawLoop = () => {
+            if (drawingRef.current && lastPosRef.current && nextPosRef.current) {
+                ctx.lineJoin = 'round';
+                ctx.lineCap = 'round';
+                ctx.lineWidth = isErasing ? eraserSize : 2;
+                ctx.strokeStyle = isErasing ? 'rgba(0,0,0,1)' : lineColor;
+                ctx.globalCompositeOperation = isErasing ? 'destination-out' : 'source-over';
 
-        ctx.beginPath();
-        ctx.moveTo(lastPos.x, lastPos.y);
-        ctx.lineTo(pos.x, pos.y);
-        ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(lastPosRef.current.x, lastPosRef.current.y);
+                ctx.lineTo(nextPosRef.current.x, nextPosRef.current.y);
+                ctx.stroke();
 
-        setLastPos(pos);
-    };
+                lastPosRef.current = nextPosRef.current;
+            }
+            requestAnimationFrame(drawLoop);
+        };
+
+        drawLoop();
+    }, [isErasing, eraserSize, lineColor]);
 
     const handleClear = () => {
         const canvas = drawCanvasRef.current;
@@ -166,7 +171,6 @@ const Sixtypes = () => {
             }
 
             const { data: urlData } = supabase.storage.from('sixtypes').getPublicUrl(filename);
-
             const imageUrl = urlData?.publicUrl;
             if (!imageUrl) {
                 alert('URL 생성 실패');
@@ -187,15 +191,7 @@ const Sixtypes = () => {
 
     return (
         <div style={{ maxWidth: '1024px', margin: '0 auto', padding: '12px' }}>
-            <div
-                style={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    gap: '8px',
-                    justifyContent: 'center',
-                    marginBottom: '12px',
-                }}
-            >
+            <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginBottom: '12px' }}>
                 <button onClick={() => setIsErasing(false)}>✏️ 그리기</button>
                 <button onClick={() => setIsErasing(true)}>🧽 지우개</button>
                 <button onClick={handleClear}>🗑 전체 지우기</button>
@@ -223,8 +219,6 @@ const Sixtypes = () => {
                     aspectRatio: aspectRatio.toString(),
                     touchAction: 'none',
                     userSelect: 'none',
-                    WebkitUserSelect: 'none',
-                    WebkitTouchCallout: 'none',
                 }}
                 onContextMenu={(e) => e.preventDefault()}
             >
@@ -247,20 +241,15 @@ const Sixtypes = () => {
                         cursor: isErasing ? 'none' : 'crosshair',
                         position: 'relative',
                         zIndex: 1,
-                        touchAction: 'none',
-                        userSelect: 'none',
-                        WebkitUserSelect: 'none',
-                        WebkitTouchCallout: 'none',
                     }}
                     onMouseDown={startDrawing}
                     onMouseUp={endDrawing}
                     onMouseLeave={endDrawing}
-                    onMouseMove={draw}
+                    onMouseMove={updatePos}
                     onTouchStart={startDrawing}
                     onTouchEnd={endDrawing}
                     onTouchCancel={endDrawing}
-                    onTouchMove={draw}
-                    onContextMenu={(e) => e.preventDefault()}
+                    onTouchMove={updatePos}
                 />
                 {isErasing && (
                     <div
