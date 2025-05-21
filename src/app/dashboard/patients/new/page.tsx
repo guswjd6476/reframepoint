@@ -2,22 +2,20 @@
 
 import React, { useState, useRef, useEffect, ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { toPng } from 'html-to-image';
 import SignaturePad from 'signature_pad';
-import Image from 'next/image';
 import { uploadSignature, addNewPatient } from '@/app/api/supabaseApi';
 import { useAuth } from '@/app/context/AuthContext';
+import * as htmlToImage from 'html-to-image';
 
 export default function NewPatientPage() {
     const router = useRouter();
+    const { session } = useAuth();
 
     const [step, setStep] = useState(1);
     const [agreed, setAgreed] = useState(false);
-    const [previewData, setPreviewData] = useState<string | null>(null);
     const [signatureData, setSignatureData] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
-    const [previewLoaded, setPreviewLoaded] = useState(false);
-    const { session } = useAuth();
+
     const [form, setForm] = useState({
         name: '',
         birth_date: '',
@@ -28,12 +26,7 @@ export default function NewPatientPage() {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const signaturePadRef = useRef<SignaturePad | null>(null);
     const agreementRef = useRef<HTMLDivElement | null>(null);
-
-    const today = new Date().toLocaleDateString('ko-KR', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-    });
+    const today = new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -71,53 +64,32 @@ export default function NewPatientPage() {
         };
     }, []);
 
-    useEffect(() => {
-        if (!signatureData || step !== 1) return;
-
-        const generatePreview = async () => {
-            if (!agreementRef.current) {
-                alert('서약서 영역이 렌더링되지 않았습니다.');
-                return;
-            }
-
-            try {
-                const dataUrl = await toPng(agreementRef.current, {
-                    cacheBust: true,
-                    backgroundColor: 'white',
-                    pixelRatio: 2,
-                    width: agreementRef.current.offsetWidth,
-                    height: agreementRef.current.offsetHeight,
-                });
-                setPreviewData(dataUrl);
-                setPreviewLoaded(false);
-            } catch (err) {
-                console.error('서약서 이미지 생성 오류:', err);
-                alert('서약서 이미지를 저장하는 데 실패했습니다.');
-            }
-        };
-
-        setTimeout(generatePreview, 100);
-    }, [signatureData, step]); // ✅ step 추가
-
-    useEffect(() => {
-        if (previewData && step === 1) {
-            setStep(3);
-        }
-    }, [previewData, step]);
-
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setForm((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleAgreementSubmit = () => {
+    const handleAgreementSubmit = async () => {
         if (!agreed || !signaturePadRef.current || signaturePadRef.current.isEmpty()) {
             alert('보안 각서에 동의하고 서명해주세요.');
             return;
         }
 
-        const sigDataUrl = signaturePadRef.current.toDataURL('image/png');
-        setSignatureData(sigDataUrl);
+        try {
+            const node = agreementRef.current;
+            if (!node) {
+                alert('약속서 캡처에 실패했습니다.');
+                return;
+            }
+
+            // 서약서 전체 이미지로 캡처
+            const dataUrl = await htmlToImage.toPng(node);
+            setSignatureData(dataUrl);
+            setStep(2);
+        } catch (err) {
+            console.error('html-to-image error:', err);
+            alert('서약서 이미지 생성 중 오류 발생');
+        }
     };
 
     const handleSubmit = async () => {
@@ -129,7 +101,7 @@ export default function NewPatientPage() {
 
         setLoading(true);
 
-        const fileName = `agreement-${Date.now()}.png`;
+        const fileName = `agreement-full-${Date.now()}.png`;
         const { url: signatureurl, error: uploadError } = await uploadSignature(signatureData, fileName);
 
         if (uploadError || !signatureurl) {
@@ -150,7 +122,6 @@ export default function NewPatientPage() {
         setLoading(false);
 
         if (error) {
-            console.error(error);
             alert('등록 중 오류 발생');
         } else {
             alert('등록 완료되었습니다.');
@@ -164,8 +135,7 @@ export default function NewPatientPage() {
                 <>
                     <div
                         ref={agreementRef}
-                        className="border rounded-lg p-10 bg-white text-sm text-gray-800 space-y-6 shadow-lg font-serif"
-                        style={{ width: '600px', minHeight: '400px' }}
+                        className="border rounded-lg p-10 bg-white text-sm text-gray-800 space-y-6 shadow-lg font-serif w-full max-w-[600px] mx-auto"
                     >
                         <h2 className="text-2xl font-bold text-center underline mb-6 tracking-wide">
                             비밀 유지 서약서
@@ -217,31 +187,12 @@ export default function NewPatientPage() {
 
                         <div className="pt-6">
                             <p className="text-sm mb-1">서명:</p>
-                            {signatureData ? (
-                                <Image
-                                    src={signatureData}
-                                    alt="서명 이미지"
-                                    width={300}
-                                    height={150}
-                                    className="border"
-                                />
-                            ) : (
-                                <canvas
-                                    ref={canvasRef}
-                                    className="border rounded bg-white touch-none w-[300px] h-[150px]"
-                                    style={{ touchAction: 'none' }}
-                                />
-                            )}
+                            <canvas
+                                ref={canvasRef}
+                                className="border rounded bg-white touch-none w-[300px] h-[150px]"
+                                style={{ touchAction: 'none' }}
+                            />
                         </div>
-
-                        {!signatureData && (
-                            <button
-                                onClick={() => signaturePadRef.current?.clear()}
-                                className="mt-2 text-sm text-gray-600 underline"
-                            >
-                                서명 초기화
-                            </button>
-                        )}
                     </div>
 
                     <button
@@ -253,50 +204,10 @@ export default function NewPatientPage() {
                 </>
             )}
 
-            {step === 3 && (
-                <div className="space-y-8 text-center">
-                    <h3 className="text-2xl font-bold text-gray-800">서약서 미리보기</h3>
-                    <div className="flex justify-center">
-                        <div className="bg-white border-2 border-gray-200 rounded-lg shadow-md p-4">
-                            {previewData ? (
-                                <div className="relative w-[600px] h-auto">
-                                    <Image
-                                        src={previewData}
-                                        alt="서약서 미리보기"
-                                        width={600}
-                                        height={400}
-                                        onLoad={() => setPreviewLoaded(true)}
-                                        className={`w-full h-auto rounded-md border shadow transition-opacity duration-300 ${
-                                            previewLoaded ? 'opacity-100' : 'opacity-0'
-                                        }`}
-                                    />
-                                    {!previewLoaded && (
-                                        <div className="absolute inset-0 w-[600px] h-[400px] bg-gray-100 flex items-center justify-center text-gray-400">
-                                            미리보기 준비 중...
-                                        </div>
-                                    )}
-                                </div>
-                            ) : (
-                                <div className="w-[600px] h-[400px] bg-gray-100 flex items-center justify-center text-gray-400">
-                                    미리보기 준비 중...
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    <button
-                        onClick={() => setStep(2)}
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md text-sm font-semibold"
-                    >
-                        확인 후 상담 정보 입력
-                    </button>
-                </div>
-            )}
-
             {step === 2 && (
                 <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
                     <h3 className="text-xl font-semibold mb-6 text-gray-800 border-b pb-2">상담 대상자 정보</h3>
-                    <div className="grid gap-5 mb-6">
+                    <div className="grid gap-5 mb-6 md:grid-cols-2">
                         {[
                             { name: 'name', label: '이름', placeholder: '이름을 입력하세요', type: 'text' },
                             { name: 'birth_date', label: '생년월일', placeholder: '', type: 'date' },

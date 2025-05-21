@@ -2,8 +2,15 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
     images: {
-        domains: ['caymroqwpaqyppsopyva.supabase.co'], // 여기에 Supabase 호스트를 추가
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: 'caymroqwpaqyppsopyva.supabase.co',
+                pathname: '/**',
+            },
+        ],
     },
+    reactStrictMode: true,
 };
 
 export default nextConfig;

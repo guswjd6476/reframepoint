@@ -50,7 +50,6 @@ export const getPatients = async () => {
         console.error('유저 정보 오류:', userError);
         return { data: [], error: userError };
     }
-    console.log({ user });
 
     const { data, error } = await supabase.from('patients').select('*').eq('counselors', user.id);
 
@@ -75,10 +74,10 @@ export const addNewPatient = async (patient: {
     return { data, error };
 };
 
-export const createCounselorAccount = async (email: string, password: string, name: string) => {
+export const createCounselorAccount = async (email: string, password: string, name: string, region: string) => {
     const res = await fetch('/api/create-counselor', {
         method: 'POST',
-        body: JSON.stringify({ email, password, name }),
+        body: JSON.stringify({ email, password, name, region }),
     });
 
     const result = await res.json();

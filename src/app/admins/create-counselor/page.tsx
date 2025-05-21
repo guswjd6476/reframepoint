@@ -8,12 +8,13 @@ export default function CreateCounselorPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
+    const [region, setRegion] = useState('');
     const [message, setMessage] = useState('');
     const router = useRouter();
 
     const handleCreateCounselor = async () => {
         try {
-            const result = await createCounselorAccount(email, password, name);
+            const result = await createCounselorAccount(email, password, name, region);
             setMessage(result.message);
             setEmail('');
             setPassword('');
@@ -42,6 +43,16 @@ export default function CreateCounselorPage() {
                 onChange={(e) => setName(e.target.value)}
                 className="w-full p-3 border rounded-md"
             />
+            <select value={region} onChange={(e) => setRegion(e.target.value)} className="w-full p-3 border rounded-md">
+                <option value="">지역 선택</option>
+                <option value="도봉">도봉</option>
+                <option value="성북">성북</option>
+                <option value="노원">노원</option>
+                <option value="중랑">중랑</option>
+                <option value="강북">강북</option>
+                <option value="대학">대학</option>
+                <option value="새신자">새신자</option>
+            </select>
             <input
                 type="email"
                 placeholder="이메일"

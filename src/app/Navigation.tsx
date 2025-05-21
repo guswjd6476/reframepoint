@@ -10,7 +10,7 @@ export default function Navigation() {
     const [scrolling, setScrolling] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const { session, logout } = useAuth();
-    console.log(session);
+
     useEffect(() => {
         const handleScroll = () => {
             setScrolling(window.scrollY > 100);
@@ -109,7 +109,7 @@ export default function Navigation() {
                             <Link className="text-gray-200 hover:text-blue-500" href="/dashboard" onClick={toggleMenu}>
                                 대시보드
                             </Link>
-                            {session.user?.email === 'seouljdb@jcb.com' && (
+                            {session.user?.email === 'seouljdb@jdb.com' && (
                                 <Link className="text-gray-200 hover:text-blue-500" href="/admins" onClick={toggleMenu}>
                                     관리자
                                 </Link>
