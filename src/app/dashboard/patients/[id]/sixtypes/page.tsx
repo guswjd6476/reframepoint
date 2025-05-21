@@ -35,7 +35,6 @@ const Sixtypes = () => {
 
         if (!container || !bgCanvas || !drawCanvas || !img) return;
 
-        // 기존 드로잉 저장
         const drawImage = new Image();
         drawImage.src = drawCanvas.toDataURL();
 
@@ -43,14 +42,15 @@ const Sixtypes = () => {
         const height = width / aspectRatio;
 
         [bgCanvas, drawCanvas].forEach((canvas) => {
-            canvas.width = width;
-            canvas.height = height;
-            canvas.style.width = '100%';
-            canvas.style.height = 'auto';
+            canvas.width = width * window.devicePixelRatio; // 고해상도 디스플레이 지원
+            canvas.height = height * window.devicePixelRatio;
+            canvas.style.width = `${width}px`;
+            canvas.style.height = `${height}px`;
         });
 
         const bgCtx = bgCanvas.getContext('2d');
         if (bgCtx) {
+            bgCtx.scale(window.devicePixelRatio, window.devicePixelRatio);
             bgCtx.clearRect(0, 0, width, height);
             bgCtx.drawImage(img, 0, 0, width, height);
         }
@@ -58,6 +58,7 @@ const Sixtypes = () => {
         drawImage.onload = () => {
             const ctx = drawCanvas.getContext('2d');
             if (ctx) {
+                ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
                 ctx.drawImage(drawImage, 0, 0, width, height);
             }
         };
@@ -77,21 +78,21 @@ const Sixtypes = () => {
 
         if ('touches' in e) {
             return {
-                x: e.touches[0].clientX - rect.left,
-                y: e.touches[0].clientY - rect.top,
+                x: (e.touches[0].clientX - rect.left) * (canvas.width / rect.width),
+                y: (e.touches[0].clientY - rect.top) * (canvas.height / rect.height),
             };
         } else {
             return {
-                x: e.clientX - rect.left,
-                y: e.clientY - rect.top,
+                x: (e.clientX - rect.left) * (canvas.width / rect.width),
+                y: (e.clientY - rect.top) * (canvas.height / rect.height),
             };
         }
     };
 
     const startDrawing = (e: MouseEvent | TouchEvent) => {
         if ('touches' in e) {
-            if (e.touches.length > 1) return; // 멀티터치 무시
-            e.preventDefault(); // 기본 동작 차단
+            if (e.touches.length > 1) return;
+            e.preventDefault();
         }
         setDrawing(true);
         setLastPos(getPos(e));
@@ -104,8 +105,8 @@ const Sixtypes = () => {
 
     const draw = (e: MouseEvent | TouchEvent) => {
         if ('touches' in e) {
-            if (e.touches.length > 1) return; // 멀티터치 무시
-            e.preventDefault(); // 기본 동작 차단
+            if (e.touches.length > 1) return;
+            e.preventDefault();
         }
         const pos = getPos(e);
         setCursorPos(pos);
@@ -122,8 +123,14 @@ const Sixtypes = () => {
         ctx.strokeStyle = isErasing ? 'rgba(0,0,0,1)' : lineColor;
         ctx.globalCompositeOperation = isErasing ? 'destination-out' : 'source-over';
 
+        // 베지어 곡선을 사용하여 부드러운 선 그리기
         ctx.beginPath();
         ctx.moveTo(lastPos.x, lastPos.y);
+        const midPoint = {
+            x: (lastPos.x + pos.x) / 2,
+            y: (lastPos.y + pos.y) / 2,
+        };
+        ctx.quadraticCurveTo(lastPos.x, lastPos.y, midPoint.x, midPoint.y);
         ctx.lineTo(pos.x, pos.y);
         ctx.stroke();
 
