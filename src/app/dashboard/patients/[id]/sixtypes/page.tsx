@@ -2,7 +2,7 @@
 
 import { supabase } from '@/app/lib/supabase';
 import { useParams } from 'next/navigation';
-import React, { useRef, useState, useEffect, useCallback, MouseEvent, TouchEvent } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 
 const Sixtypes = () => {
     const bgCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -59,37 +59,25 @@ const Sixtypes = () => {
         return () => window.removeEventListener('resize', resizeCanvas);
     }, [img, resizeCanvas]);
 
-    const getPos = (e: MouseEvent | TouchEvent): { x: number; y: number } => {
+    const getPos = (e: PointerEvent): { x: number; y: number } => {
         const canvas = drawCanvasRef.current;
         if (!canvas) return { x: 0, y: 0 };
         const rect = canvas.getBoundingClientRect();
-
-        if ('touches' in e) {
-            return {
-                x: e.touches[0].clientX - rect.left,
-                y: e.touches[0].clientY - rect.top,
-            };
-        } else {
-            return {
-                x: e.clientX - rect.left,
-                y: e.clientY - rect.top,
-            };
-        }
+        return {
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top,
+        };
     };
 
-    const startDrawing = (e: MouseEvent | TouchEvent) => {
+    const handlePointerDown = (e: PointerEvent) => {
+        if (e.pointerType !== 'pen' && e.pointerType !== 'mouse') return;
         e.preventDefault();
         setDrawing(true);
         setLastPos(getPos(e));
     };
 
-    const endDrawing = () => {
-        setDrawing(false);
-        setLastPos(null);
-    };
-
-    const draw = (e: MouseEvent | TouchEvent) => {
-        e.preventDefault();
+    const handlePointerMove = (e: PointerEvent) => {
+        if (e.pointerType !== 'pen' && e.pointerType !== 'mouse') return;
         const pos = getPos(e);
         setCursorPos(pos);
 
@@ -111,6 +99,12 @@ const Sixtypes = () => {
         ctx.stroke();
 
         setLastPos(pos);
+    };
+
+    const handlePointerUp = (e: PointerEvent) => {
+        if (e.pointerType !== 'pen' && e.pointerType !== 'mouse') return;
+        setDrawing(false);
+        setLastPos(null);
     };
 
     const handleClear = () => {
@@ -149,7 +143,6 @@ const Sixtypes = () => {
             }
 
             const { data: urlData } = supabase.storage.from('sixtypes').getPublicUrl(filename);
-
             const imageUrl = urlData?.publicUrl;
             if (!imageUrl) {
                 alert('URL 생성 실패');
@@ -168,6 +161,23 @@ const Sixtypes = () => {
         }, 'image/png');
     };
 
+    useEffect(() => {
+        const canvas = drawCanvasRef.current;
+        if (!canvas) return;
+
+        canvas.addEventListener('pointerdown', handlePointerDown);
+        canvas.addEventListener('pointermove', handlePointerMove);
+        canvas.addEventListener('pointerup', handlePointerUp);
+        canvas.addEventListener('pointerleave', handlePointerUp);
+
+        return () => {
+            canvas.removeEventListener('pointerdown', handlePointerDown);
+            canvas.removeEventListener('pointermove', handlePointerMove);
+            canvas.removeEventListener('pointerup', handlePointerUp);
+            canvas.removeEventListener('pointerleave', handlePointerUp);
+        };
+    }, [handlePointerDown, handlePointerMove, handlePointerUp]);
+
     return (
         <div style={{ maxWidth: '1024px', margin: '0 auto', padding: '12px' }}>
             <div
@@ -183,13 +193,7 @@ const Sixtypes = () => {
                 <button onClick={() => setIsErasing(true)}>🧽 지우개</button>
                 <button onClick={handleClear}>🗑 전체 지우기</button>
                 <button onClick={handleSave}>💾 저장</button>
-                {!isErasing && (
-                    <input
-                        type="color"
-                        value={lineColor}
-                        onChange={(e) => setLineColor(e.target.value)}
-                    />
-                )}
+                {!isErasing && <input type="color" value={lineColor} onChange={(e) => setLineColor(e.target.value)} />}
                 {isErasing && (
                     <label>
                         <input
@@ -233,14 +237,6 @@ const Sixtypes = () => {
                         zIndex: 1,
                         touchAction: 'none',
                     }}
-                    onMouseDown={startDrawing}
-                    onMouseUp={endDrawing}
-                    onMouseLeave={endDrawing}
-                    onMouseMove={draw}
-                    onTouchStart={startDrawing}
-                    onTouchEnd={endDrawing}
-                    onTouchCancel={endDrawing}
-                    onTouchMove={draw}
                 />
                 {isErasing && (
                     <div
