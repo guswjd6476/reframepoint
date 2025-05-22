@@ -9,7 +9,7 @@ const Sixtypes = () => {
     const drawCanvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const params = useParams();
-    const patientId = params?.id as string;
+    const participantId = params?.id as string;
 
     const [img, setImg] = useState<HTMLImageElement | null>(null);
     const [aspectRatio, setAspectRatio] = useState(2);
@@ -181,7 +181,7 @@ const Sixtypes = () => {
 
             const { error: insertError } = await supabase
                 .from('sixtypes')
-                .insert([{ patient_id: patientId, image_url: imageUrl }]);
+                .insert([{ participant_id: participantId, image_url: imageUrl }]);
 
             if (insertError) {
                 alert('DB 저장 실패: ' + insertError.message);

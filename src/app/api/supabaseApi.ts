@@ -21,26 +21,26 @@ export const onAuthStateChange = (callback: (event: string, session: Session | n
     return supabase.auth.onAuthStateChange(callback);
 };
 
-export const saveCoreEmotionTest = async (patientId: string, answers: Record<number, string[]>) => {
+export const saveCoreEmotionTest = async (participantId: string, answers: Record<number, string[]>) => {
     return await supabase.from('core_emotion_tests').insert([
         {
-            patient_id: patientId,
+            participant_id: participantId,
             answers,
             created_at: new Date().toISOString(),
         },
     ]);
 };
 
-export const savePersonalityTest = async (patientId: string, answers: Record<string, number>) => {
+export const savePersonalityTest = async (participantId: string, answers: Record<string, number>) => {
     return await supabase.from('personality_tests').insert([
         {
-            patient_id: patientId,
+            participant_id: participantId,
             answers,
         },
     ]);
 };
 
-export const getPatients = async () => {
+export const getParticipants = async () => {
     const {
         data: { user },
         error: userError,
@@ -51,12 +51,16 @@ export const getPatients = async () => {
         return { data: [], error: userError };
     }
 
-    const { data, error } = await supabase.from('patients').select('*').eq('counselors', user.id);
+    const { data, error } = await supabase
+        .from('participant')
+        .select('*')
+        .eq('counselors', user.id)
+        .order('created_at', { ascending: false }); // 최신순 정렬 추가
 
     return { data, error };
 };
 
-export const addNewPatient = async (patient: {
+export const addNewParticipant = async (participant: {
     name: string;
     birth_date: string;
     stress: string;
@@ -64,20 +68,20 @@ export const addNewPatient = async (patient: {
     signatureurl: string;
     counselorId: string;
 }) => {
-    const { counselorId, ...rest } = patient;
+    const { counselorId, ...rest } = participant;
 
     const { data, error } = await supabase
-        .from('patients')
+        .from('participant')
         .insert([{ ...rest, counselors: counselorId }])
         .select();
 
     return { data, error };
 };
-export const getCoreEmotionTestResult = async (patientId: string) => {
+export const getCoreEmotionTestResult = async (participantId: string) => {
     const { data, error } = await supabase
         .from('core_emotion_tests')
         .select('answers')
-        .eq('patient_id', patientId)
+        .eq('participant_id', participantId)
         .single();
 
     if (data) {
@@ -117,6 +121,6 @@ export const uploadSignature = async (dataUrl: string, fileName: string) => {
 
     return { url: publicUrl, error: null };
 };
-export async function deletePatient(id: string) {
-    return await supabase.from('patients').delete().eq('id', id);
+export async function deleteParticipant(id: string) {
+    return await supabase.from('participant').delete().eq('id', id);
 }

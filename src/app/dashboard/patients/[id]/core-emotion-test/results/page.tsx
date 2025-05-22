@@ -36,7 +36,7 @@ function groupItemsByCategory(items: string[]): Record<string, string[]> {
 
 const CoreEmotionResultPage = () => {
     const params = useParams();
-    const patientId = params?.id as string;
+    const participantId = params?.id as string;
 
     const [loading, setLoading] = useState(true);
     const [answersMap, setAnswersMap] = useState<Record<number, string[]>>({});
@@ -45,7 +45,7 @@ const CoreEmotionResultPage = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            const { data: answers, error } = await getCoreEmotionTestResult(patientId);
+            const { data: answers, error } = await getCoreEmotionTestResult(participantId);
             if (error || !answers) {
                 setError(true);
                 setLoading(false);
@@ -76,7 +76,7 @@ const CoreEmotionResultPage = () => {
         };
 
         fetchData();
-    }, [patientId]);
+    }, [participantId]);
 
     if (loading) return <p className="text-center mt-20 text-gray-500 text-lg font-light">불러오는 중...</p>;
     if (error)

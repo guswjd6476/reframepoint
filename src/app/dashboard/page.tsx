@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { getPatients, deletePatient } from '../api/supabaseApi';
+import { getParticipants, deleteParticipant } from '../api/supabaseApi';
 
-type Patient = {
+type Participant = {
     id: string;
     name: string;
     birth_date: string;
@@ -13,30 +13,30 @@ type Patient = {
 };
 
 export default function Dashboard() {
-    const [patients, setPatients] = useState<Patient[]>([]);
+    const [participant, setParticipant] = useState<Participant[]>([]);
     const [showList, setShowList] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
-        if (showList) fetchPatients();
+        if (showList) fetchParticipant();
     }, [showList]);
 
-    const fetchPatients = async () => {
-        const { data, error } = await getPatients();
+    const fetchParticipant = async () => {
+        const { data, error } = await getParticipants();
         if (error) console.error(error);
-        else setPatients(data ?? []);
+        else setParticipant(data ?? []);
     };
 
     const handleDelete = async (id: string) => {
         const confirm = window.confirm('정말 삭제하시겠습니까?');
         if (!confirm) return;
 
-        const { error } = await deletePatient(id);
+        const { error } = await deleteParticipant(id);
         if (error) {
             console.error('삭제 오류:', error.message);
             alert('삭제에 실패했습니다.');
         } else {
-            setPatients((prev) => prev.filter((p) => p.id !== id));
+            setParticipant((prev) => prev.filter((p) => p.id !== id));
         }
     };
 
@@ -46,7 +46,7 @@ export default function Dashboard() {
 
             <div className="flex flex-col gap-4 mb-6">
                 <button
-                    onClick={() => router.push('/dashboard/patients/new')}
+                    onClick={() => router.push('/dashboard/participant/new')}
                     className="bg-blue-500 text-white px-6 py-2 rounded-md shadow-md hover:bg-blue-600 transition duration-200"
                 >
                     상담 대상자 추가하러 가기
@@ -73,26 +73,26 @@ export default function Dashboard() {
                             </tr>
                         </thead>
                         <tbody>
-                            {patients.map((patient) => (
-                                <tr key={patient.id} className="border-t hover:bg-gray-50">
+                            {participant.map((participants) => (
+                                <tr key={participants.id} className="border-t hover:bg-gray-50">
                                     <td
                                         className="py-3 px-4 cursor-pointer"
-                                        onClick={() => router.push(`/dashboard/patients/${patient.id}`)}
+                                        onClick={() => router.push(`/dashboard/participant/${participants.id}`)}
                                     >
-                                        {patient.name}
+                                        {participants.name}
                                     </td>
-                                    <td className="py-3 px-4 hidden md:table-cell">{patient.birth_date}</td>
-                                    <td className="py-3 px-4 hidden md:table-cell">{patient.stress}</td>
-                                    <td className="py-3 px-4 hidden md:table-cell">{patient.religion}</td>
+                                    <td className="py-3 px-4 hidden md:table-cell">{participants.birth_date}</td>
+                                    <td className="py-3 px-4 hidden md:table-cell">{participants.stress}</td>
+                                    <td className="py-3 px-4 hidden md:table-cell">{participants.religion}</td>
                                     <td className="py-3 px-4 flex gap-2">
                                         <button
-                                            onClick={() => router.push(`/dashboard/patients/${patient.id}`)}
+                                            onClick={() => router.push(`/dashboard/participant/${participants.id}`)}
                                             className="bg-blue-500 text-white px-3 py-1 rounded-md text-sm hover:bg-blue-600"
                                         >
                                             상세 보기
                                         </button>
                                         <button
-                                            onClick={() => handleDelete(patient.id)}
+                                            onClick={() => handleDelete(participants.id)}
                                             className="bg-red-500 text-white px-3 py-1 rounded-md text-sm hover:bg-red-600"
                                         >
                                             삭제

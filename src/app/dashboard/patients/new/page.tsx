@@ -3,11 +3,11 @@
 import React, { useState, useRef, useEffect, ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import SignaturePad from 'signature_pad';
-import { uploadSignature, addNewPatient } from '@/app/api/supabaseApi';
+import { uploadSignature, addNewParticipant } from '@/app/api/supabaseApi';
 import { useAuth } from '@/app/context/AuthContext';
 import * as htmlToImage from 'html-to-image';
 
-export default function NewPatientPage() {
+export default function NewParticipantPage() {
     const router = useRouter();
     const { session } = useAuth();
 
@@ -110,7 +110,7 @@ export default function NewPatientPage() {
             return;
         }
 
-        const { error } = await addNewPatient({
+        const { error } = await addNewParticipant({
             name,
             birth_date,
             stress,

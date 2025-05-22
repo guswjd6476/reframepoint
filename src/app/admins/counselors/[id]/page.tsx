@@ -12,7 +12,7 @@ type Counselor = {
     user_id: string;
 };
 
-type Patient = {
+type Participant = {
     id: string;
     name: string;
     counselors: string;
@@ -24,7 +24,7 @@ export default function CounselorDetailPage() {
     const user_id = String(params?.id);
 
     const [counselor, setCounselor] = useState<Counselor | null>(null);
-    const [patients, setPatients] = useState<Patient[]>([]);
+    const [participant, setParticipant] = useState<Participant[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -42,14 +42,14 @@ export default function CounselorDetailPage() {
                 setCounselor(counselorData);
 
                 // 환자 목록 가져오기
-                const { data: patientsData, error: patientsError } = await supabase
-                    .from('patients')
+                const { data: participantData, error: participantError } = await supabase
+                    .from('participant')
                     .select('id, name, counselors, birth_date')
                     .eq('counselors', user_id);
 
-                if (patientsError) throw patientsError;
+                if (participantError) throw participantError;
 
-                setPatients(patientsData);
+                setParticipant(participantData);
             } catch (err) {
                 console.error('데이터 로딩 실패:', err);
             } finally {
@@ -75,14 +75,17 @@ export default function CounselorDetailPage() {
             </p>
 
             <h2 className="text-2xl font-semibold mt-10">목록</h2>
-            {patients.length > 0 ? (
+            {participant.length > 0 ? (
                 <ul className="list-disc list-inside space-y-2">
-                    {patients.map((patient) => (
-                        <li key={patient.id}>
-                            <Link href={`/dashboard/patients/${patient.id}`} className="text-blue-600 hover:underline">
-                                {patient.name}
+                    {participant.map((participants) => (
+                        <li key={participants.id}>
+                            <Link
+                                href={`/dashboard/participant/${participants.id}`}
+                                className="text-blue-600 hover:underline"
+                            >
+                                {participants.name}
                             </Link>{' '}
-                            ({patient.birth_date})
+                            ({participants.birth_date})
                         </li>
                     ))}
                 </ul>

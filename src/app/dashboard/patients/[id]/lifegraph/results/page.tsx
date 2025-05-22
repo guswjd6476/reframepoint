@@ -21,7 +21,7 @@ export default function SixTypeResultsPage() {
                 const { data, error } = await supabase
                     .from('lifegraphs')
                     .select('*')
-                    .eq('patient_id', id)
+                    .eq('participant_id', id)
                     .maybeSingle();
 
                 if (error) throw error;

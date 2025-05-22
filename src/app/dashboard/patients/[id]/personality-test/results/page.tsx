@@ -19,7 +19,7 @@ import { typeData } from '@/app/lib/context';
 ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Title, Tooltip, Legend);
 
 export default function ResultsPage() {
-    const { id: patientId } = useParams();
+    const { id: participantId } = useParams();
     const [results, setResults] = useState<{ categoryScores: Record<string, number> } | null>(null);
     const [loading, setLoading] = useState(true);
     const [type, setType] = useState('');
@@ -32,7 +32,7 @@ export default function ResultsPage() {
             const { data, error } = await supabase
                 .from('personality_tests')
                 .select('answers')
-                .eq('patient_id', patientId)
+                .eq('participant_id', participantId)
                 .maybeSingle();
 
             if (error || !data) {
@@ -117,7 +117,7 @@ export default function ResultsPage() {
         };
 
         fetchResults();
-    }, [patientId]);
+    }, [participantId]);
 
     if (loading) return <p className="text-center text-gray-600">로딩 중...</p>;
     if (!results) return <p className="text-center text-red-500">결과를 불러오는 데 실패했습니다.</p>;
@@ -159,24 +159,18 @@ export default function ResultsPage() {
         <div className="max-w-4xl mx-auto p-8 bg-white shadow-md rounded-lg">
             <header className="text-center border-b pb-4 mb-6">
                 <h1 className="text-2xl font-bold">에니어그램 성격 유형 검사 결과</h1>
-                <p className="text-sm text-gray-500">ID: {patientId}</p>
+                <p className="text-sm text-gray-500">ID: {participantId}</p>
             </header>
 
             <div className="mb-6">
-                <Line
-                    data={chartData}
-                    options={{ responsive: true }}
-                />
+                <Line data={chartData} options={{ responsive: true }} />
             </div>
 
             <table className="w-full text-center border-collapse border border-gray-300 mb-6">
                 <thead>
                     <tr className="bg-gray-100">
                         {chartLabels.map((label, idx) => (
-                            <th
-                                key={idx}
-                                className="border border-gray-300 px-4 py-2"
-                            >
+                            <th key={idx} className="border border-gray-300 px-4 py-2">
                                 유형 {label}
                             </th>
                         ))}
@@ -185,10 +179,7 @@ export default function ResultsPage() {
                 <tbody>
                     <tr>
                         {chartValues.map((value, idx) => (
-                            <td
-                                key={idx}
-                                className="border border-gray-300 px-4 py-2"
-                            >
+                            <td key={idx} className="border border-gray-300 px-4 py-2">
                                 {value}
                             </td>
                         ))}

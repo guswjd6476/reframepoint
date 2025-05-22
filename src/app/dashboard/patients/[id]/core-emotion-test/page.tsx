@@ -7,7 +7,7 @@ import { saveCoreEmotionTest } from '@/app/api/supabaseApi';
 
 const CoreEmotionTest = () => {
     const params = useParams();
-    const patientId = params?.id as string;
+    const participantId = params?.id as string;
     const [answers, setAnswers] = useState<Record<number, string[]>>({});
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState<string | null>(null);
@@ -35,14 +35,14 @@ const CoreEmotionTest = () => {
         setLoading(true);
         setMessage(null);
 
-        if (!patientId) {
+        if (!participantId) {
             setMessage('❌ 오류: 환자 ID가 없습니다.');
             setLoading(false);
             return;
         }
 
         try {
-            const { error } = await saveCoreEmotionTest(patientId, answers);
+            const { error } = await saveCoreEmotionTest(participantId, answers);
 
             if (error) throw error;
             setMessage('✅ 검사 결과가 성공적으로 저장되었습니다!');

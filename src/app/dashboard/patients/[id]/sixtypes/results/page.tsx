@@ -18,7 +18,11 @@ export default function SixTypeResultsPage() {
             if (!id) return;
 
             try {
-                const { data, error } = await supabase.from('sixtypes').select('*').eq('patient_id', id).maybeSingle();
+                const { data, error } = await supabase
+                    .from('sixtypes')
+                    .select('*')
+                    .eq('participant_id', id)
+                    .maybeSingle();
 
                 if (error) throw error;
                 if (!data) {
@@ -47,12 +51,7 @@ export default function SixTypeResultsPage() {
 
             {imageUrl && (
                 <div className="w-full flex justify-center">
-                    <Image
-                        src={imageUrl}
-                        alt="6도형 이미지"
-                        fill
-                        className="rounded-xl object-contain border shadow"
-                    />
+                    <Image src={imageUrl} alt="6도형 이미지" fill className="rounded-xl object-contain border shadow" />
                 </div>
             )}
 

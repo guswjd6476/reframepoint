@@ -8,8 +8,8 @@ import { savePersonalityTest } from '@/app/api/supabaseApi';
 export default function PersonalityTest() {
     const params = useParams();
     const router = useRouter();
-    const patientId = params?.id as string;
-    const storageKey = `personality_test_${patientId}`;
+    const participantId = params?.id as string;
+    const storageKey = `personality_test_${participantId}`;
 
     const [answers, setAnswers] = useState<{ [key: string]: number }>({});
 
@@ -32,7 +32,7 @@ export default function PersonalityTest() {
     );
 
     const handleSubmit = async () => {
-        if (!patientId) {
+        if (!participantId) {
             alert('잘못된 접근입니다.');
             return;
         }
@@ -43,7 +43,7 @@ export default function PersonalityTest() {
             return;
         }
 
-        const { error } = await savePersonalityTest(patientId, answers);
+        const { error } = await savePersonalityTest(participantId, answers);
 
         if (error) {
             console.error(error);

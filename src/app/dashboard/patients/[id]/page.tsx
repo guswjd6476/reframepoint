@@ -4,10 +4,10 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { supabase } from '@/app/lib/supabase';
 
-export default function PatientPage() {
+export default function ParticipantPage() {
     const router = useRouter();
     const params = useParams();
-    const [patientId, setPatientId] = useState<string | null>(null);
+    const [participantId, setParticipantId] = useState<string | null>(null);
 
     const [isPersonalityDone, setIsPersonalityDone] = useState(false);
     const [isEmotionDone, setIsEmotionDone] = useState(false);
@@ -22,14 +22,14 @@ export default function PatientPage() {
         if (!params?.id) return;
 
         const id = Array.isArray(params.id) ? params.id[0] : params.id;
-        setPatientId(id);
+        setParticipantId(id);
 
         const fetchStatuses = async () => {
             try {
                 const { data: personality, error: pError } = await supabase
                     .from('personality_tests')
                     .select('id')
-                    .eq('patient_id', id)
+                    .eq('participant_id', id)
                     .maybeSingle();
                 if (pError) throw pError;
                 setIsPersonalityDone(!!personality);
@@ -37,7 +37,7 @@ export default function PatientPage() {
                 const { data: emotion, error: eError } = await supabase
                     .from('core_emotion_tests')
                     .select('id')
-                    .eq('patient_id', id)
+                    .eq('participant_id', id)
                     .maybeSingle();
                 if (eError) throw eError;
                 setIsEmotionDone(!!emotion);
@@ -45,7 +45,7 @@ export default function PatientPage() {
                 const { data: sixType, error: sError } = await supabase
                     .from('sixtypes')
                     .select('id')
-                    .eq('patient_id', id)
+                    .eq('participant_id', id)
                     .maybeSingle();
                 if (sError) throw sError;
                 setIsSixTypeDone(!!sixType);
@@ -53,7 +53,7 @@ export default function PatientPage() {
                 const { data: fourType, error: fError } = await supabase
                     .from('fourtypes')
                     .select('id')
-                    .eq('patient_id', id)
+                    .eq('participant_id', id)
                     .maybeSingle();
                 if (fError) throw fError;
                 setIsFourTypeDone(!!fourType);
@@ -61,7 +61,7 @@ export default function PatientPage() {
                 const { data: lifeGraph, error: lError } = await supabase
                     .from('lifegraphs')
                     .select('id')
-                    .eq('patient_id', id)
+                    .eq('participant_id', id)
                     .maybeSingle();
                 if (lError) throw lError;
 
@@ -95,11 +95,11 @@ export default function PatientPage() {
                     </div>
                     <button
                         onClick={() =>
-                            patientId &&
+                            participantId &&
                             router.push(
                                 isSixTypeDone
-                                    ? `/dashboard/patients/${patientId}/sixtypes/results`
-                                    : `/dashboard/patients/${patientId}/sixtypes`
+                                    ? `/dashboard/participant/${participantId}/sixtypes/results`
+                                    : `/dashboard/participant/${participantId}/sixtypes`
                             )
                         }
                         className={`py-1 px-4 rounded-md font-semibold transition ${
@@ -122,11 +122,11 @@ export default function PatientPage() {
                     </div>
                     <button
                         onClick={() =>
-                            patientId &&
+                            participantId &&
                             router.push(
                                 isLifeGraphDone
-                                    ? `/dashboard/patients/${patientId}/lifegraph/results`
-                                    : `/dashboard/patients/${patientId}/lifegraph`
+                                    ? `/dashboard/participant/${participantId}/lifegraph/results`
+                                    : `/dashboard/participant/${participantId}/lifegraph`
                             )
                         }
                         className={`py-1 px-4 rounded-md font-semibold transition ${
@@ -149,11 +149,11 @@ export default function PatientPage() {
                     </div>
                     <button
                         onClick={() =>
-                            patientId &&
+                            participantId &&
                             router.push(
                                 isPersonalityDone
-                                    ? `/dashboard/patients/${patientId}/personality-test/results`
-                                    : `/dashboard/patients/${patientId}/personality-test`
+                                    ? `/dashboard/participant/${participantId}/personality-test/results`
+                                    : `/dashboard/participant/${participantId}/personality-test`
                             )
                         }
                         className={`py-1 px-4 rounded-md font-semibold transition ${
@@ -176,11 +176,11 @@ export default function PatientPage() {
                     </div>
                     <button
                         onClick={() =>
-                            patientId &&
+                            participantId &&
                             router.push(
                                 isFourTypeDone
-                                    ? `/dashboard/patients/${patientId}/fourtypes/results`
-                                    : `/dashboard/patients/${patientId}/fourtypes`
+                                    ? `/dashboard/participant/${participantId}/fourtypes/results`
+                                    : `/dashboard/participant/${participantId}/fourtypes`
                             )
                         }
                         className={`py-1 px-4 rounded-md font-semibold transition ${
@@ -203,11 +203,11 @@ export default function PatientPage() {
                     </div>
                     <button
                         onClick={() =>
-                            patientId &&
+                            participantId &&
                             router.push(
                                 isEmotionDone
-                                    ? `/dashboard/patients/${patientId}/core-emotion-test/results`
-                                    : `/dashboard/patients/${patientId}/core-emotion-test`
+                                    ? `/dashboard/participant/${participantId}/core-emotion-test/results`
+                                    : `/dashboard/participant/${participantId}/core-emotion-test`
                             )
                         }
                         className={`py-1 px-4 rounded-md font-semibold transition ${

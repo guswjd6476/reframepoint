@@ -9,7 +9,7 @@ const LifeGraphCanvas = () => {
     const drawCanvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const params = useParams();
-    const patientId = params?.id as string;
+    const participantId = params?.id as string;
     const [drawing, setDrawing] = useState(false);
     const [lastPos, setLastPos] = useState<{ x: number; y: number } | null>(null);
     const [img, setImg] = useState<HTMLImageElement | null>(null);
@@ -204,7 +204,7 @@ const LifeGraphCanvas = () => {
 
             const { error: insertError } = await supabase
                 .from('lifegraphs')
-                .insert([{ patient_id: patientId, image_url: publicUrl }]);
+                .insert([{ patient_id: participantId, image_url: publicUrl }]);
 
             if (insertError) {
                 alert('DB 저장 실패: ' + insertError.message);

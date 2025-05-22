@@ -18,7 +18,11 @@ export default function FourTypeResultsPage() {
             if (!id) return;
 
             try {
-                const { data, error } = await supabase.from('fourtypes').select('*').eq('patient_id', id).maybeSingle();
+                const { data, error } = await supabase
+                    .from('fourtypes')
+                    .select('*')
+                    .eq('participant_id', id)
+                    .maybeSingle();
 
                 if (error) throw error;
                 if (!data) {
