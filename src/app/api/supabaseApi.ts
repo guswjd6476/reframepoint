@@ -77,19 +77,19 @@ export const addNewParticipant = async (participant: {
 
     return { data, error };
 };
-export const getCoreEmotionTestResult = async (participantId: string) => {
+export async function getCoreEmotionTestResult(participantId: string) {
     const { data, error } = await supabase
         .from('core_emotion_tests')
-        .select('answers')
+        .select('*')
         .eq('participant_id', participantId)
+        .limit(1)
         .single();
-
-    if (data) {
-        return { data: data.answers, error: null };
+    if (error && error.code === 'PGRST116') {
+        return { data: null, error: null };
     }
+    return { data, error };
+}
 
-    return { data: null, error };
-};
 export const createCounselorAccount = async (email: string, password: string, name: string, region: string) => {
     const res = await fetch('/api/create-counselor', {
         method: 'POST',

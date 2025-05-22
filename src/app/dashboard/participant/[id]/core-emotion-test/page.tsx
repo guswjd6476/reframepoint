@@ -36,7 +36,7 @@ const CoreEmotionTest = () => {
         setMessage(null);
 
         if (!participantId) {
-            setMessage('❌ 오류: 환자 ID가 없습니다.');
+            setMessage('❌ 오류:  ID가 없습니다.');
             setLoading(false);
             return;
         }

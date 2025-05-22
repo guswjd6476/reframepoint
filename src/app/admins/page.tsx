@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
 import LoadingSpinner from '../about/components/LoadingSpinner';
+import Link from 'next/link';
 
 export default function AdminPage() {
     const { session } = useAuth();
@@ -49,10 +50,10 @@ export default function AdminPage() {
 
 function AdminButton({ href, label }: { href: string; label: string }) {
     return (
-        <a href={href} className="w-full">
+        <Link href={href} className="w-full">
             <button className="w-full py-4 px-6 bg-neutral-800 text-white rounded-xl text-base font-medium shadow-sm hover:bg-neutral-700 transition duration-200">
                 {label}
             </button>
-        </a>
+        </Link>
     );
 }

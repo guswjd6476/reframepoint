@@ -41,7 +41,6 @@ export default function CounselorDetailPage() {
                 if (counselorError) throw counselorError;
                 setCounselor(counselorData);
 
-                // 환자 목록 가져오기
                 const { data: participantData, error: participantError } = await supabase
                     .from('participant')
                     .select('id, name, counselors, birth_date')
@@ -90,7 +89,7 @@ export default function CounselorDetailPage() {
                     ))}
                 </ul>
             ) : (
-                <p>등록된 환자가 없습니다.</p>
+                <p>등록된 참여자가 없습니다.</p>
             )}
         </div>
     );
