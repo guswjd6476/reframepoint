@@ -1,10 +1,11 @@
 'use client';
 
+import Drawbox from '@/app/about/components/Drawbox';
 import { supabase } from '@/app/lib/supabase';
 import { useParams } from 'next/navigation';
 import React, { useRef, useState, useEffect, useCallback, MouseEvent, TouchEvent } from 'react';
 
-const Sixtypes = () => {
+const Fourtypes = () => {
     const bgCanvasRef = useRef<HTMLCanvasElement>(null);
     const drawCanvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -24,7 +25,7 @@ const Sixtypes = () => {
 
     useEffect(() => {
         const image = new Image();
-        image.src = '/sixtypes.png';
+        image.src = '/fourtypes.jpg';
         image.onload = () => {
             setImg(image);
             setAspectRatio(image.width / image.height);
@@ -162,9 +163,9 @@ const Sixtypes = () => {
         tempCanvas.toBlob(async (blob) => {
             if (!blob) return;
 
-            const filename = `sixtypes-${Date.now()}.png`;
-            const { error: uploadError } = await supabase.storage.from('sixtypes').upload(filename, blob, {
-                contentType: 'image/png',
+            const filename = `fourtypes-${Date.now()}.jpg`;
+            const { error: uploadError } = await supabase.storage.from('fourtypes').upload(filename, blob, {
+                contentType: 'image/jpg',
             });
 
             if (uploadError) {
@@ -172,7 +173,7 @@ const Sixtypes = () => {
                 return;
             }
 
-            const { data: urlData } = supabase.storage.from('sixtypes').getPublicUrl(filename);
+            const { data: urlData } = supabase.storage.from('fourtypes').getPublicUrl(filename);
             const imageUrl = urlData?.publicUrl;
             if (!imageUrl) {
                 alert('URL 생성 실패');
@@ -180,7 +181,7 @@ const Sixtypes = () => {
             }
 
             const { error: insertError } = await supabase
-                .from('sixtypes')
+                .from('fourtypes')
                 .insert([{ participant_id: participantId, image_url: imageUrl }]);
 
             if (insertError) {
@@ -188,31 +189,21 @@ const Sixtypes = () => {
             } else {
                 alert('업로드 및 저장 성공!');
             }
-        }, 'image/png');
+        }, 'image/jpg');
     };
 
     return (
-        <div style={{ maxWidth: '1024px', margin: '0 auto', padding: '12px' }}>
-            <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginBottom: '12px' }}>
-                <button onClick={() => setIsErasing(false)}>✏️ 그리기</button>
-                <button onClick={() => setIsErasing(true)}>🧽 지우개</button>
-                <button onClick={handleClear}>🗑 전체 지우기</button>
-                <button onClick={handleSave}>💾 저장</button>
-                {!isErasing && <input type="color" value={lineColor} onChange={(e) => setLineColor(e.target.value)} />}
-                {isErasing && (
-                    <label>
-                        <input
-                            type="range"
-                            min={5}
-                            max={50}
-                            value={eraserSize}
-                            onChange={(e) => setEraserSize(Number(e.target.value))}
-                        />
-                        {eraserSize}px
-                    </label>
-                )}
-            </div>
-
+        <div style={{ maxWidth: '800px', margin: '0 auto', padding: '12px' }}>
+            <Drawbox
+                setIsErasing={setIsErasing}
+                isErasing={isErasing}
+                handleClear={handleClear}
+                handleSave={handleSave}
+                lineColor={lineColor}
+                setLineColor={setLineColor}
+                eraserSize={eraserSize}
+                setEraserSize={setEraserSize}
+            />
             <div
                 ref={containerRef}
                 style={{
@@ -277,4 +268,4 @@ const Sixtypes = () => {
     );
 };
 
-export default Sixtypes;
+export default Fourtypes;

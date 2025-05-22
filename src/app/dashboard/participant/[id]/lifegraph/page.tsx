@@ -1,5 +1,6 @@
 'use client';
 
+import Drawbox from '@/app/about/components/Drawbox';
 import { supabase } from '@/app/lib/supabase';
 import { useParams } from 'next/navigation';
 import React, { useRef, useState, useEffect, useCallback } from 'react';
@@ -204,7 +205,7 @@ const LifeGraphCanvas = () => {
 
             const { error: insertError } = await supabase
                 .from('lifegraphs')
-                .insert([{ patient_id: participantId, image_url: publicUrl }]);
+                .insert([{ participant_id: participantId, image_url: publicUrl }]);
 
             if (insertError) {
                 alert('DB 저장 실패: ' + insertError.message);
@@ -216,33 +217,16 @@ const LifeGraphCanvas = () => {
 
     return (
         <div style={{ maxWidth: '1024px', margin: '0 auto', padding: '12px', boxSizing: 'border-box' }}>
-            <div
-                style={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    gap: '8px',
-                    justifyContent: 'center',
-                    marginBottom: '12px',
-                }}
-            >
-                <button onClick={() => setIsErasing(false)}>✏️ 그리기</button>
-                <button onClick={() => setIsErasing(true)}>🧽 지우개</button>
-                <button onClick={handleClear}>🗑 전체 지우기</button>
-                <button onClick={handleSave}>💾 저장</button>
-                {!isErasing && <input type="color" value={lineColor} onChange={(e) => setLineColor(e.target.value)} />}
-                {isErasing && (
-                    <label>
-                        <input
-                            type="range"
-                            min={5}
-                            max={50}
-                            value={eraserSize}
-                            onChange={(e) => setEraserSize(Number(e.target.value))}
-                        />
-                        {eraserSize}px
-                    </label>
-                )}
-            </div>
+            <Drawbox
+                setIsErasing={setIsErasing}
+                isErasing={isErasing}
+                handleClear={handleClear}
+                handleSave={handleSave}
+                lineColor={lineColor}
+                setLineColor={setLineColor}
+                eraserSize={eraserSize}
+                setEraserSize={setEraserSize}
+            />
 
             <div
                 ref={containerRef}
