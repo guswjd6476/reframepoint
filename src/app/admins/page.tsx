@@ -1,12 +1,14 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
+import LoadingSpinner from '../about/components/LoadingSpinner';
 
 export default function AdminPage() {
     const { session } = useAuth();
     const router = useRouter();
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         if (!session) {
@@ -15,11 +17,14 @@ export default function AdminPage() {
         }
         if (session.user.email !== 'seouljdb@jdb.com') {
             router.replace('/unauthorized');
+            return;
         }
+
+        setIsLoading(false);
     }, [session, router]);
 
-    if (!session) {
-        return <div>Loading...</div>;
+    if (isLoading) {
+        return <LoadingSpinner />;
     }
 
     return (
@@ -33,6 +38,7 @@ export default function AdminPage() {
                 <div className="grid sm:grid-cols-3 gap-4">
                     <AdminButton href="/admins/counselors" label="상담사 명단 확인" />
                     <AdminButton href="/admins/create-counselor" label="계정 생성" />
+                    <AdminButton href="/admins/organization" label="단체 관리" />
                     <AdminButton href="/admins/create-content" label="컨텐츠 추가" />
                     <AdminButton href="/admins/view-content" label="컨텐츠 보기" />
                 </div>

@@ -73,7 +73,19 @@ export const addNewPatient = async (patient: {
 
     return { data, error };
 };
+export const getCoreEmotionTestResult = async (patientId: string) => {
+    const { data, error } = await supabase
+        .from('core_emotion_tests')
+        .select('answers')
+        .eq('patient_id', patientId)
+        .single();
 
+    if (data) {
+        return { data: data.answers, error: null };
+    }
+
+    return { data: null, error };
+};
 export const createCounselorAccount = async (email: string, password: string, name: string, region: string) => {
     const res = await fetch('/api/create-counselor', {
         method: 'POST',

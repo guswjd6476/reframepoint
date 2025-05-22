@@ -90,30 +90,27 @@ const LifeGraphCanvas = () => {
         setLastPos(null);
     };
 
-    const drawLine = useCallback(
-        (pos: { x: number; y: number }) => {
-            setCursorPos(pos);
-            if (!drawing || !lastPos) return;
+    const drawLine = (pos: { x: number; y: number }) => {
+        setCursorPos(pos);
+        if (!drawing || !lastPos) return;
 
-            const canvas = drawCanvasRef.current;
-            const ctx = canvas?.getContext('2d');
-            if (!ctx) return;
+        const canvas = drawCanvasRef.current;
+        const ctx = canvas?.getContext('2d');
+        if (!ctx) return;
 
-            ctx.lineJoin = 'round';
-            ctx.lineCap = 'round';
-            ctx.lineWidth = isErasing ? eraserSize : 2;
-            ctx.strokeStyle = isErasing ? 'rgba(0,0,0,1)' : lineColor;
-            ctx.globalCompositeOperation = isErasing ? 'destination-out' : 'source-over';
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        ctx.lineWidth = isErasing ? eraserSize : 2;
+        ctx.strokeStyle = isErasing ? 'rgba(0,0,0,1)' : lineColor;
+        ctx.globalCompositeOperation = isErasing ? 'destination-out' : 'source-over';
 
-            ctx.beginPath();
-            ctx.moveTo(lastPos.x, lastPos.y);
-            ctx.lineTo(pos.x, pos.y);
-            ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(lastPos.x, lastPos.y);
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
 
-            setLastPos(pos);
-        },
-        [drawing, lastPos, isErasing, lineColor, eraserSize]
-    );
+        setLastPos(pos);
+    };
 
     // Touch event handlers
     useEffect(() => {
@@ -150,16 +147,16 @@ const LifeGraphCanvas = () => {
             canvas.removeEventListener('touchmove', handleTouchMove);
             canvas.removeEventListener('touchend', handleTouchEnd);
         };
-    }, [drawLine]);
+    }, [drawing, lastPos, isErasing, lineColor, eraserSize]);
 
     // Mouse event handlers
     const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
         startDrawing(getMousePos(e));
     };
-    const handleMouseUp = () => {
+    const handleMouseUp = (e: React.MouseEvent<HTMLCanvasElement>) => {
         endDrawing();
     };
-    const handleMouseLeave = () => {
+    const handleMouseLeave = (e: React.MouseEvent<HTMLCanvasElement>) => {
         endDrawing();
     };
     const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {

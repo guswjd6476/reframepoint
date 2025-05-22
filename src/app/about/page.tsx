@@ -8,7 +8,7 @@ import About from './components/About';
 export default function AboutPage() {
     const [activeTab, setActiveTab] = useState('소개');
 
-    const tabs = ['소개', '연혁', '협력인원'];
+    const tabs = ['소개', '연혁', '협력 단체'];
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -34,7 +34,7 @@ export default function AboutPage() {
             {activeTab === '연혁' && <HistorySection />}
 
             {/* 협력인원 섹션 */}
-            {activeTab === '협력인원' && <TeamMembers />}
+            {activeTab === '협력 단체' && <TeamMembers />}
 
             {/* 푸터 */}
             <footer className="bg-gray-800 text-white py-6 mt-20 text-center">
