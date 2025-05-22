@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image'; // ✅ import 추가
 import { supabase } from '@/app/lib/supabase';
 
 type Organization = {
@@ -53,11 +54,14 @@ export default function TeamMembers() {
                         >
                             <div className="flex flex-col items-center text-center">
                                 {org.logo_url ? (
-                                    <img
-                                        src={org.logo_url}
-                                        alt={`${org.name} 로고`}
-                                        className="h-24 w-24 object-contain mb-4 rounded-full border"
-                                    />
+                                    <div className="relative h-24 w-24 mb-4 rounded-full border overflow-hidden">
+                                        <Image
+                                            src={org.logo_url}
+                                            alt={`${org.name} 로고`}
+                                            fill
+                                            style={{ objectFit: 'contain' }}
+                                        />
+                                    </div>
                                 ) : (
                                     <div className="h-24 w-24 flex items-center justify-center bg-gray-100 text-gray-400 rounded-full mb-4">
                                         없음

@@ -14,14 +14,15 @@ export default function CreateOrganizationPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsSubmitting(true);
         setError(null);
 
-        let logoUrl = null;
+        let logoUrl: string | null = null;
 
         try {
+            // 파일 업로드
             if (logoFile) {
                 const fileExt = logoFile.name.split('.').pop();
                 const fileName = `${Date.now()}.${fileExt}`;
@@ -36,10 +37,10 @@ export default function CreateOrganizationPage() {
                 }
 
                 const { data } = supabase.storage.from('organization-logos').getPublicUrl(filePath);
-
-                logoUrl = data?.publicUrl;
+                logoUrl = data?.publicUrl || null;
             }
 
+            // 데이터 삽입
             const { error: insertError } = await supabase.from('organization').insert({
                 name,
                 website,
@@ -52,8 +53,12 @@ export default function CreateOrganizationPage() {
             }
 
             router.push('/admins/organization');
-        } catch (err: any) {
-            setError(err.message || '문제가 발생했습니다.');
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                setError(err.message);
+            } else {
+                setError('알 수 없는 오류가 발생했습니다.');
+            }
         } finally {
             setIsSubmitting(false);
         }

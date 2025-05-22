@@ -42,7 +42,7 @@ const CoreEmotionTest = () => {
         }
 
         try {
-            const { data, error } = await saveCoreEmotionTest(patientId, answers);
+            const { error } = await saveCoreEmotionTest(patientId, answers);
 
             if (error) throw error;
             setMessage('✅ 검사 결과가 성공적으로 저장되었습니다!');

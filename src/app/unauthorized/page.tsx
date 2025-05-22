@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import React from 'react';
 
 export default function UnauthorizedPage() {
@@ -10,9 +11,9 @@ export default function UnauthorizedPage() {
             <p className="text-gray-700 mb-8 text-center max-w-md">
                 이 페이지에 접근할 권한이 없습니다. 로그인하거나 권한이 있는 계정으로 시도해 주세요.
             </p>
-            <a href="/" className="px-6 py-3 bg-red-600 text-white rounded-md hover:bg-red-700 transition">
+            <Link href="/" className="px-6 py-3 bg-red-600 text-white rounded-md hover:bg-red-700 transition">
                 메인 페이지로 이동
-            </a>
+            </Link>
         </div>
     );
 }

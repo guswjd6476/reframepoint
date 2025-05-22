@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { supabase } from '@/app/lib/supabase';
 
 type Organization = {
@@ -17,7 +17,6 @@ export default function OrganizationListPage() {
     const [organizations, setOrganizations] = useState<Organization[]>([]);
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState<string | null>(null);
-    const router = useRouter();
 
     useEffect(() => {
         fetchOrganizations();
@@ -26,17 +25,21 @@ export default function OrganizationListPage() {
     async function fetchOrganizations() {
         setLoading(true);
         const { data, error } = await supabase.from('organization').select('*').order('id');
+
         if (error) {
             setMessage(`불러오기 오류: ${error.message}`);
         } else {
             setOrganizations(data ?? []);
         }
+
         setLoading(false);
     }
 
     async function handleDelete(id: number) {
         if (!confirm('정말 삭제하시겠습니까?')) return;
+
         const { error } = await supabase.from('organization').delete().eq('id', id);
+
         if (error) {
             setMessage(`삭제 실패: ${error.message}`);
         } else {
@@ -80,7 +83,12 @@ export default function OrganizationListPage() {
                                 <td className="border p-2">{org.name}</td>
                                 <td className="border p-2">
                                     {org.website ? (
-                                        <a href={org.website} target="_blank" className="text-blue-600 underline">
+                                        <a
+                                            href={org.website}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-blue-600 underline"
+                                        >
                                             {org.website}
                                         </a>
                                     ) : (
@@ -90,13 +98,19 @@ export default function OrganizationListPage() {
                                 <td className="border p-2">{org.description || '-'}</td>
                                 <td className="border p-2">
                                     {org.logo_url ? (
-                                        <img src={org.logo_url} className="w-16 h-16 object-contain" />
+                                        <div className="w-16 h-16 relative">
+                                            <Image
+                                                src={org.logo_url}
+                                                alt={`${org.name} 로고`}
+                                                fill
+                                                className="object-contain"
+                                            />
+                                        </div>
                                     ) : (
                                         '-'
                                     )}
                                 </td>
                                 <td className="border p-2 space-x-2">
-                                    {/* 수정은 추후 edit 페이지 만들면 연결 */}
                                     <button
                                         onClick={() => alert('수정 기능은 아직 구현 안 됨')}
                                         className="bg-yellow-400 px-3 py-1 rounded"

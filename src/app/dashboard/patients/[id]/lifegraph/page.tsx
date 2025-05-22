@@ -153,10 +153,10 @@ const LifeGraphCanvas = () => {
     const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
         startDrawing(getMousePos(e));
     };
-    const handleMouseUp = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const handleMouseUp = () => {
         endDrawing();
     };
-    const handleMouseLeave = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const handleMouseLeave = () => {
         endDrawing();
     };
     const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
