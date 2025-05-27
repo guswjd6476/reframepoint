@@ -37,7 +37,7 @@ export default function AdminPage() {
                 </div>
 
                 <div className="grid sm:grid-cols-3 gap-4">
-                    <AdminButton href="/admins/counselors" label="상담사 명단 확인" />
+                    <AdminButton href="/admins/counselors" label="코치 명단 확인" />
                     <AdminButton href="/admins/create-counselor" label="계정 생성" />
                     <AdminButton href="/admins/organization" label="단체 관리" />
                     <AdminButton href="/admins/create-content" label="컨텐츠 추가" />

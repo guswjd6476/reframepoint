@@ -117,7 +117,7 @@ export default function CounselorProfilePage() {
 
     return (
         <div className="max-w-xl mx-auto p-6 space-y-6">
-            <h1 className="text-2xl font-bold">상담사 프로필 수정</h1>
+            <h1 className="text-2xl font-bold">코치 프로필 수정</h1>
 
             <div className="space-y-2">
                 <label className="block font-medium">프로필 사진</label>

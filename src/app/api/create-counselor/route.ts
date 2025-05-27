@@ -23,5 +23,5 @@ export async function POST(req: Request) {
         return NextResponse.json({ success: false, message: insertError.message }, { status: 400 });
     }
 
-    return NextResponse.json({ success: true, message: '상담사 계정 생성 완료' });
+    return NextResponse.json({ success: true, message: '코치 계정 생성 완료' });
 }

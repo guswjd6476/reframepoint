@@ -35,7 +35,7 @@ export default function CreateCounselorPage() {
 
     return (
         <div className="max-w-md mx-auto mt-20 p-6 bg-white rounded-xl shadow-md space-y-5">
-            <h1 className="text-2xl font-bold text-center">상담사 계정 생성</h1>
+            <h1 className="text-2xl font-bold text-center">코치 계정 생성</h1>
             <input
                 type="text"
                 placeholder="이름"

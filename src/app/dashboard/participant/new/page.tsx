@@ -212,7 +212,7 @@ export default function NewParticipantPage() {
                             { name: 'name', label: '이름', placeholder: '이름을 입력하세요', type: 'text' },
                             { name: 'birth_date', label: '생년월일', placeholder: '', type: 'date' },
                             { name: 'stress', label: '스트레스요인', placeholder: '인간관계', type: 'text' },
-                            { name: 'religion', label: '종교', placeholder: '무교', type: 'text' },
+                            { name: 'religion', label: '사는곳(동)', placeholder: '광진구 자양동', type: 'text' },
                         ].map(({ name, label, placeholder, type }) => (
                             <div key={name}>
                                 <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
@@ -234,7 +234,7 @@ export default function NewParticipantPage() {
                         disabled={loading}
                         className="bg-blue-600 hover:bg-blue-700 text-white w-full py-2 rounded-md text-sm font-semibold disabled:bg-gray-400"
                     >
-                        {loading ? '등록 중...' : '상담 등록'}
+                        {loading ? '등록 중...' : '참여자 등록'}
                     </button>
                 </div>
             )}

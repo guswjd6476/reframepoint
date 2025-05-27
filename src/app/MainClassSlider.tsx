@@ -6,6 +6,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import Image from 'next/image';
+import { brandColor } from '@/app/lib/brandcolor'; // brandColor import
 
 interface SlideItem {
     id: number;
@@ -51,7 +52,9 @@ const MainClassSlider = () => {
 
     return (
         <section className="py-20 bg-white">
-            <h2 className="text-3xl font-bold text-neutral-800 mb-8 text-center">대표 컨텐츠</h2>
+            <h2 className="text-3xl font-bold mb-8 text-center" style={{ color: brandColor.deepmoss }}>
+                대표 컨텐츠
+            </h2>
             <div className="container mx-auto px-6">
                 <Swiper
                     slidesPerView={1.2}
@@ -77,7 +80,10 @@ const MainClassSlider = () => {
                                     />
                                 </div>
                                 <div className="p-4 sm:p-5 text-center">
-                                    <h3 className="text-base sm:text-lg font-semibold text-neutral-800 truncate">
+                                    <h3
+                                        className="text-base sm:text-lg font-semibold truncate"
+                                        style={{ color: brandColor.deepmoss }}
+                                    >
                                         {card.title}
                                     </h3>
                                 </div>

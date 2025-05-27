@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import { brandColor } from '@/app/lib/brandcolor'; // 경로 맞게 조정
 
 const historyData = [
     {
@@ -23,9 +24,10 @@ const historyData = [
 
 export default function HistorySection() {
     return (
-        <section className="py-24 container mx-auto px-6 bg-white">
+        <section className="py-24 container mx-auto px-6" style={{ backgroundColor: '#faf8f4' }}>
             <motion.h3
-                className="text-4xl font-extrabold text-gray-900 text-center mb-20 tracking-tight"
+                className="text-4xl font-extrabold text-center mb-20 tracking-tight"
+                style={{ color: brandColor.deepmoss }}
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
@@ -34,7 +36,10 @@ export default function HistorySection() {
             </motion.h3>
 
             <div className="relative max-w-3xl mx-auto">
-                <div className="absolute top-2 left-5 h-full w-1 bg-gradient-to-b from-indigo-400 via-indigo-300 to-indigo-400 rounded"></div>
+                <div
+                    className="absolute top-2 left-5 h-full w-1 rounded"
+                    style={{ backgroundColor: brandColor.deepmoss }}
+                ></div>
 
                 {historyData.map((item, index) => (
                     <motion.div
@@ -44,14 +49,26 @@ export default function HistorySection() {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.6, delay: index * 0.3 }}
                     >
-                        <div className="absolute left-0 top-1.5 w-4 h-4 bg-indigo-600 rounded-full shadow-md"></div>
+                        <div
+                            className="absolute left-0 top-1.5 w-4 h-4 rounded-full shadow-md"
+                            style={{ backgroundColor: brandColor.deepmoss }}
+                        ></div>
 
                         <div className="flex items-center space-x-4">
-                            <time className="text-gray-400 text-sm font-medium tracking-wide w-16">{item.year}</time>
-                            <h4 className="text-xl font-semibold text-gray-900">{item.event}</h4>
+                            <time
+                                className="text-sm font-medium tracking-wide w-16"
+                                style={{ color: brandColor.orangeish }}
+                            >
+                                {item.year}
+                            </time>
+                            <h4 className="text-xl font-semibold" style={{ color: brandColor.orangeish }}>
+                                {item.event}
+                            </h4>
                         </div>
 
-                        <p className="mt-2 text-gray-600 leading-relaxed text-sm max-w-xl">{item.description}</p>
+                        <p className="mt-2 leading-relaxed text-sm max-w-xl" style={{ color: brandColor.deepmoss }}>
+                            {item.description}
+                        </p>
                     </motion.div>
                 ))}
             </div>

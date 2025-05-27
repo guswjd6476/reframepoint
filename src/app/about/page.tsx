@@ -26,21 +26,10 @@ export default function AboutPage() {
                     </button>
                 ))}
             </div>
-
-            {/* 소개 섹션 */}
             {activeTab === '소개' && <About />}
-
-            {/* 연혁 섹션 */}
             {activeTab === '연혁' && <HistorySection />}
 
-            {/* 협력인원 섹션 */}
             {activeTab === '협력 단체' && <TeamMembers />}
-
-            {/* 푸터 */}
-            <footer className="bg-gray-800 text-white py-6 mt-20 text-center">
-                <p>© 2025 ReframePoint. All rights reserved.</p>
-                <p className="mt-2">문의: contact@reframepoint.com</p>
-            </footer>
         </div>
     );
 }

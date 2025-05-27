@@ -124,7 +124,7 @@ export default function ParticipantPage() {
     return (
         <div className="max-w-3xl mx-auto mt-12 p-10 bg-white rounded-3xl shadow-lg space-y-12">
             <h2 className="text-2xl font-extrabold text-center text-blue-900 mb-8 tracking-tight">
-                상담 대상자 검사 커리큘럼
+                코칭 대상자 검사 커리큘럼
             </h2>
 
             <ul className="space-y-8">

@@ -25,7 +25,7 @@ export default function CounselorsPage() {
 
                 setCounselors(data);
             } catch (err) {
-                console.error('상담사 목록 불러오기 실패:', err);
+                console.error('코치 목록 불러오기 실패:', err);
             } finally {
                 setLoading(false);
             }
@@ -39,12 +39,12 @@ export default function CounselorsPage() {
     }
 
     if (counselors.length === 0) {
-        return <div className="text-center text-gray-600">상담사 정보가 없습니다.</div>;
+        return <div className="text-center text-gray-600">코치 정보가 없습니다.</div>;
     }
 
     return (
         <div className="max-w-4xl mx-auto mt-20 p-6 bg-white rounded-xl shadow-md space-y-6">
-            <h1 className="text-3xl font-bold text-center">상담사 목록</h1>
+            <h1 className="text-3xl font-bold text-center">코치 목록</h1>
             <table className="min-w-full table-auto border-collapse">
                 <thead>
                     <tr className="bg-indigo-600 text-white">
