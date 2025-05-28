@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext';
 import Navigation from './Navigation';
 import Footer from './about/components/Footer';
 
+
 export const metadata = {
     title: 'ReframePoint',
     description: 'Reframing through education',
