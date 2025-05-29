@@ -45,21 +45,21 @@ const CoreEmotionResultPage = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            const { data: answers, error } = await getCoreEmotionTestResult(participantId);
-            // console.log('API Response:', answers); // Debug: Log raw response
-            if (error || !answers) {
+            const { data, error } = await getCoreEmotionTestResult(participantId);
+            if (error || !data) {
                 setError(true);
                 setLoading(false);
                 return;
             }
 
+            const answers = Array.isArray(data) ? data[0]?.answers : data.answers;
+
             const answersRecord: Record<number, string[]> = {};
             Object.entries(emotionItemMap).forEach(([key]) => {
                 const id = Number(key);
-                const checkedItems = answers[id.toString()];
+                const checkedItems = answers?.[id];
                 answersRecord[id] = Array.isArray(checkedItems) ? checkedItems : [];
             });
-            // console.log('answersRecord:', answersRecord); // Debug: Log constructed record
 
             const emotionCounts = Object.entries(answersRecord).map(([key, items]) => ({
                 id: Number(key),
@@ -137,11 +137,14 @@ const CoreEmotionResultPage = () => {
                                             {items.map((item) => {
                                                 const key = `${category}: ${item}`;
                                                 const isChecked = checkedItems.includes(key);
-                                                // console.log(`Emotion ${id}, key: ${key}, isChecked: ${isChecked}`); // Debug: Log checkbox state
                                                 return (
                                                     <label
                                                         key={key}
-                                                        className="flex items-center space-x-2 mb-1 cursor-default select-none"
+                                                        className={`flex items-center space-x-2 mb-1 cursor-default select-none ${
+                                                            isChecked
+                                                                ? 'bg-blue-50 text-blue-800 px-2 py-1 rounded'
+                                                                : ''
+                                                        }`}
                                                     >
                                                         <input
                                                             type="checkbox"

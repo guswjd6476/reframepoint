@@ -51,10 +51,10 @@ export default function TeamMembers() {
                         {teamData.map((org) => (
                             <div
                                 key={org.id}
-                                className="bg-white rounded-2xl shadow-md hover:shadow-lg transition-all p-6 flex flex-col items-center text-center border-2 border-Bgreen"
+                                className="bg-white rounded-2xl shadow-md hover:shadow-lg transition-all p-6 flex flex-col text-center border-2 border-Bgreen h-full"
                             >
                                 {org.logo_url ? (
-                                    <div className="relative h-24 w-24 mb-4 rounded-full overflow-hidden border bg-white shadow-sm">
+                                    <div className="relative h-24 w-24 mb-4 rounded-full overflow-hidden border bg-white shadow-sm mx-auto">
                                         <Image
                                             src={org.logo_url}
                                             alt={`${org.name} 로고`}
@@ -64,12 +64,15 @@ export default function TeamMembers() {
                                         />
                                     </div>
                                 ) : (
-                                    <div className="h-24 w-24 flex items-center justify-center bg-Bgrey text-Bdark rounded-full mb-4 font-semibold text-sm">
+                                    <div className="h-24 w-24 flex items-center justify-center bg-Bgrey text-Bdark rounded-full mb-4 font-semibold text-sm mx-auto">
                                         로고 없음
                                     </div>
                                 )}
                                 <h4 className="text-xl font-bold text-Bblack mb-2">{org.name}</h4>
-                                <p className="text-sm text-Bblack mb-6 leading-relaxed min-h-[3rem]">
+                                <p
+                                    className="text-sm text-Bblack leading-relaxed mb-6 line-clamp-3"
+                                    title={org.description}
+                                >
                                     {org.description || '설명이 없습니다.'}
                                 </p>
                                 {org.website ? (
@@ -77,12 +80,12 @@ export default function TeamMembers() {
                                         href={org.website}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="inline-block bg-Bgreen text-Benamel px-6 py-2 rounded-full font-semibold text-sm hover:bg-Byellow hover:text-white transition-all shadow-md hover:shadow-lg"
+                                        className="mt-auto inline-block bg-Bgreen text-Benamel px-6 py-2 rounded-full font-semibold text-sm hover:bg-Byellow hover:text-white transition-all shadow-md hover:shadow-lg"
                                     >
                                         홈페이지 방문 →
                                     </a>
                                 ) : (
-                                    <p className="text-sm text-Bdark mt-auto">홈페이지 없음</p>
+                                    <p className="mt-auto text-sm text-Bdark">홈페이지 없음</p>
                                 )}
                             </div>
                         ))}
