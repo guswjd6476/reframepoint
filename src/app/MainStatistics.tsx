@@ -6,8 +6,11 @@ import { brandColor } from './lib/brandcolor';
 
 const MainStatistics = () => {
     return (
-        <section className="py-16" style={{ backgroundColor: brandColor.enamel }}>
-            <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-3 gap-12 text-center">
+        <section
+            className="py-10 md:py-14 lg:py-16"
+            style={{ backgroundColor: brandColor.enamel }}
+        >
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10 lg:gap-12 text-center">
                 {[
                     {
                         count: '5,000명+',
@@ -31,14 +34,15 @@ const MainStatistics = () => {
                         whileInView={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: item.delay }}
                         viewport={{ once: true }}
-                        className="bg-white rounded-2xl shadow-xl px-8 py-20 border border-transparent hover:border-[3px]]"
+                        className="bg-white rounded-2xl shadow-xl px-4 sm:px-6 md:px-8 py-8 sm:py-12 md:py-16 border border-transparent hover:border-4 transition-all duration-300"
                     >
-                        <h3 className="text-4xl font-extrabold mb-2" style={{ color: brandColor.deepmoss }}>
+                        <h3
+                            className="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-2"
+                            style={{ color: brandColor.deepmoss }}
+                        >
                             {item.count}
                         </h3>
-                        <p className="text-lg" style={{ color: '#555' }}>
-                            {item.label}
-                        </p>
+                        <p className="text-sm sm:text-base md:text-lg text-gray-600">{item.label}</p>
                     </motion.div>
                 ))}
             </div>
