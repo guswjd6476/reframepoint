@@ -26,30 +26,13 @@ export default function Navigation() {
         setIsMenuOpen(!isMenuOpen);
     };
 
-    const linkStyle = {
-        color: darkGray,
-        transition: 'color 0.3s',
-        fontWeight: 'bold' as const,
-        textDecoration: 'none',
-    };
-
-    const handleMouseEnter = (e: React.MouseEvent<HTMLElement>) => {
-        (e.target as HTMLElement).style.color = brandColor.deepmoss;
-        (e.target as HTMLElement).style.textDecoration = 'underline';
-    };
-
-    const handleMouseLeave = (e: React.MouseEvent<HTMLElement>) => {
-        (e.target as HTMLElement).style.color = darkGray;
-        (e.target as HTMLElement).style.textDecoration = 'none';
-    };
 
     return (
         <>
             <motion.header
-                className={`fixed h-[60px] top-0 left-0 w-full z-40 transition-all duration-300 ease-in-out ${
+                className={`fixed h-[60px] top-0 left-0 w-full z-40 transition-all duration-300 ease-in-out bg-Bbeige ${
                     scrolling ? 'backdrop-blur-md shadow-lg' : ''
                 }`}
-                style={{ backgroundColor: brandColor.enamel }}
                 initial={{ y: 0, opacity: 1 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.3 }}
@@ -57,15 +40,16 @@ export default function Navigation() {
                 <div className="container mx-auto flex justify-between items-center px-6">
                     <Link className="flex justify-center items-center" href="/">
                         <Image
-                            src="/logo.png"
+                            src="/Group 6.png"
                             alt="ReframePoint Logo"
                             width={60}
                             height={60}
                             priority
                             className="mr-2"
                         />
-                        <h1 className="lg:text-xl lg:font-bold lg:block hidden" style={{ color: brandColor.deepmoss }}>
-                            ReframePoint
+                        <h1 className="lg:text-xl lg:font-bold" >
+                            <span className='text-Bgreen'>Reframe</span>
+                            <span className='text-Byellow'>Point</span>
                         </h1>
                     </Link>
 
@@ -79,45 +63,35 @@ export default function Navigation() {
                     <nav className="hidden lg:flex space-x-6">
                         <Link
                             href="/about"
-                            style={linkStyle}
-                            onMouseEnter={handleMouseEnter}
-                            onMouseLeave={handleMouseLeave}
+                            className="px-3 py-1 rounded-full font-bold text-Bblack transition-colors duration-300 hover:bg-Byellow hover:text-black"
                         >
-                            소개
+                            About
                         </Link>
                         <Link
                             href="/content"
-                            style={linkStyle}
-                            onMouseEnter={handleMouseEnter}
-                            onMouseLeave={handleMouseLeave}
+                            className="px-3 py-1 rounded-full font-bold text-Bblack transition-colors duration-300 hover:bg-Byellow hover:text-black"
                         >
-                            컨텐츠
+                            Content
                         </Link>
                         {session ? (
                             <>
                                 <Link
                                     href="/dashboard"
-                                    style={linkStyle}
-                                    onMouseEnter={handleMouseEnter}
-                                    onMouseLeave={handleMouseLeave}
+                                    className="px-3 py-1 rounded-full font-bold text-Bblack transition-colors duration-300 hover:bg-Byellow hover:text-black"
                                 >
                                     대시보드
                                 </Link>
                                 {session.user?.email === 'seouljdb@jdb.com' && (
                                     <Link
                                         href="/admins"
-                                        style={linkStyle}
-                                        onMouseEnter={handleMouseEnter}
-                                        onMouseLeave={handleMouseLeave}
+                                        className="px-3 py-1 rounded-full font-bold text-Bblack transition-colors duration-300 hover:bg-Byellow hover:text-black"
                                     >
                                         관리자
                                     </Link>
                                 )}
                                 <button
                                     onClick={logout}
-                                    style={linkStyle}
-                                    onMouseEnter={handleMouseEnter}
-                                    onMouseLeave={handleMouseLeave}
+                                    className="px-3 py-1 rounded-full font-bold text-Bblack transition-colors duration-300 hover:bg-Byellow hover:text-black"
                                 >
                                     로그아웃
                                 </button>
@@ -125,11 +99,9 @@ export default function Navigation() {
                         ) : (
                             <Link
                                 href="/login"
-                                style={linkStyle}
-                                onMouseEnter={handleMouseEnter}
-                                onMouseLeave={handleMouseLeave}
+                                className="px-3 py-1 rounded-full font-bold text-Bblack transition-colors duration-300 hover:bg-Byellow hover:text-black"
                             >
-                                로그인
+                                Login
                             </Link>
                         )}
                     </nav>
