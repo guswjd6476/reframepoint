@@ -46,6 +46,7 @@ const CoreEmotionResultPage = () => {
     useEffect(() => {
         const fetchData = async () => {
             const { data: answers, error } = await getCoreEmotionTestResult(participantId);
+            // console.log('API Response:', answers); // Debug: Log raw response
             if (error || !answers) {
                 setError(true);
                 setLoading(false);
@@ -55,9 +56,10 @@ const CoreEmotionResultPage = () => {
             const answersRecord: Record<number, string[]> = {};
             Object.entries(emotionItemMap).forEach(([key]) => {
                 const id = Number(key);
-                const checkedItems = answers[id];
+                const checkedItems = answers[id.toString()];
                 answersRecord[id] = Array.isArray(checkedItems) ? checkedItems : [];
             });
+            // console.log('answersRecord:', answersRecord); // Debug: Log constructed record
 
             const emotionCounts = Object.entries(answersRecord).map(([key, items]) => ({
                 id: Number(key),
@@ -124,7 +126,10 @@ const CoreEmotionResultPage = () => {
                             </thead>
                             <tbody>
                                 {Object.entries(groupedItems).map(([category, items]) => (
-                                    <tr key={category} className="align-top even:bg-gray-50">
+                                    <tr
+                                        key={category}
+                                        className="align-top even:bg-gray-50"
+                                    >
                                         <td className="border border-gray-200 px-4 py-3 font-semibold text-gray-700">
                                             {category}
                                         </td>
@@ -132,6 +137,7 @@ const CoreEmotionResultPage = () => {
                                             {items.map((item) => {
                                                 const key = `${category}: ${item}`;
                                                 const isChecked = checkedItems.includes(key);
+                                                // console.log(`Emotion ${id}, key: ${key}, isChecked: ${isChecked}`); // Debug: Log checkbox state
                                                 return (
                                                     <label
                                                         key={key}
