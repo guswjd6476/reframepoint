@@ -78,7 +78,10 @@ export default function ParticipantPage() {
 
     if (error)
         return (
-            <p className="text-center text-red-600 text-lg mt-20 font-semibold" role="alert">
+            <p
+                className="text-center text-red-600 text-lg mt-20 font-semibold"
+                role="alert"
+            >
                 {error}
             </p>
         );
@@ -116,7 +119,7 @@ export default function ParticipantPage() {
             order: 5,
             name: '핵심감정 검사',
             done: isCoreEmotionDone,
-            basePath: 'core-emotions',
+            basePath: 'core-emotion-test',
             description: '내면의 핵심 감정을 파악하여 자기 이해를 돕습니다.',
         },
     ];
