@@ -63,8 +63,11 @@ export default function Dashboard() {
     };
 
     return (
-        <main className="p-8 max-w-6xl mx-auto" style={{ color: brandColor.deepmoss }}>
-            <h1 className="text-4xl font-extrabold mb-8 pb-2 border-b-4" style={{ borderColor: brandColor.orangeish }}>
+        <main className="p-8 max-w-6xl mx-auto min-h-screen text-deepmoss">
+            <h1
+                className="text-4xl font-extrabold mb-8 pb-2 border-b-4"
+                style={{ borderColor: brandColor.orangeish }}
+            >
                 코칭 대상자 관리
             </h1>
 
@@ -86,7 +89,11 @@ export default function Dashboard() {
                         stroke={brandColor.orangeish}
                         strokeWidth={2}
                     >
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M12 4v16m8-8H4"
+                        />
                     </svg>
                     코칭 대상자 추가하기
                 </button>
@@ -108,10 +115,14 @@ export default function Dashboard() {
                                 className="h-5 w-5"
                                 fill="none"
                                 viewBox="0 0 24 24"
-                                stroke={brandColor.deepmoss}
+                                stroke={brandColor.orangeish}
                                 strokeWidth={2}
                             >
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M6 18L18 6M6 6l12 12"
+                                />
                             </svg>
                             목록 숨기기
                         </>
@@ -122,10 +133,14 @@ export default function Dashboard() {
                                 className="h-5 w-5"
                                 fill="none"
                                 viewBox="0 0 24 24"
-                                stroke={brandColor.deepmoss}
+                                stroke={brandColor.orangeish}
                                 strokeWidth={2}
                             >
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h7" />
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M4 6h16M4 12h16M4 18h7"
+                                />
                             </svg>
                             목록 보기
                         </>
@@ -136,7 +151,10 @@ export default function Dashboard() {
             {showList && (
                 <>
                     <section className="mb-6">
-                        <label htmlFor="search" className="block mb-2 font-semibold">
+                        <label
+                            htmlFor="search"
+                            className="block mb-2 font-semibold"
+                        >
                             이름 검색
                         </label>
                         <input
@@ -164,8 +182,14 @@ export default function Dashboard() {
                         className="overflow-x-auto rounded-lg shadow-lg border"
                         style={{ borderColor: brandColor.deepmoss }}
                     >
-                        <table className="w-full text-left" style={{ color: brandColor.deepmoss }}>
-                            <thead className="bg-gray-100" style={{ backgroundColor: brandColor.enamel }}>
+                        <table
+                            className="w-full text-left"
+                            style={{ color: brandColor.deepmoss }}
+                        >
+                            <thead
+                                className="bg-gray-100"
+                                style={{ backgroundColor: brandColor.enamel }}
+                            >
                                 <tr>
                                     <th className="py-3 px-5 text-sm font-semibold">이름</th>
                                     <th className="py-3 px-5 text-sm font-semibold hidden md:table-cell">생년월일</th>
@@ -260,7 +284,10 @@ export default function Dashboard() {
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan={5} className="text-center py-6 text-gray-400">
+                                        <td
+                                            colSpan={5}
+                                            className="text-center py-6 text-gray-400"
+                                        >
                                             검색된 대상자가 없습니다.
                                         </td>
                                     </tr>

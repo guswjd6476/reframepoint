@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/app/lib/supabase';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronRight } from 'lucide-react';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
 
 type Content = {
     id: number;
@@ -18,6 +19,7 @@ type Content = {
 export default function Contents() {
     const [contents, setContents] = useState<Content[]>([]);
     const [loading, setLoading] = useState(true);
+    const [openId, setOpenId] = useState<number | null>(null);
 
     useEffect(() => {
         const fetchContents = async () => {
@@ -38,62 +40,86 @@ export default function Contents() {
         fetchContents();
     }, []);
 
+    const toggle = (id: number) => {
+        setOpenId(openId === id ? null : id);
+    };
+
     return (
         <motion.div
-            id="features"
-            className="bg-gradient-to-b from-blue-50 to-indigo-100 py-24 min-h-screen flex flex-col items-center"
+            className="min-h-screen bg-[#f9f9f8] py-24 px-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1 }}
         >
-            <div className="container mx-auto px-6 text-center">
-                <h3 className="text-6xl font-extrabold text-gray-900 tracking-tight drop-shadow-md">모든 컨텐츠</h3>
-                <p className="mt-6 text-lg text-gray-800 max-w-3xl mx-auto leading-relaxed">
-                    ReframePoint에서 제공하는 다양한 컨텐츠를 만나보세요. <br />
-                    대표, 추천 컨텐츠는 특별한 아이콘으로 표시됩니다.
+            <div className="max-w-4xl mx-auto">
+                <h2 className="text-5xl font-bold text-center text-Bgreen">모든 컨텐츠</h2>
+                <p className="mt-4 text-center text-gray-600 text-lg">
+                    가볍게 스크롤하며 흥미로운 콘텐츠를 발견해보세요.
                 </p>
 
                 {loading ? (
-                    <p className="mt-10 text-gray-600">불러오는 중...</p>
+                    <p className="mt-10 text-center text-gray-500">불러오는 중...</p>
                 ) : contents.length === 0 ? (
-                    <p className="mt-10 text-gray-600">등록된 컨텐츠가 없습니다.</p>
+                    <p className="mt-10 text-center text-gray-500">등록된 컨텐츠가 없습니다.</p>
                 ) : (
-                    <div className="mt-20 grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl mx-auto">
-                        {contents.map((content, index) => (
-                            <motion.div
+                    <div className="mt-12 space-y-6">
+                        {contents.map((content) => (
+                            <div
                                 key={content.id}
-                                className="relative bg-white bg-opacity-80 backdrop-blur-xl p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-transform transform hover:scale-105 hover:-translate-y-2 flex flex-col items-center text-center"
-                                initial={{ y: 50, opacity: 0 }}
-                                whileInView={{ y: 0, opacity: 1 }}
-                                transition={{ duration: 0.8, delay: index * 0.2 }}
-                                viewport={{ once: true }}
+                                className="group bg-white border border-gray-200 rounded-xl hover:bg-Bbeige/20 transition-colors"
                             >
-                                {content.image_url && (
-                                    <Image
-                                        src={content.image_url}
-                                        alt={content.title}
-                                        width={500}
-                                        height={320}
-                                        className="w-[320px] h-[220px] object-cover rounded-lg shadow-md"
+                                <button
+                                    onClick={() => toggle(content.id)}
+                                    className="w-full flex items-center justify-between px-6 py-5 text-left"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <h4 className="text-xl font-semibold text-Bgreen">{content.title}</h4>
+                                        {content.is_featured && (
+                                            <span className="text-xs bg-Byellow text-Bblack px-2 py-1 rounded-full">
+                                                대표
+                                            </span>
+                                        )}
+                                        {content.is_recommended && (
+                                            <span className="text-xs bg-Bgreen text-white px-2 py-1 rounded-full">
+                                                추천
+                                            </span>
+                                        )}
+                                    </div>
+                                    <ChevronRight
+                                        className={`transform transition-transform duration-300 ${
+                                            openId === content.id ? 'rotate-90 text-Bgreen' : 'text-gray-400'
+                                        }`}
+                                        size={20}
                                     />
-                                )}
+                                </button>
 
-                                <div className="absolute top-4 left-4 flex gap-2">
-                                    {content.is_featured && (
-                                        <span className="bg-yellow-400 text-white text-xs font-bold px-2 py-1 rounded-full shadow">
-                                            대표
-                                        </span>
+                                <AnimatePresence>
+                                    {openId === content.id && (
+                                        <motion.div
+                                            initial={{ opacity: 0, height: 0 }}
+                                            animate={{ opacity: 1, height: 'auto' }}
+                                            exit={{ opacity: 0, height: 0 }}
+                                            transition={{ duration: 0.4 }}
+                                            className="px-6 pb-6"
+                                        >
+                                            <div className="flex flex-col md:flex-row gap-4">
+                                                {content.image_url && (
+                                                    <Image
+                                                        src={content.image_url}
+                                                        alt={content.title}
+                                                        width={300}
+                                                        height={180}
+                                                        className="rounded-lg object-cover w-full max-w-md shadow-sm"
+                                                    />
+                                                )}
+                                                <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                                                    {content.description}
+                                                </p>
+                                            </div>
+                                        </motion.div>
                                     )}
-                                    {content.is_recommended && (
-                                        <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow">
-                                            추천
-                                        </span>
-                                    )}
-                                </div>
-
-                                <h4 className="font-bold text-3xl text-gray-900 mt-6">{content.title}</h4>
-                                <p className="text-gray-700 mt-4 text-lg leading-relaxed">{content.description}</p>
-                            </motion.div>
+                                </AnimatePresence>
+                            </div>
                         ))}
                     </div>
                 )}

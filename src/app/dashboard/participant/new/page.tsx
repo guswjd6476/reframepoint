@@ -130,7 +130,7 @@ export default function NewParticipantPage() {
     };
 
     return (
-        <div className="p-6 max-w-2xl mx-auto">
+        <div className="p-6 max-w-2xl mx-auto min-h-screen">
             {step === 1 && (
                 <>
                     <div
@@ -175,7 +175,11 @@ export default function NewParticipantPage() {
                                     strokeWidth="3"
                                     viewBox="0 0 24 24"
                                 >
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M5 13l4 4L19 7"
+                                    />
                                 </svg>
                             </div>
                             <span>상기 내용을 충분히 읽고 이해하였으며 이에 동의합니다.</span>
@@ -205,7 +209,7 @@ export default function NewParticipantPage() {
             )}
 
             {step === 2 && (
-                <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+                <div className="bg-white  p-6 rounded-lg shadow-md border border-gray-200">
                     <h3 className="text-xl font-semibold mb-6 text-gray-800 border-b pb-2">상담 대상자 정보</h3>
                     <div className="grid gap-5 mb-6 md:grid-cols-2">
                         {[
@@ -215,7 +219,10 @@ export default function NewParticipantPage() {
                             { name: 'religion', label: '사는곳(동)', placeholder: '광진구 자양동', type: 'text' },
                         ].map(({ name, label, placeholder, type }) => (
                             <div key={name}>
-                                <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
+                                <label
+                                    htmlFor={name}
+                                    className="block text-sm font-medium text-gray-700 mb-1"
+                                >
                                     {label}
                                 </label>
                                 <input
