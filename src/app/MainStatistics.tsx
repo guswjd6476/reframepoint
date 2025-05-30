@@ -2,13 +2,11 @@
 
 import * as motion from 'motion/react-client';
 import React from 'react';
-import { brandColor } from './lib/brandcolor';
 
 const MainStatistics = () => {
     return (
         <section
-            className="py-10 md:py-14 lg:py-16"
-            style={{ backgroundColor: brandColor.enamel }}
+            className="py-10 md:py-14 lg:py-16 bg-Bblack"
         >
             <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10 lg:gap-12 text-center">
                 {[
@@ -38,7 +36,6 @@ const MainStatistics = () => {
                     >
                         <h3
                             className="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-2"
-                            style={{ color: brandColor.deepmoss }}
                         >
                             {item.count}
                         </h3>
