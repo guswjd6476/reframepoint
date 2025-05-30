@@ -74,12 +74,10 @@ export default function Contents() {
                                     onClick={() => toggle(content.id)}
                                     className="w-full relative flex items-center justify-between px-6 py-5 text-left"
                                 >
-                                    {/* 제목: 고정 위치 */}
                                     <h4 className="absolute left-[30px] top-1/2 -translate-y-1/2 text-xl font-semibold text-Bgreen">
                                         {content.title}
                                     </h4>
 
-                                    {/* 배지: 제목 오른쪽으로 이동 */}
                                     <div className="pl-[130px] flex gap-2">
                                         {content.is_featured && (
                                             <span className="text-xs bg-Byellow text-Bblack px-2 py-1 rounded-full">
@@ -104,7 +102,6 @@ export default function Contents() {
                                     />
                                 </button>
 
-                                {/* 상세 설명 */}
                                 <AnimatePresence>
                                     {openId === content.id && (
                                         <motion.div

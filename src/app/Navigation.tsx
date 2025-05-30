@@ -54,8 +54,6 @@ export default function Navigation() {
                             <span className="text-Byellow">Point</span>
                         </h1>
                     </Link>
-
-                    {/* 모바일 햄버거 버튼 */}
                     <div
                         className="lg:hidden"
                         onClick={toggleMenu}

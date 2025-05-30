@@ -32,7 +32,7 @@ const MainStatistics = () => {
                         whileInView={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: item.delay }}
                         viewport={{ once: true }}
-                        className="bg-Bbeige rounded-2xl shadow-xl px-4 sm:px-6 md:px-8 py-8 sm:py-12 md:py-16 border border-2 border-Byellow border-transparent transition-all duration-300 hover:border-Byellow hover:border-8"
+                        className="bg-Bbeige rounded-2xl shadow-xl px-4 sm:px-6 md:px-8 py-8 sm:py-12 md:py-16 border-2 border-Byellow border-transparent transition-all duration-300 hover:border-Byellow hover:border-8"
                     >
                         <h3
                             className="text-Bgreen text-2xl sm:text-3xl md:text-4xl font-extrabold mb-2"

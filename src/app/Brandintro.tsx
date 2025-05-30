@@ -11,7 +11,6 @@ const Brandintro = () => {
     >
       <div className="container mx-auto px-6 flex flex-col-reverse md:flex-row items-center gap-16">
 
-     {/* 이미지 영역 */}
         <div className="md:w-1/2 flex justify-center">
           <Image
             src="/monstera1.png"
@@ -22,7 +21,6 @@ const Brandintro = () => {
           />
         </div>
 
-        {/* 텍스트 영역 */}
         <div className="md:w-1/2 bg-Bbeige px-8 py-10 rounded-3xl shadow-lg text-Bblack space-y-6">
         <h2 className="italic text-xl md:text-4xl font-semibold text-Bgreen leading-tight">
             “Not the senses I have but what I do with them is my kingdom.”
