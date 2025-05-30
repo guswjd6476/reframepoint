@@ -2,14 +2,10 @@
 
 import * as motion from 'motion/react-client';
 import React from 'react';
-import { brandColor } from './lib/brandcolor';
 
 const MainStatistics = () => {
     return (
-        <section
-            className="py-10 md:py-14 lg:py-16"
-            style={{ backgroundColor: brandColor.enamel }}
-        >
+        <section className="py-10 md:py-14 lg:py-16 bg-Bblack">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10 lg:gap-12 text-center">
                 {[
                     {
@@ -34,12 +30,9 @@ const MainStatistics = () => {
                         whileInView={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: item.delay }}
                         viewport={{ once: true }}
-                        className="bg-white rounded-2xl shadow-xl px-4 sm:px-6 md:px-8 py-8 sm:py-12 md:py-16 border border-transparent hover:border-4 transition-all duration-300"
+                        className="bg-Bbeige rounded-2xl shadow-xl px-4 sm:px-6 md:px-8 py-8 sm:py-12 md:py-16 border-2 border-Byellow border-transparent transition-all duration-300 hover:border-Byellow hover:border-8"
                     >
-                        <h3
-                            className="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-2"
-                            style={{ color: brandColor.deepmoss }}
-                        >
+                        <h3 className="text-Bgreen text-2xl sm:text-3xl md:text-4xl font-extrabold mb-2">
                             {item.count}
                         </h3>
                         <p className="text-sm sm:text-base md:text-lg text-gray-600">{item.label}</p>

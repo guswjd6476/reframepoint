@@ -4,7 +4,7 @@ import { brandColor } from '@/app/lib/brandcolor';
 
 export default function Footer() {
     return (
-        <footer className="py-12 mt-16" style={{ backgroundColor: brandColor.deepmoss, color: brandColor.enamel }}>
+        <footer className="py-12" style={{ backgroundColor: brandColor.deepmoss, color: brandColor.enamel }}>
             <div className="container mx-auto px-6 md:px-0 max-w-4xl text-center space-y-4">
                 <p className="text-sm md:text-base font-semibold tracking-wide">
                     © 2022 ReframePoint. All rights reserved.

@@ -11,14 +11,14 @@ export default function About() {
             {/* 회사명 및 의미 */}
             <div className="text-center mb-24">
                 <h2 className="text-5xl font-extrabold text-Bdark leading-tight tracking-tight">
-                    <span className="text-Byellow">REFRAMEPOINT</span>
+                    <span className="text-Byellow"> {'" REFRAMEPOINT "'}</span>
                 </h2>
                 <p className="mt-6 text-lg text-Bblack max-w-3xl mx-auto leading-relaxed tracking-wide">
                     ‘Reframe’은 <br />
                     <span className="font-semibold text-Bgreen">새로운 시각으로 바라본다</span>는 의미입니다.
                     <br />
                     ‘Point’는 <br />
-                    <span className="font-semibold text-Byellow">핵심, 출발점</span>을 뜻하죠.
+                    <span className="font-semibold text-Byellow">핵심, 출발점</span>을 뜻합니다.
                     <br />
                     <br />
                     그래서 REFRAMEPOINT는
@@ -44,7 +44,7 @@ export default function About() {
 
             {/* 설립 이념 */}
             <div className="mb-24 px-10 py-12 bg-Bbeige rounded-3xl shadow-lg max-w-4xl mx-auto">
-                <h3 className="text-3xl font-extrabold text-Bdark mb-8 text-center tracking-wide">설립 이념</h3>
+                <h3 className="text-3xl font-extrabold text-Bdark mb-8 text-center tracking-wide">설립 목적</h3>
                 <p
                     className="text-Bbrown text-lg leading-relaxed whitespace-pre-line tracking-wide"
                     style={{ lineHeight: 1.8 }}

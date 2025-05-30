@@ -37,10 +37,7 @@ export default function Navigation() {
                 transition={{ duration: 0.3 }}
             >
                 <div className="container mx-auto flex justify-between items-center px-6">
-                    <Link
-                        className="flex justify-center items-center"
-                        href="/"
-                    >
+                    <Link className="flex justify-center items-center" href="/">
                         <Image
                             src="/Group 6.png"
                             alt="ReframePoint Logo"
@@ -54,24 +51,10 @@ export default function Navigation() {
                             <span className="text-Byellow">Point</span>
                         </h1>
                     </Link>
-
-                    {/* 모바일 햄버거 버튼 */}
-                    <div
-                        className="lg:hidden"
-                        onClick={toggleMenu}
-                    >
-                        <div
-                            className="w-8 h-1 mb-2"
-                            style={{ backgroundColor: darkGray }}
-                        ></div>
-                        <div
-                            className="w-8 h-1 mb-2"
-                            style={{ backgroundColor: darkGray }}
-                        ></div>
-                        <div
-                            className="w-8 h-1"
-                            style={{ backgroundColor: darkGray }}
-                        ></div>
+                    <div className="lg:hidden" onClick={toggleMenu}>
+                        <div className="w-8 h-1 mb-2" style={{ backgroundColor: darkGray }}></div>
+                        <div className="w-8 h-1 mb-2" style={{ backgroundColor: darkGray }}></div>
+                        <div className="w-8 h-1" style={{ backgroundColor: darkGray }}></div>
                     </div>
 
                     <nav className="hidden lg:flex space-x-6">
@@ -133,43 +116,24 @@ export default function Navigation() {
                         transition={{ duration: 0.3 }}
                     >
                         <div className="flex justify-end p-6">
-                            <button
-                                onClick={toggleMenu}
-                                className="text-white text-3xl"
-                            >
+                            <button onClick={toggleMenu} className="text-white text-3xl">
                                 &times;
                             </button>
                         </div>
                         <div className="flex flex-col items-center text-white space-y-6 font-bold">
-                            <Link
-                                className="hover:underline"
-                                href="/about"
-                                onClick={toggleMenu}
-                            >
+                            <Link className="hover:underline" href="/about" onClick={toggleMenu}>
                                 소개
                             </Link>
-                            <Link
-                                className="hover:underline"
-                                href="/content"
-                                onClick={toggleMenu}
-                            >
+                            <Link className="hover:underline" href="/content" onClick={toggleMenu}>
                                 컨텐츠
                             </Link>
                             {session ? (
                                 <>
-                                    <Link
-                                        className="hover:underline"
-                                        href="/dashboard"
-                                        onClick={toggleMenu}
-                                    >
+                                    <Link className="hover:underline" href="/dashboard" onClick={toggleMenu}>
                                         대시보드
                                     </Link>
                                     {session.user?.email === 'seouljdb@jdb.com' && (
-                                        <Link
-                                            className="hover:underline"
-                                            href="/admins"
-                                            onClick={toggleMenu}
-                                        >
+                                        <Link className="hover:underline" href="/admins" onClick={toggleMenu}>
                                             관리자
                                         </Link>
                                     )}
@@ -184,11 +148,7 @@ export default function Navigation() {
                                     </button>
                                 </>
                             ) : (
-                                <Link
-                                    className="hover:underline"
-                                    href="/login"
-                                    onClick={toggleMenu}
-                                >
+                                <Link className="hover:underline" href="/login" onClick={toggleMenu}>
                                     로그인
                                 </Link>
                             )}
