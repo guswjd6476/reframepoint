@@ -72,10 +72,15 @@ export default function Contents() {
                             >
                                 <button
                                     onClick={() => toggle(content.id)}
-                                    className="w-full flex items-center justify-between px-6 py-5 text-left"
+                                    className="w-full relative flex items-center justify-between px-6 py-5 text-left"
                                 >
-                                    <div className="flex items-center gap-3">
-                                        <h4 className="text-xl font-semibold text-Bgreen">{content.title}</h4>
+                                    {/* 제목: 고정 위치 */}
+                                    <h4 className="absolute left-[30px] top-1/2 -translate-y-1/2 text-xl font-semibold text-Bgreen">
+                                        {content.title}
+                                    </h4>
+
+                                    {/* 배지: 제목 오른쪽으로 이동 */}
+                                    <div className="pl-[130px] flex gap-2">
                                         {content.is_featured && (
                                             <span className="text-xs bg-Byellow text-Bblack px-2 py-1 rounded-full">
                                                 대표
@@ -87,14 +92,19 @@ export default function Contents() {
                                             </span>
                                         )}
                                     </div>
+
+                                    {/* 화살표 */}
                                     <ChevronRight
-                                        className={`transform transition-transform duration-300 ${
-                                            openId === content.id ? 'rotate-90 text-Bgreen' : 'text-gray-400'
+                                        className={`ml-4 transform transition-transform duration-300 ${
+                                            openId === content.id
+                                                ? 'rotate-90 text-Bgreen'
+                                                : 'text-gray-400'
                                         }`}
                                         size={20}
                                     />
                                 </button>
 
+                                {/* 상세 설명 */}
                                 <AnimatePresence>
                                     {openId === content.id && (
                                         <motion.div
