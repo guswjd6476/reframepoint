@@ -1,0 +1,11 @@
+# *
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+
+# Host
+Host: https://reframepoint.co.kr
+
+# Sitemaps
+Sitemap: https://reframepoint.co.kr/sitemap.xml
