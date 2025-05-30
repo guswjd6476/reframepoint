@@ -52,9 +52,11 @@ export default function Contents() {
             transition={{ duration: 1 }}
         >
             <div className="max-w-4xl mx-auto">
-                <h2 className="text-5xl font-bold text-center text-Bgreen">모든 컨텐츠</h2>
+                <h2 className="text-5xl font-bold text-center text-Bgreen">
+                    {"ReframePoint's Contents"}
+                </h2>
                 <p className="mt-4 text-center text-gray-600 text-lg">
-                    가볍게 스크롤하며 흥미로운 콘텐츠를 발견해보세요.
+                    다양한 컨텐츠로 나를 발견해보세요.
                 </p>
 
                 {loading ? (
