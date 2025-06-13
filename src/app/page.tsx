@@ -95,6 +95,9 @@ export default function Home() {
             </section>
 
             <Brandintro />
+
+            <MainStatistics />
+            <MainClassSlider />
             <section className="relative w-full h-82 bg-gradient-to-b from-black via-gray-900 to-gray-800 overflow-hidden">
                 <div className="absolute inset-0 opacity-20">
                     <Image
@@ -123,8 +126,6 @@ export default function Home() {
                     <p className="text-sm text-gray-400">첫 달 무료 체험 가능. 언제든 해지 OK.</p>
                 </div>
             </section>
-            <MainStatistics />
-            <MainClassSlider />
         </div>
     );
 }
