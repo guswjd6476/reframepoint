@@ -95,6 +95,34 @@ export default function Home() {
             </section>
 
             <Brandintro />
+            <section className="relative w-full h-82 bg-gradient-to-b from-black via-gray-900 to-gray-800 overflow-hidden">
+                <div className="absolute inset-0 opacity-20">
+                    <Image
+                        src="/back.jpg" // 부드러운 텍스처 이미지 (예: 흐릿한 책 페이지나 추상 배경)
+                        alt="Background texture"
+                        layout="fill"
+                        objectFit="cover"
+                        quality={100}
+                        placeholder="blur"
+                        blurDataURL="/netflix-texture-placeholder.jpg"
+                    />
+                </div>
+
+                {/* Content Overlay */}
+                <div className="relative z-10 max-w-4xl mx-auto py-20 px-6 text-center text-white space-y-6">
+                    <h2 className="text-4xl md:text-5xl font-bold tracking-tight">지금 리프레임포인트와 함께하세요!</h2>
+                    <p className="text-lg md:text-xl text-gray-300 leading-relaxed max-w-2xl mx-auto">
+                        실험적인 출판 세계를 탐험하고, 연간 구독으로 특별한 혜택을 누려보세요.
+                    </p>
+                    <a
+                        href="/subscribe"
+                        className="inline-block bg-red-600 text-white font-semibold px-8 py-4 rounded-lg text-lg hover:bg-red-700 transition-colors"
+                    >
+                        연간 결제 시작하기
+                    </a>
+                    <p className="text-sm text-gray-400">첫 달 무료 체험 가능. 언제든 해지 OK.</p>
+                </div>
+            </section>
             <MainStatistics />
             <MainClassSlider />
         </div>

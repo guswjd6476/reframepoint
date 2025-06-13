@@ -2,10 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/app/lib/supabase';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Navigation } from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/navigation';
 import Image from 'next/image';
 
 interface SlideItem {
@@ -29,7 +25,7 @@ const MainClassSlider = () => {
             if (error) {
                 console.error('대표 컨텐츠 로딩 실패:', error.message);
             } else {
-                setSlides(data);
+                setSlides(data ?? []);
             }
 
             setLoading(false);
@@ -62,47 +58,28 @@ const MainClassSlider = () => {
                     </p>
                 </div>
 
-                <div className="relative">
-                    <Swiper
-                        slidesPerView={1.1}
-                        spaceBetween={24}
-                        loop={true}
-                        autoplay={{ delay: 3000, disableOnInteraction: false }}
-                        breakpoints={{
-                            640: { slidesPerView: 2.2 },
-                            1024: { slidesPerView: 3.5 },
-                        }}
-                        navigation={{
-                            nextEl: '.swiper-button-next',
-                            prevEl: '.swiper-button-prev',
-                        }}
-                        modules={[Autoplay, Navigation]}
-                    >
-                        {slides.map((card) => (
-                            <SwiperSlide key={card.id}>
-                                <div className="h-full bg-white border border-gray-200 hover:border-Bgreen hover:border-4 rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 flex flex-col">
-                                    <div className="relative w-full h-48 md:h-56">
-                                        <Image
-                                            src={card.image_url}
-                                            alt={card.title}
-                                            layout="fill"
-                                            objectFit="cover"
-                                            className="rounded-t-3xl"
-                                        />
-                                    </div>
-                                    <div className="flex-1 p-4 sm:p-5 flex items-center justify-center">
-                                        <h3 className="text-lg font-semibold text-neutral-800 text-center leading-snug line-clamp-2">
-                                            {card.title}
-                                        </h3>
-                                    </div>
-                                </div>
-                            </SwiperSlide>
-                        ))}
-                    </Swiper>
-
-                    {/* Navigation Buttons */}
-                    <div className="swiper-button-prev !text-Bgreen !left-[-35px] hidden md:flex" />
-                    <div className="swiper-button-next !text-Bgreen !right-[-35px] hidden md:flex" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {slides.map((card) => (
+                        <div
+                            key={card.id}
+                            className="h-full bg-white border border-gray-200 rounded-3xl overflow-hidden shadow-md flex flex-col cursor-pointer"
+                        >
+                            <div className="relative w-full h-48 md:h-56">
+                                <Image
+                                    src={card.image_url}
+                                    alt={card.title}
+                                    fill
+                                    style={{ objectFit: 'cover' }}
+                                    className="rounded-t-3xl"
+                                />
+                            </div>
+                            <div className="flex-1 p-4 sm:p-5 flex items-center justify-center">
+                                <h3 className="text-lg font-semibold text-neutral-800 text-center leading-snug line-clamp-2">
+                                    {card.title}
+                                </h3>
+                            </div>
+                        </div>
+                    ))}
                 </div>
             </div>
         </section>
