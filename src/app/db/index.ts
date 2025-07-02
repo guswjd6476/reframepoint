@@ -1,4 +1,5 @@
-import { supabase } from '../lib/supabase';
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
 
 interface AnswerData {
     clientid: string;
@@ -16,6 +17,8 @@ interface StampData {
 
 // 답변 저장
 export const insertAnswers = async (clientid: string, answers: Record<string, number>) => {
+    const supabase = createServerComponentClient({ cookies });
+
     const { error } = await supabase.from('responses').insert([{ clientid, answers }]);
 
     if (error) {
@@ -24,8 +27,10 @@ export const insertAnswers = async (clientid: string, answers: Record<string, nu
     }
 };
 
-// 전체 답변 가져오기
+// 전체 답변 조회
 export const getAnswers = async (): Promise<AnswerData[] | null> => {
+    const supabase = createServerComponentClient({ cookies });
+
     const { data, error } = await supabase.from('responses').select('clientid, answers, created_at');
 
     if (error) {
@@ -36,8 +41,10 @@ export const getAnswers = async (): Promise<AnswerData[] | null> => {
     return data ?? null;
 };
 
-// 특정 ID 답변 가져오기
+// 특정 ID 답변 조회
 export const getIdAnswers = async (clientid: string): Promise<AnswerData | null> => {
+    const supabase = createServerComponentClient({ cookies });
+
     const { data, error } = await supabase
         .from('responses')
         .select('clientid, answers, created_at')
@@ -54,6 +61,8 @@ export const getIdAnswers = async (clientid: string): Promise<AnswerData | null>
 
 // 사용자 삭제
 export const deleteUser = async (clientid: string): Promise<void> => {
+    const supabase = createServerComponentClient({ cookies });
+
     const { error } = await supabase.from('responses').delete().eq('clientid', clientid);
 
     if (error) {
@@ -67,6 +76,8 @@ export const updateStamp = async (
     clientid: string,
     stampType: 'firststamp' | 'secondstamp' | 'thirdstamp' | 'laststamp'
 ): Promise<void> => {
+    const supabase = createServerComponentClient({ cookies });
+
     const { error } = await supabase
         .from('responses')
         .update({ [stampType]: true })
@@ -80,6 +91,8 @@ export const updateStamp = async (
 
 // 도장 상태 조회
 export const getIdStamp = async (clientid: string): Promise<StampData | null> => {
+    const supabase = createServerComponentClient({ cookies });
+
     const { data, error } = await supabase
         .from('responses')
         .select('clientid, firststamp, secondstamp, thirdstamp, laststamp')
