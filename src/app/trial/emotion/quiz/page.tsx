@@ -23,6 +23,19 @@ export default function QuizPage() {
         }
     };
 
+    const handleGoBack = () => {
+        if (current > 0) {
+            // 현재 질문의 답을 지움
+            const currentQuestionId = questions[current - 1].id;
+            setAnswers((prev) => {
+                const updated = { ...prev };
+                delete updated[questions[current].id];
+                return updated;
+            });
+            setCurrent(current - 1);
+        }
+    };
+
     const handleSubmitResults = async () => {
         if (!clientid) {
             alert('사용자 이름을 가져올 수 없습니다.');
@@ -86,6 +99,13 @@ export default function QuizPage() {
                         </button>
                     ))}
                 </div>
+
+                {/* 뒤로가기 버튼 */}
+                {current > 0 && (
+                    <button onClick={handleGoBack} className="mt-2 text-sm text-blue-600 underline hover:text-blue-800">
+                        ← 이전 질문으로
+                    </button>
+                )}
             </div>
 
             {/* 설명 */}
