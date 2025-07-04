@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 
 const types: Record<string, { name: string; book: string; quote: string }> = {
     A: {
@@ -69,7 +69,6 @@ const calculateResult = (answers: Record<string, number>) => {
 
 export default function ResultPage() {
     const searchParams = useSearchParams();
-    const router = useRouter();
     const [result, setResult] = useState<{ type: string; score: number } | null>(null);
     const clientid = searchParams.get('clientid');
 
@@ -90,31 +89,6 @@ export default function ResultPage() {
     if (!result || !result.type) return <p className="text-center text-gray-600">결과를 계산 중입니다...</p>;
 
     const { name, book, quote } = types[result.type];
-
-    const handleStamp = async () => {
-        if (!clientid) return alert('clientid가 없습니다.');
-
-        try {
-            const response = await fetch('/api/updateStamp', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ clientid, stampType: 'firststamp' }),
-            });
-
-            const data = await response.json();
-            if (response.ok) {
-                alert('도장이 성공적으로 추가되었습니다!');
-                router.push(`/stamppage?clientid=${clientid}`);
-            } else {
-                alert(`오류 발생: ${data.message}`);
-            }
-        } catch (error) {
-            console.error('도장 업데이트 실패:', error);
-            alert('도장을 업데이트하는 중 오류가 발생했습니다.');
-        }
-    };
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center px-6 py-10 bg-gradient-to-br from-green-100 to-blue-100">

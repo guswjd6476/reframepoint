@@ -25,8 +25,6 @@ export default function QuizPage() {
 
     const handleGoBack = () => {
         if (current > 0) {
-            // 현재 질문의 답을 지움
-            const currentQuestionId = questions[current - 1].id;
             setAnswers((prev) => {
                 const updated = { ...prev };
                 delete updated[questions[current].id];

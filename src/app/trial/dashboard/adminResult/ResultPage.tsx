@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Chart as ChartJS, RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend } from 'chart.js';
 import { Radar } from 'react-chartjs-2';
+import Link from 'next/link';
 
 ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
 
@@ -158,6 +159,14 @@ export default function ResultPage() {
                             ))}
                         </tbody>
                     </table>
+                </div>
+                <div className="text-center mt-6">
+                    <Link
+                        href={`/trial/dashboard/adminResult/detail`}
+                        className="inline-block bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition"
+                    >
+                        상세보기
+                    </Link>
                 </div>
             </div>
         </div>
