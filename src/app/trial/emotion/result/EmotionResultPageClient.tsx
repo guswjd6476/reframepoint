@@ -130,13 +130,6 @@ export default function ResultPage() {
                 <p className="text-lg font-semibold text-gray-800 mb-2">📝 명문장</p>
                 <p className="text-md text-gray-600">“{quote}”</p>
             </div>
-
-            <button
-                onClick={handleStamp}
-                className="mt-4 px-6 py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg shadow-md transition"
-            >
-                도장받기
-            </button>
         </div>
     );
 }
