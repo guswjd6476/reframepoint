@@ -21,14 +21,12 @@ export default function HomePage() {
             <div className="absolute w-72 h-72 bg-yellow-200 rounded-full opacity-30 top-[-50px] left-[-50px] animate-pulse"></div>
             <div className="absolute w-72 h-72 bg-blue-200 rounded-full opacity-30 bottom-[-50px] right-[-50px] animate-pulse"></div>
 
-            {/* 카드 */}
             <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 0.5, ease: 'easeOut' }}
                 className="bg-white shadow-xl rounded-2xl p-8 w-full max-w-md z-10 text-center"
             >
-                {/* 아이콘 (피크민) */}
                 <div className="flex justify-center gap-2 mb-4">
                     <div className="w-4 h-4 rounded-full bg-yellow-400 animate-bounce"></div>
                     <div className="w-4 h-4 rounded-full bg-blue-400 animate-bounce delay-100"></div>
