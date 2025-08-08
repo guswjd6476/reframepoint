@@ -1,16 +1,71 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
+import Link from 'next/link'; // next/link import 확인
+import { Library, Users, Target, CheckCircle2 } from 'lucide-react';
+
 import MainClassSlider from './MainClassSlider';
 import Brandintro from './Brandintro';
 import MainStatistics from './MainStatistics';
-// import MainFeatures from './MainFeatures';
-import Image from 'next/image';
-import Link from 'next/link';
 
 export default function Home() {
+    const [showPopup, setShowPopup] = useState(true);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setShowPopup(true);
+        }, 500);
+        return () => clearTimeout(timer);
+    }, []);
+
     return (
         <div style={{ fontFamily: 'sans-serif' }}>
+            {showPopup && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-4">
+                    <div className="bg-white rounded-xl shadow-2xl max-w-3xl w-full overflow-hidden relative flex flex-col md:flex-row">
+                        <button
+                            onClick={() => setShowPopup(false)}
+                            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl font-bold z-50"
+                        >
+                            &times;
+                        </button>
+
+                        <div className="w-full md:w-1/2 relative h-72 md:h-auto bg-gray-100">
+                            <Image
+                                src="/stress.jpg"
+                                alt="스트레스 설문"
+                                layout="fill"
+                                objectFit="cover"
+                                className="rounded-l-xl"
+                            />
+                        </div>
+                        <div className="w-full md:w-1/2 p-6 flex flex-col justify-center">
+                            <p className="text-sm text-Borange font-semibold mb-2">스트레스 서베이 참여 안내</p>
+                            <h2 className="text-2xl font-bold text-Bgreen leading-snug mb-4">
+                                20-30대의 스트레스 원인과 영향을 함께 조사합니다
+                            </h2>
+                            <p className="text-gray-700 text-sm mb-4 leading-relaxed">
+                                본 설문은 20대와 30대가 직면하고 있는 <strong>스트레스 요인</strong>과 그로 인한{' '}
+                                <strong>정신적, 신체적 영향</strong>을 조사하기 위해 설계되었습니다.
+                                <br />
+                                최근 증가하는 자살률, 우울증, 번아웃, 다양한 스트레스 문제를 진단하고{' '}
+                                <strong>해결방안</strong>을 모색하고자 합니다.
+                            </p>
+                            <a
+                                href="https://smore.im/form/hRC2z1iCSM"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="mt-auto inline-block bg-Borange text-white font-semibold px-6 py-3 rounded-full text-center hover:opacity-90 transition"
+                            >
+                                설문 참여하기
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* 🟡 메인 콘텐츠 영역 */}
             <section className="bg-Bbeige relative w-full h-screen flex items-center justify-center overflow-hidden">
                 <div className="relative flex -space-x-16">
                     <div className="w-[390px] h-[570px] bg-Bblack rounded-[240px] z-30 shadow-2xl flex flex-col items-center justify-center gap-6 text-center px-6 relative overflow-hidden">
@@ -22,18 +77,16 @@ export default function Home() {
                         >
                             <path
                                 d="
-      M0 40
-      C 50 10, 90 70, 120 40
-
-      Q 125 10, 145 90
-      Q 155 10, 175 90
-      Q 185 10, 205 90
-      Q 215 10, 235 90
-      Q 245 10, 265 90
-      Q 275 10, 295 90
-
-      C 300 60, 350 20, 400 40
-    "
+                                    M0 40
+                                    C 50 10, 90 70, 120 40
+                                    Q 125 10, 145 90
+                                    Q 155 10, 175 90
+                                    Q 185 10, 205 90
+                                    Q 215 10, 235 90
+                                    Q 245 10, 265 90
+                                    Q 275 10, 295 90
+                                    C 300 60, 350 20, 400 40
+                                "
                                 stroke="#E5DCCB"
                                 strokeWidth="4"
                                 fill="none"
@@ -57,10 +110,10 @@ export default function Home() {
                         </svg>
 
                         <div className="text-white font-semibold text-3xl leading-snug z-50 mt-4 relative">
-                            welcome to
-                            <br />
+                            welcome to <br />
                             <span className="text-Bgreen stroke-Bbeige">R</span>eframe{' '}
                             <span className="text-Byellow">P</span>oint
+                            <p className="text-base text-gray-300 mt-2 font-normal">당신의 관점을 바꾸는 새로운 시작</p>
                         </div>
 
                         <Link
@@ -94,14 +147,130 @@ export default function Home() {
                 </div>
             </section>
 
+            {/* 🟢 기존 컴포넌트 */}
             <Brandintro />
-
             <MainStatistics />
             <MainClassSlider />
-            <section className="relative w-full h-82 bg-gradient-to-b from-black via-gray-900 to-gray-800 overflow-hidden">
+
+            {/* ⭐ [신규 추가] 핵심 장점 섹션 */}
+            <section className="py-20 bg-white">
+                <div className="max-w-6xl mx-auto px-6 text-center">
+                    <h2 className="text-4xl font-bold text-Bblack mb-4">Why Reframe Point?</h2>
+                    <p className="text-lg text-gray-600 mb-12 max-w-2xl mx-auto">
+                        우리는 당신의 성장을 위한 최고의 환경을 제공합니다. 체계적인 콘텐츠와 커뮤니티를 통해 변화를
+                        경험하세요.
+                    </p>
+                    <div className="grid md:grid-cols-3 gap-8">
+                        <div className="p-8 border border-gray-200 rounded-lg shadow-sm hover:shadow-lg transition-shadow">
+                            <Library className="w-16 h-16 mx-auto mb-4 text-Bgreen" strokeWidth={1.5} />
+                            <h3 className="text-2xl font-bold text-Bgreen mb-2">엄선된 고품질 콘텐츠</h3>
+                            <p className="text-gray-600">
+                                각 분야 전문가들이 제작한 깊이 있는 콘텐츠를 무제한으로 이용하세요.
+                            </p>
+                        </div>
+                        <div className="p-8 border border-gray-200 rounded-lg shadow-sm hover:shadow-lg transition-shadow">
+                            <Users className="w-16 h-16 mx-auto mb-4 text-Bgreen" strokeWidth={1.5} />
+                            <h3 className="text-2xl font-bold text-Bgreen mb-2">성장을 돕는 커뮤니티</h3>
+                            <p className="text-gray-600">
+                                같은 목표를 가진 사람들과 교류하며 동기부여를 얻고 함께 성장하세요.
+                            </p>
+                        </div>
+                        <div className="p-8 border border-gray-200 rounded-lg shadow-sm hover:shadow-lg transition-shadow">
+                            <Target className="w-16 h-16 mx-auto mb-4 text-Bgreen" strokeWidth={1.5} />
+                            <h3 className="text-2xl font-bold text-Bgreen mb-2">개인 맞춤형 성장 계획</h3>
+                            <p className="text-gray-600">
+                                나의 현재 상태를 진단하고, 목표 달성을 위한 최적의 로드맵을 제공받으세요.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* ⭐ [신규 추가] 가격 및 구독 플랜 섹션 - 가격이 수정되었습니다 */}
+            <section className="py-20 bg-Bbeige">
+                <div className="max-w-6xl mx-auto px-6 text-center">
+                    <h2 className="text-4xl font-bold text-Bblack mb-4">당신에게 맞는 플랜을 선택하세요</h2>
+                    <p className="text-lg text-gray-600 mb-12 max-w-2xl mx-auto">
+                        모든 플랜에서 리프레임포인트의 핵심 기능을 자유롭게 이용할 수 있습니다. 언제든지 해지
+                        가능합니다.
+                    </p>
+                    <div className="flex flex-col lg:flex-row justify-center items-center gap-8">
+                        {/* 월간 플랜 */}
+                        <div className="bg-white rounded-lg p-8 w-full max-w-sm border border-gray-200">
+                            <h3 className="text-2xl font-bold text-Bblack">월간 구독</h3>
+                            <p className="text-gray-500 mt-2">부담없이 시작하고 싶다면</p>
+                            <p className="text-5xl font-bold text-Bblack my-6">
+                                ₩79,000<span className="text-lg font-normal text-gray-500">/월</span>
+                            </p>
+                            <ul className="space-y-4 text-left">
+                                <li className="flex items-center">
+                                    <CheckCircle2 className="h-6 w-6 text-Bgreen flex-shrink-0" />
+                                    <span className="ml-3">전체 콘텐츠 무제한 이용</span>
+                                </li>
+                                <li className="flex items-center">
+                                    <CheckCircle2 className="h-6 w-6 text-Bgreen flex-shrink-0" />
+                                    <span className="ml-3">커뮤니티 참여 가능</span>
+                                </li>
+                                <li className="flex items-center">
+                                    <CheckCircle2 className="h-6 w-6 text-Bgreen flex-shrink-0" />
+                                    <span className="ml-3">월간 성장 리포트 제공</span>
+                                </li>
+                            </ul>
+                            <Link
+                                href="/subscribe"
+                                className="w-full mt-8 block bg-gray-200 text-Bblack font-bold py-3 rounded-lg hover:bg-gray-300 transition text-center"
+                            >
+                                월간 플랜으로 시작
+                            </Link>
+                        </div>
+
+                        <div className="bg-Bgreen text-white rounded-lg p-8 w-full max-w-sm border-2 border-Borange relative shadow-2xl">
+                            <div className="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2 bg-Borange text-white px-4 py-1 rounded-full text-sm font-semibold">
+                                가장 인기 있는 선택
+                            </div>
+                            <h3 className="text-2xl font-bold">연간 구독</h3>
+                            <p className="text-green-200 mt-2">가장 합리적인 선택</p>
+                            <p className="text-5xl font-bold my-6">
+                                ₩59,000<span className="text-lg font-normal text-green-200">/월</span>
+                            </p>
+                            <p className="text-yellow-300 font-semibold mb-6">연 708,000원 (25% 이상 할인)</p>
+                            <ul className="space-y-4 text-left">
+                                <li className="flex items-center">
+                                    <CheckCircle2 className="h-6 w-6 text-white flex-shrink-0" />
+                                    <span className="ml-3">전체 콘텐츠 무제한 이용</span>
+                                </li>
+                                <li className="flex items-center">
+                                    <CheckCircle2 className="h-6 w-6 text-white flex-shrink-0" />
+                                    <span className="ml-3">커뮤니티 참여 가능</span>
+                                </li>
+                                <li className="flex items-center">
+                                    <CheckCircle2 className="h-6 w-6 text-white flex-shrink-0" />
+                                    <span className="ml-3">월간 성장 리포트 제공</span>
+                                </li>
+                                <li className="flex items-center">
+                                    <CheckCircle2 className="h-6 w-6 text-white flex-shrink-0" />
+                                    <span className="ml-3 font-bold">프리미엄 워크숍 초대권</span>
+                                </li>
+                                <li className="flex items-center">
+                                    <CheckCircle2 className="h-6 w-6 text-white flex-shrink-0" />
+                                    <span className="ml-3 font-bold">전문가 1:1 코칭 세션 (연 1회)</span>
+                                </li>
+                            </ul>
+                            <Link
+                                href="/subscribe"
+                                className="w-full mt-8 block bg-Borange text-white font-bold py-3 rounded-lg hover:opacity-90 transition text-center"
+                            >
+                                25% 이상 할인받고 시작하기
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section className="relative w-full bg-gradient-to-b from-black via-gray-900 to-gray-800 overflow-hidden">
                 <div className="absolute inset-0 opacity-20">
                     <Image
-                        src="/back.jpg" // 부드러운 텍스처 이미지 (예: 흐릿한 책 페이지나 추상 배경)
+                        src="/back.jpg"
                         alt="Background texture"
                         layout="fill"
                         objectFit="cover"
@@ -111,19 +280,18 @@ export default function Home() {
                     />
                 </div>
 
-                {/* Content Overlay */}
                 <div className="relative z-10 max-w-4xl mx-auto py-20 px-6 text-center text-white space-y-6">
-                    <h2 className="text-4xl md:text-5xl font-bold tracking-tight">지금 리프레임포인트와 함께하세요!</h2>
+                    <h2 className="text-4xl md:text-5xl font-bold tracking-tight">망설일 이유가 없습니다.</h2>
                     <p className="text-lg md:text-xl text-gray-300 leading-relaxed max-w-2xl mx-auto">
-                        실험적인 출판 세계를 탐험하고, 연간 구독으로 특별한 혜택을 누려보세요.
+                        지금 바로 시작하고 당신의 잠재력을 깨워보세요. 최고의 투자는 바로 자신에게 하는 투자입니다.
                     </p>
-                    <a
+                    <Link
                         href="/subscribe"
-                        className="inline-block bg-red-600 text-white font-semibold px-8 py-4 rounded-lg text-lg hover:bg-red-700 transition-colors"
+                        className="inline-block bg-Borange text-white font-semibold px-8 py-4 rounded-lg text-lg hover:bg-red-700 transition-colors"
                     >
-                        연간 결제 시작하기
-                    </a>
-                    <p className="text-sm text-gray-400">첫 달 무료 체험 가능. 언제든 해지 OK.</p>
+                        내게 맞는 플랜 찾아보기
+                    </Link>
+                    <p className="text-sm text-gray-400">구독은 언제든지 해지 가능합니다.</p>
                 </div>
             </section>
         </div>
