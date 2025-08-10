@@ -57,7 +57,7 @@ export default function Home() {
                                     <strong> 해결방안</strong>을 모색합니다.
                                 </p>
                                 <a
-                                    href="https://smore.im/form/hRC2z1iCSM"
+                                    href="https://smore.im/form/rbUBfNZ71d"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="inline-block bg-Borange text-white font-semibold px-6 py-2 rounded-full hover:opacity-90 transition"
@@ -132,7 +132,13 @@ export default function Home() {
                     <div className="w-[390px] h-[570px] bg-white border-[10px] border-Bgreen rounded-[240px] z-20 shadow-xl flex flex-col items-center justify-center gap-4 px-6 relative">
                         <div className="absolute top-8 text-Bgreen text-[120px] font-bold rotate-[30deg]">R</div>
 
-                        <Image src="/Group 6.png" alt="ReframePoint Logo" width={100} height={100} priority />
+                        <Image
+                            src="/Group 6.png"
+                            alt="ReframePoint Logo"
+                            width={100}
+                            height={100}
+                            priority
+                        />
 
                         <div className="absolute bottom-8 text-Bgreen text-[120px] font-bold -rotate-[40deg]">P</div>
                     </div>
@@ -152,12 +158,10 @@ export default function Home() {
                 </div>
             </section>
 
-            {/* 🟢 기존 컴포넌트 */}
             <Brandintro />
             <MainStatistics />
             <MainClassSlider />
 
-            {/* ⭐ [신규 추가] 핵심 장점 섹션 */}
             <section className="py-20 bg-white">
                 <div className="max-w-6xl mx-auto px-6 text-center">
                     <h2 className="text-4xl font-bold text-Bblack mb-4">Why Reframe Point?</h2>
@@ -167,21 +171,30 @@ export default function Home() {
                     </p>
                     <div className="grid md:grid-cols-3 gap-8">
                         <div className="p-8 border border-gray-200 rounded-lg shadow-sm hover:shadow-lg transition-shadow">
-                            <Library className="w-16 h-16 mx-auto mb-4 text-Bgreen" strokeWidth={1.5} />
+                            <Library
+                                className="w-16 h-16 mx-auto mb-4 text-Bgreen"
+                                strokeWidth={1.5}
+                            />
                             <h3 className="text-2xl font-bold text-Bgreen mb-2">엄선된 고품질 콘텐츠</h3>
                             <p className="text-gray-600">
                                 각 분야 전문가들이 제작한 깊이 있는 콘텐츠를 무제한으로 이용하세요.
                             </p>
                         </div>
                         <div className="p-8 border border-gray-200 rounded-lg shadow-sm hover:shadow-lg transition-shadow">
-                            <Users className="w-16 h-16 mx-auto mb-4 text-Bgreen" strokeWidth={1.5} />
+                            <Users
+                                className="w-16 h-16 mx-auto mb-4 text-Bgreen"
+                                strokeWidth={1.5}
+                            />
                             <h3 className="text-2xl font-bold text-Bgreen mb-2">성장을 돕는 커뮤니티</h3>
                             <p className="text-gray-600">
                                 같은 목표를 가진 사람들과 교류하며 동기부여를 얻고 함께 성장하세요.
                             </p>
                         </div>
                         <div className="p-8 border border-gray-200 rounded-lg shadow-sm hover:shadow-lg transition-shadow">
-                            <Target className="w-16 h-16 mx-auto mb-4 text-Bgreen" strokeWidth={1.5} />
+                            <Target
+                                className="w-16 h-16 mx-auto mb-4 text-Bgreen"
+                                strokeWidth={1.5}
+                            />
                             <h3 className="text-2xl font-bold text-Bgreen mb-2">개인 맞춤형 성장 계획</h3>
                             <p className="text-gray-600">
                                 나의 현재 상태를 진단하고, 목표 달성을 위한 최적의 로드맵을 제공받으세요.
@@ -191,7 +204,6 @@ export default function Home() {
                 </div>
             </section>
 
-            {/* ⭐ [신규 추가] 가격 및 구독 플랜 섹션 - 가격이 수정되었습니다 */}
             <section className="py-20 bg-Bbeige">
                 <div className="max-w-6xl mx-auto px-6 text-center">
                     <h2 className="text-4xl font-bold text-Bblack mb-4">당신에게 맞는 플랜을 선택하세요</h2>
@@ -200,7 +212,6 @@ export default function Home() {
                         가능합니다.
                     </p>
                     <div className="flex flex-col lg:flex-row justify-center items-center gap-8">
-                        {/* 월간 플랜 */}
                         <div className="bg-white rounded-lg p-8 w-full max-w-sm border border-gray-200">
                             <h3 className="text-2xl font-bold text-Bblack">월간 구독</h3>
                             <p className="text-gray-500 mt-2">부담없이 시작하고 싶다면</p>
