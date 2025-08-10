@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
-import Link from 'next/link'; // next/link import 확인
+import Link from 'next/link';
 import { Library, Users, Target, CheckCircle2 } from 'lucide-react';
 
 import MainClassSlider from './MainClassSlider';
@@ -10,67 +10,140 @@ import Brandintro from './Brandintro';
 import MainStatistics from './MainStatistics';
 
 export default function Home() {
-    const [showPopup, setShowPopup] = useState(true);
+    // 팝업의 DOM 존재 여부를 관리하는 상태
+    const [isPopupVisible, setIsPopupVisible] = useState(false);
+    // 팝업의 애니메이션(등장/퇴장) 효과를 관리하는 상태
+    const [isAnimating, setIsAnimating] = useState(false);
 
     useEffect(() => {
+        // localStorage는 브라우저 환경에서만 접근 가능하므로 useEffect 내부에서 사용
+        const dontShowUntil = localStorage.getItem('popupDontShowUntil');
+
+        // 저장된 시간이 있고, 그 시간이 현재 시간보다 미래라면 팝업을 보여주지 않음
+        if (dontShowUntil && new Date().getTime() < parseInt(dontShowUntil, 10)) {
+            return;
+        }
+
+        // 0.5초 후에 팝업을 표시
         const timer = setTimeout(() => {
-            setShowPopup(true);
+            setIsPopupVisible(true); // 팝업을 DOM에 추가
+            // requestAnimationFrame을 사용해 브라우저가 렌더링할 준비가 되었을 때 애니메이션 시작
+            requestAnimationFrame(() => {
+                setIsAnimating(true);
+            });
         }, 500);
+
         return () => clearTimeout(timer);
-    }, []);
+    }, []); // 최초 렌더링 시 한 번만 실행
+
+    const handleClosePopup = () => {
+        setIsAnimating(false); // 퇴장 애니메이션 시작
+        setTimeout(() => {
+            setIsPopupVisible(false); // 애니메이션이 끝난 후 DOM에서 제거
+        }, 300); // CSS transition 시간과 일치해야 함
+    };
+
+    const handleDontShowToday = () => {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1); // 내일 날짜 설정
+        localStorage.setItem('popupDontShowUntil', tomorrow.getTime().toString());
+        handleClosePopup();
+    };
 
     return (
         <div style={{ fontFamily: 'sans-serif' }}>
-            {showPopup && (
-                <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-[9999] p-4">
-                    <div className="relative w-full max-w-xl rounded-2xl overflow-hidden shadow-2xl bg-black">
+            {isPopupVisible && (
+                <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[9999] p-4 backdrop-blur-sm">
+                    {/* --- POPUP START --- */}
+                    <div
+                        className={`
+                            relative w-full max-w-md rounded-2xl shadow-2xl bg-gray-900 overflow-hidden
+                            transform transition-all duration-300 ease-in-out
+                            ${isAnimating ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}
+                        `}
+                    >
+                        {/* 1. 이미지 영역 (상단 전체 차지) */}
+                        <div className="relative w-full aspect-[4/5]">
+                            <Image
+                                src="/stress.jpg"
+                                alt="스트레스 설문 포스터"
+                                layout="fill"
+                                objectFit="cover"
+                                priority
+                            />
+                        </div>
+
                         {/* 닫기 버튼 */}
                         <button
-                            onClick={() => setShowPopup(false)}
-                            className="absolute top-4 right-4 text-white hover:text-gray-300 text-3xl font-bold z-50"
+                            onClick={handleClosePopup}
+                            className="absolute top-3 right-3 p-1 bg-black/50 rounded-full text-white hover:bg-black/80 transition-colors z-50"
                         >
-                            &times;
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                            >
+                                <line
+                                    x1="18"
+                                    y1="6"
+                                    x2="6"
+                                    y2="18"
+                                ></line>
+                                <line
+                                    x1="6"
+                                    y1="6"
+                                    x2="18"
+                                    y2="18"
+                                ></line>
+                            </svg>
                         </button>
 
-                        {/* 포스터 전체 표시 */}
-                        <div className="relative w-full flex flex-col items-center">
-                            <div className="relative w-full max-h-[500px] aspect-[3/4] bg-black">
-                                <Image
-                                    src="/stress.jpg"
-                                    alt="스트레스 설문"
-                                    layout="fill"
-                                    objectFit="contain"
-                                    priority
-                                />
-                            </div>
+                        {/* 2. 텍스트 및 버튼 영역 */}
+                        <div className="p-6 text-white text-center">
+                            {/* 반응형 텍스트: 모바일 text-xs, 데스크탑 sm:text-sm */}
+                            <p className="text-xs sm:text-sm font-semibold text-Borange mb-2">
+                                스트레스 서베이 참여 안내
+                            </p>
+                            {/* 반응형 텍스트: 모바일 text-xl, 데스크탑 sm:text-2xl */}
+                            <h2 className="text-xl sm:text-2xl font-bold mb-3 leading-snug">
+                                20-30대의 스트레스,
+                                <br />
+                                함께 해결책을 찾아요
+                            </h2>
+                            {/* 반응형 텍스트: 모바일 text-xs, 데스크탑 sm:text-sm */}
+                            <p className="text-xs sm:text-sm text-gray-300 mb-6 leading-relaxed">
+                                당신의 이야기가 더 나은 내일을 만드는 데 큰 힘이 됩니다.
+                            </p>
 
-                            {/* 설명 영역 */}
-                            <div className="w-full bg-black bg-opacity-70 text-white p-5">
-                                <p className="text-sm font-semibold text-Borange mb-2">스트레스 서베이 참여 안내</p>
-                                <h2 className="text-xl font-bold mb-3 leading-snug">
-                                    20-30대의 스트레스 원인과 영향을 함께 조사합니다
-                                </h2>
-                                <p className="text-sm text-gray-200 mb-4 leading-relaxed">
-                                    본 설문은 20대와 30대가 직면하고 있는 <strong>스트레스 요인</strong>과
-                                    <strong> 정신적, 신체적 영향</strong>을 조사하기 위해 설계되었습니다. 최근 증가하는
-                                    자살률, 우울증, 번아웃 문제를 진단하고
-                                    <strong> 해결방안</strong>을 모색합니다.
-                                </p>
+                            <div className="flex flex-col gap-3">
+                                {/* 반응형 버튼: 모바일에서 패딩 및 텍스트 크기 축소 */}
                                 <a
                                     href="https://smore.im/form/rbUBfNZ71d"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="inline-block bg-Borange text-white font-semibold px-6 py-2 rounded-full hover:opacity-90 transition"
+                                    className="w-full text-center bg-Borange text-white font-bold px-5 py-2.5 text-sm sm:text-base sm:px-6 sm:py-3 rounded-lg hover:opacity-90 transition-all"
                                 >
                                     설문 참여하기
                                 </a>
+                                <button
+                                    onClick={handleDontShowToday}
+                                    className="text-gray-400 text-xs hover:text-white transition"
+                                >
+                                    오늘 하루 보지 않기
+                                </button>
                             </div>
                         </div>
                     </div>
+                    {/* --- POPUP END --- */}
                 </div>
             )}
 
-            {/* 🟡 메인 콘텐츠 영역 */}
             <section className="bg-Bbeige relative w-full h-screen flex items-center justify-center overflow-hidden">
                 <div className="relative flex -space-x-16">
                     <div className="w-[390px] h-[570px] bg-Bblack rounded-[240px] z-30 shadow-2xl flex flex-col items-center justify-center gap-6 text-center px-6 relative overflow-hidden">
