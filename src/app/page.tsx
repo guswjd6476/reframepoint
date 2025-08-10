@@ -22,44 +22,49 @@ export default function Home() {
     return (
         <div style={{ fontFamily: 'sans-serif' }}>
             {showPopup && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-4">
-                    <div className="bg-white rounded-xl shadow-2xl max-w-3xl w-full overflow-hidden relative flex flex-col md:flex-row">
+                <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-[9999] p-4">
+                    <div className="relative w-full max-w-xl rounded-2xl overflow-hidden shadow-2xl bg-black">
+                        {/* 닫기 버튼 */}
                         <button
                             onClick={() => setShowPopup(false)}
-                            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl font-bold z-50"
+                            className="absolute top-4 right-4 text-white hover:text-gray-300 text-3xl font-bold z-50"
                         >
                             &times;
                         </button>
 
-                        <div className="w-full md:w-1/2 relative h-72 md:h-auto bg-gray-100">
-                            <Image
-                                src="/stress.jpg"
-                                alt="스트레스 설문"
-                                layout="fill"
-                                objectFit="cover"
-                                className="rounded-l-xl"
-                            />
-                        </div>
-                        <div className="w-full md:w-1/2 p-6 flex flex-col justify-center">
-                            <p className="text-sm text-Borange font-semibold mb-2">스트레스 서베이 참여 안내</p>
-                            <h2 className="text-2xl font-bold text-Bgreen leading-snug mb-4">
-                                20-30대의 스트레스 원인과 영향을 함께 조사합니다
-                            </h2>
-                            <p className="text-gray-700 text-sm mb-4 leading-relaxed">
-                                본 설문은 20대와 30대가 직면하고 있는 <strong>스트레스 요인</strong>과 그로 인한{' '}
-                                <strong>정신적, 신체적 영향</strong>을 조사하기 위해 설계되었습니다.
-                                <br />
-                                최근 증가하는 자살률, 우울증, 번아웃, 다양한 스트레스 문제를 진단하고{' '}
-                                <strong>해결방안</strong>을 모색하고자 합니다.
-                            </p>
-                            <a
-                                href="https://smore.im/form/hRC2z1iCSM"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="mt-auto inline-block bg-Borange text-white font-semibold px-6 py-3 rounded-full text-center hover:opacity-90 transition"
-                            >
-                                설문 참여하기
-                            </a>
+                        {/* 포스터 전체 표시 */}
+                        <div className="relative w-full flex flex-col items-center">
+                            <div className="relative w-full max-h-[500px] aspect-[3/4] bg-black">
+                                <Image
+                                    src="/stress.jpg"
+                                    alt="스트레스 설문"
+                                    layout="fill"
+                                    objectFit="contain"
+                                    priority
+                                />
+                            </div>
+
+                            {/* 설명 영역 */}
+                            <div className="w-full bg-black bg-opacity-70 text-white p-5">
+                                <p className="text-sm font-semibold text-Borange mb-2">스트레스 서베이 참여 안내</p>
+                                <h2 className="text-xl font-bold mb-3 leading-snug">
+                                    20-30대의 스트레스 원인과 영향을 함께 조사합니다
+                                </h2>
+                                <p className="text-sm text-gray-200 mb-4 leading-relaxed">
+                                    본 설문은 20대와 30대가 직면하고 있는 <strong>스트레스 요인</strong>과
+                                    <strong> 정신적, 신체적 영향</strong>을 조사하기 위해 설계되었습니다. 최근 증가하는
+                                    자살률, 우울증, 번아웃 문제를 진단하고
+                                    <strong> 해결방안</strong>을 모색합니다.
+                                </p>
+                                <a
+                                    href="https://smore.im/form/hRC2z1iCSM"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-block bg-Borange text-white font-semibold px-6 py-2 rounded-full hover:opacity-90 transition"
+                                >
+                                    설문 참여하기
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
