@@ -3,51 +3,42 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 
-const types: Record<string, { name: string; book: string; quote: string }> = {
+const types: Record<string, { name: string; tip: string }> = {
     A: {
         name: '개혁가',
-        book: '『죄와 벌』 - 도스토옙스키',
-        quote: '“위대한 일을 하려는 사람은 무엇이든 참을 수 있다.”',
+        tip: '완벽함에 대한 압박을 내려놓고, 가벼운 산책이나 명상으로 마음을 비워보세요.',
     },
     B: {
         name: '조력자',
-        book: '『어린 왕자』 - 생텍쥐페리',
-        quote: '“가장 중요한 것은 눈에 보이지 않아.”',
+        tip: '다른 사람을 돕는 일에서 잠시 벗어나, 혼자만의 취미나 여유 시간을 가지세요.',
     },
     C: {
         name: '성취자',
-        book: '『위대한 개츠비』 - F. 스콧 피츠제럴드',
-        quote: '“그는 자주 희망의 녹색 불빛을 응시했다.”',
+        tip: '성과와 목표에서 잠시 떨어져, 아무 목적 없이 즐길 수 있는 활동을 해보세요.',
     },
     D: {
         name: '예술가',
-        book: '『폭풍의 언덕』 - 에밀리 브론테',
-        quote: '“나는 그와 하나였다. 그는 나 자신보다도 나였다.”',
+        tip: '감정을 글, 그림, 음악 등 창의적인 방식으로 표현하며 마음을 풀어보세요.',
     },
     E: {
         name: '탐구자',
-        book: '『파우스트』 - 괴테',
-        quote: '“나는 알고 싶다, 세상의 근원을.”',
+        tip: '끊임없는 정보 탐색에서 벗어나, 휴대폰을 끄고 자연 속에서 시간을 보내세요.',
     },
     F: {
         name: '충실한 유형',
-        book: '『안나 카레니나』 - 톨스토이',
-        quote: '“행복한 가정은 모두 비슷하지만, 불행한 가정은 저마다의 이유로 불행하다.”',
+        tip: '미래에 대한 걱정을 줄이고, 믿을 수 있는 사람과 가볍게 대화하세요.',
     },
     G: {
         name: '열정가',
-        book: '『돈키호테』 - 세르반테스',
-        quote: '“꿈을 꾸는 자만이 세상을 바꾼다.”',
+        tip: '너무 많은 계획을 줄이고, 하루에 한두 가지 즐거운 일에 집중해보세요.',
     },
     H: {
         name: '지도자',
-        book: '『군주론』 - 니콜로 마키아벨리',
-        quote: '“사람들은 당신을 사랑하기보다는 두려워하도록 만들어야 한다.”',
+        tip: '책임에서 잠시 벗어나, 주도권을 내려놓고 편하게 쉬는 시간을 가지세요.',
     },
     I: {
         name: '평화주의자',
-        book: '『월든』 - 헨리 데이비드 소로',
-        quote: '“단순하게 살라. 자연과 함께하라. 진정한 자아를 만나자.”',
+        tip: '갈등을 피하기보다, 솔직한 대화를 나누고 나만의 공간에서 충전하세요.',
     },
 };
 
@@ -88,7 +79,7 @@ export default function ResultPage() {
 
     if (!result || !result.type) return <p className="text-center text-gray-600">결과를 계산 중입니다...</p>;
 
-    const { name, book, quote } = types[result.type];
+    const { name, tip } = types[result.type];
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center px-6 py-10 bg-gradient-to-br from-green-100 to-blue-100">
@@ -98,11 +89,8 @@ export default function ResultPage() {
             </p>
 
             <div className="mb-6 bg-white rounded-xl shadow-lg p-6 max-w-xl text-center">
-                <p className="text-lg font-semibold text-gray-800 mb-2">📘 추천 도서</p>
-                <p className="text-md text-gray-700 italic mb-4">{book}</p>
-
-                <p className="text-lg font-semibold text-gray-800 mb-2">📝 명문장</p>
-                <p className="text-md text-gray-600">“{quote}”</p>
+                <p className="text-lg font-semibold text-gray-800 mb-2"></p>
+                <p className="text-md text-gray-600">“{tip}”</p>
             </div>
         </div>
     );
