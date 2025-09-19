@@ -12,6 +12,8 @@ export default function PersonalityTest() {
     const storageKey = `personality_test_${participantId}`;
 
     const [answers, setAnswers] = useState<{ [key: string]: number }>({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isSubmitted, setIsSubmitted] = useState(false);
 
     useEffect(() => {
         const savedAnswers = localStorage.getItem(storageKey);
@@ -43,14 +45,18 @@ export default function PersonalityTest() {
             return;
         }
 
+        setIsSubmitting(true);
+
         const { error } = await savePersonalityTest(participantId, answers);
 
         if (error) {
             console.error(error);
             alert('저장 실패: ' + error.message);
+            setIsSubmitting(false); // 실패하면 다시 눌러도 되도록
         } else {
             alert('검사 결과가 저장되었습니다.');
             localStorage.removeItem(storageKey);
+            setIsSubmitted(true); // 제출 완료 상태
             router.back();
         }
     };
@@ -73,13 +79,19 @@ export default function PersonalityTest() {
                     </thead>
                     <tbody>
                         {questions.map((question, index) => (
-                            <tr key={question.id} className="border border-gray-300">
+                            <tr
+                                key={question.id}
+                                className="border border-gray-300"
+                            >
                                 <td className="border border-gray-300 px-4 py-2">{index + 1}</td>
                                 <td className="border border-gray-300 px-4 py-2 text-left w-2/5 whitespace-normal break-words">
                                     {question.text}
                                 </td>
                                 {[5, 4, 3, 2, 1].map((value) => (
-                                    <td key={value} className="border border-gray-300 px-4 py-2">
+                                    <td
+                                        key={value}
+                                        className="border border-gray-300 px-4 py-2"
+                                    >
                                         <input
                                             type="radio"
                                             name={`question-${question.id}`}
@@ -97,9 +109,14 @@ export default function PersonalityTest() {
             </div>
             <button
                 onClick={handleSubmit}
-                className="mt-6 bg-blue-500 text-white font-bold py-2 px-6 rounded-lg block mx-auto"
+                disabled={isSubmitting || isSubmitted}
+                className={`mt-6 font-bold py-2 px-6 rounded-lg block mx-auto ${
+                    isSubmitting || isSubmitted
+                        ? 'bg-gray-400 cursor-not-allowed text-white'
+                        : 'bg-blue-500 hover:bg-blue-600 text-white'
+                }`}
             >
-                검사 제출
+                {isSubmitted ? '제출 완료' : isSubmitting ? '제출 중...' : '검사 제출'}
             </button>
         </div>
     );

@@ -15,17 +15,24 @@ import {
     Legend,
 } from 'chart.js';
 import { typeData } from '@/app/lib/context';
+import { questions } from '@/app/lib/question'; // questions 데이터 import
+import AnswerDetails from './AnswerDetails';
 
 ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Title, Tooltip, Legend);
 
 export default function ResultsPage() {
     const { id: participantId } = useParams();
-    const [results, setResults] = useState<{ categoryScores: Record<string, number> } | null>(null);
+    // results 상태 타입 업데이트: allAnswers 추가
+    const [results, setResults] = useState<{
+        categoryScores: Record<string, number>;
+        allAnswers: Record<string, number>; // allAnswers 필드 추가
+    } | null>(null);
     const [loading, setLoading] = useState(true);
     const [type, setType] = useState('');
     const [wing, setWing] = useState('');
     const [integration, setIntegration] = useState('');
     const [disintegration, setDisintegration] = useState('');
+    const [showAnswerDetails, setShowAnswerDetails] = useState(false); // 새로운 상태 추가
 
     useEffect(() => {
         const fetchResults = async () => {
@@ -37,12 +44,16 @@ export default function ResultsPage() {
 
             if (error || !data) {
                 console.error('Error fetching data or no data found');
+                // 오류 발생 시 로딩 상태 해제 및 결과 없음 처리
+                setLoading(false);
+                setResults(null);
                 return;
             }
 
             const answers = data.answers;
             const scores: Record<string, number> = { A: 0, B: 0, C: 0, D: 0, E: 0, F: 0, G: 0, H: 0, I: 0 };
 
+            // 5점 척도 답변을 합산하여 카테고리별 점수 계산
             for (let i = 1; i <= 9; i++) {
                 scores.A += answers[`a${i}`] || 0;
                 scores.B += answers[`b${i}`] || 0;
@@ -55,11 +66,14 @@ export default function ResultsPage() {
                 scores.I += answers[`i${i}`] || 0;
             }
 
-            setResults({ categoryScores: scores });
+            // results 상태에 categoryScores와 함께 answers도 저장합니다.
+            setResults({ categoryScores: scores, allAnswers: answers });
             setLoading(false);
 
+            // 점수가 높은 순서로 정렬하여 주 유형 결정
             const sortedScores = Object.entries(scores).sort((a, b) => b[1] - a[1]);
 
+            // 에니어그램 유형 문자열 매핑 (D->2, E->3, F->4, A->5, B->6, C->7, G->8, H->9, I->1)
             const enneagramMapping: Record<string, string> = {
                 D: '2',
                 E: '3',
@@ -72,6 +86,7 @@ export default function ResultsPage() {
                 I: '1',
             };
 
+            // 통합/분열 방향 매핑
             const integrationMap: Record<string, string> = {
                 '1': '7',
                 '2': '4',
@@ -83,7 +98,6 @@ export default function ResultsPage() {
                 '8': '2',
                 '9': '3',
             };
-
             const disintegrationMap: Record<string, string> = {
                 '1': '4',
                 '2': '8',
@@ -99,16 +113,17 @@ export default function ResultsPage() {
             const primaryTypeLetter = sortedScores[0][0];
             const primaryType = enneagramMapping[primaryTypeLetter];
 
+            // 날개(wing) 유형 계산: 주 유형의 양 옆 번호 중 점수가 높은 것 선택
             const wingCandidates = [
-                ((parseInt(primaryType) + 8) % 9 || 9).toString(),
-                ((parseInt(primaryType) % 9) + 1).toString(),
+                ((parseInt(primaryType) + 8) % 9 || 9).toString(), // 왼쪽 날개 (예: 3 -> 2)
+                ((parseInt(primaryType) % 9) + 1).toString(), // 오른쪽 날개 (예: 3 -> 4)
             ];
 
             const wingType =
                 sortedScores
                     .map(([letter, score]) => [enneagramMapping[letter], score] as [string, number])
                     .filter(([type]) => wingCandidates.includes(type))
-                    .sort((a, b) => b[1] - a[1])[0]?.[0] ?? '';
+                    .sort((a, b) => b[1] - a[1])[0]?.[0] ?? ''; // 가장 높은 점수를 가진 날개 선택
 
             setType(primaryType);
             setWing(wingType);
@@ -120,10 +135,13 @@ export default function ResultsPage() {
     }, [participantId]);
 
     if (loading) return <p className="text-center text-gray-600">로딩 중...</p>;
-    if (!results) return <p className="text-center text-red-500">결과를 불러오는 데 실패했습니다.</p>;
+    if (!results)
+        return <p className="text-center text-red-500">결과를 불러오는 데 실패했습니다. 올바른 ID인지 확인해주세요.</p>;
 
-    const order = ['D', 'E', 'F', 'A', 'B', 'C', 'G', 'H', 'I'];
+    // 차트 및 표 출력을 위한 순서 정의 (에니어그램 번호 1~9에 해당하는 카테고리 문자)
+    const order = ['D', 'E', 'F', 'A', 'B', 'C', 'G', 'H', 'I']; // 2,3,4,5,6,7,8,9,1 순서
     const labelMapping: Record<string, string> = {
+        // 카테고리 문자를 에니어그램 번호로 매핑
         D: '2',
         E: '3',
         F: '4',
@@ -134,8 +152,8 @@ export default function ResultsPage() {
         H: '9',
         I: '1',
     };
-    const chartLabels = order.map((key) => labelMapping[key]);
-    const chartValues = order.map((key) => results.categoryScores[key]);
+    const chartLabels = order.map((key) => labelMapping[key]); // 차트 라벨 (유형 번호)
+    const chartValues = order.map((key) => results.categoryScores[key]); // 차트 값 (점수)
 
     const chartData = {
         labels: chartLabels,
@@ -147,12 +165,12 @@ export default function ResultsPage() {
                 borderColor: 'rgba(54, 162, 235, 1)',
                 borderWidth: 2,
                 fill: false,
-                tension: 0.4,
+                tension: 0.4, // 곡선 형태로 연결
             },
         ],
     };
 
-    // 사용자의 주요 유형에 해당하는 데이터 찾기
+    // 사용자의 주요 유형에 해당하는 설명 데이터 찾기
     const typeInfo = typeData.find((data) => data.type === type);
 
     return (
@@ -163,14 +181,22 @@ export default function ResultsPage() {
             </header>
 
             <div className="mb-6">
-                <Line data={chartData} options={{ responsive: true }} />
+                <h2 className="text-xl font-semibold text-center mb-4">유형별 점수 분포</h2>
+                <Line
+                    data={chartData}
+                    options={{ responsive: true, plugins: { legend: { display: false } } }}
+                />
             </div>
 
+            <h2 className="text-xl font-semibold text-center mb-4">유형별 점수표</h2>
             <table className="w-full text-center border-collapse border border-gray-300 mb-6">
                 <thead>
                     <tr className="bg-gray-100">
                         {chartLabels.map((label, idx) => (
-                            <th key={idx} className="border border-gray-300 px-4 py-2">
+                            <th
+                                key={idx}
+                                className="border border-gray-300 px-4 py-2"
+                            >
                                 유형 {label}
                             </th>
                         ))}
@@ -179,14 +205,18 @@ export default function ResultsPage() {
                 <tbody>
                     <tr>
                         {chartValues.map((value, idx) => (
-                            <td key={idx} className="border border-gray-300 px-4 py-2">
-                                {value}
+                            <td
+                                key={idx}
+                                className="border border-gray-300 px-4 py-2"
+                            >
+                                {value}점
                             </td>
                         ))}
                     </tr>
                 </tbody>
             </table>
 
+            <h2 className="text-xl font-semibold text-center mb-4">나의 에니어그램 유형</h2>
             <table className="w-full text-center border-collapse border border-gray-300 mb-6">
                 <tbody>
                     <tr className="bg-gray-100">
@@ -208,7 +238,9 @@ export default function ResultsPage() {
             {typeInfo ? (
                 <div className="mt-8 space-y-12">
                     <section>
-                        <h2 className="text-2xl font-bold text-blue-700 mb-4">나의 유형: {typeInfo.name}</h2>
+                        <h2 className="text-2xl font-bold text-blue-700 mb-4">
+                            나의 유형: {typeInfo.name} ({type} 유형)
+                        </h2>
 
                         <div className="bg-gray-50 border-l-4 border-blue-300 p-4 rounded">
                             <h3 className="text-lg font-semibold text-blue-600 mb-2">핵심 특성</h3>
@@ -270,6 +302,26 @@ export default function ResultsPage() {
                 </div>
             ) : (
                 <p className="text-center text-gray-600 mt-8">유형 {type}에 대한 설명이 아직 준비되지 않았습니다.</p>
+            )}
+
+            {/* 답변 상세 보기 버튼 */}
+            <div className="text-center mt-10">
+                <button
+                    onClick={() => setShowAnswerDetails(!showAnswerDetails)}
+                    className="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors duration-200"
+                >
+                    {showAnswerDetails ? '답변 상세 숨기기' : '내가 선택한 답변 자세히 보기'}
+                </button>
+            </div>
+
+            {/* AnswerDetails 컴포넌트 렌더링 (showAnswerDetails 상태에 따라) */}
+            {showAnswerDetails && results.allAnswers && (
+                <AnswerDetails
+                    allAnswers={results.allAnswers}
+                    labelMapping={labelMapping}
+                    categoryScores={results.categoryScores}
+                    questions={questions} // questions 데이터를 props로 전달
+                />
             )}
         </div>
     );
