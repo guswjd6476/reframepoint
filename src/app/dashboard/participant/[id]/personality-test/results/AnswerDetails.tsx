@@ -1,7 +1,5 @@
-// components/AnswerDetails.tsx
 import React from 'react';
 
-// 질문 데이터의 타입을 정의 (questions.ts 또는 questions.json의 구조에 맞춰야 함)
 interface Question {
     id: string;
     text: string;
@@ -14,12 +12,7 @@ interface AnswerDetailsProps {
     questions: Question[]; // questions 데이터를 추가
 }
 
-const AnswerDetails: React.FC<AnswerDetailsProps> = ({ allAnswers, labelMapping, categoryScores, questions }) => {
-    // categoryScores에서 키(A, B, C...)를 가져와 순서를 유지하며 렌더링
-    // 모든 질문을 가져와서 순차적으로 표시하는 것이 더 자연스러울 수 있습니다.
-    // 여기서는 질문 배열 전체를 사용하여 원래 질문 순서대로 표시합니다.
-
-    // 5점 척도에 따른 텍스트 매핑
+const AnswerDetails: React.FC<AnswerDetailsProps> = ({ allAnswers, questions }) => {
     const scoreToText = (score: number) => {
         switch (score) {
             case 5:
