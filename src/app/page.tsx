@@ -10,9 +10,7 @@ import Brandintro from './Brandintro';
 import MainStatistics from './MainStatistics';
 
 export default function Home() {
-    // 팝업의 DOM 존재 여부를 관리하는 상태
     const [isPopupVisible, setIsPopupVisible] = useState(false);
-    // 팝업의 애니메이션(등장/퇴장) 효과를 관리하는 상태
     const [isAnimating, setIsAnimating] = useState(false);
 
     useEffect(() => {
@@ -57,16 +55,16 @@ export default function Home() {
                     {/* --- POPUP START --- */}
                     <div
                         className={`
-                            relative w-full max-w-md rounded-2xl shadow-2xl bg-gray-900 overflow-hidden
-                            transform transition-all duration-300 ease-in-out
-                            ${isAnimating ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}
-                        `}
+                relative w-full max-w-md rounded-2xl shadow-2xl bg-gray-900 overflow-hidden
+                transform transition-all duration-300 ease-in-out
+                ${isAnimating ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}
+            `}
                     >
-                        {/* 1. 이미지 영역 (상단 전체 차지) */}
+                        {/* 1. 이미지 영역 */}
                         <div className="relative w-full aspect-[4/5]">
                             <Image
-                                src="/stress.jpg"
-                                alt="스트레스 설문 포스터"
+                                src="/MINDPOINT.png"
+                                alt="마인드포인트 홍보 이미지"
                                 layout="fill"
                                 objectFit="cover"
                                 priority
@@ -106,30 +104,12 @@ export default function Home() {
 
                         {/* 2. 텍스트 및 버튼 영역 */}
                         <div className="p-6 text-white text-center">
-                            {/* 반응형 텍스트: 모바일 text-xs, 데스크탑 sm:text-sm */}
-                            <p className="text-xs sm:text-sm font-semibold text-Borange mb-2">
-                                스트레스 서베이 참여 안내
-                            </p>
-                            {/* 반응형 텍스트: 모바일 text-xl, 데스크탑 sm:text-2xl */}
-                            <h2 className="text-xl sm:text-2xl font-bold mb-3 leading-snug">
-                                20-30대의 스트레스,
-                                <br />
-                                함께 해결책을 찾아요
-                            </h2>
-                            {/* 반응형 텍스트: 모바일 text-xs, 데스크탑 sm:text-sm */}
-                            <p className="text-xs sm:text-sm text-gray-300 mb-6 leading-relaxed">
-                                당신의 이야기가 더 나은 내일을 만드는 데 큰 힘이 됩니다.
-                            </p>
-
                             <div className="flex flex-col gap-3">
-                                {/* 반응형 버튼: 모바일에서 패딩 및 텍스트 크기 축소 */}
                                 <a
-                                    href="https://smore.im/form/rbUBfNZ71d"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
+                                    href="/moim/mindpoint" // 마인드포인트 관련 내부 링크 (필요 시 수정)
                                     className="w-full text-center bg-Borange text-white font-bold px-5 py-2.5 text-sm sm:text-base sm:px-6 sm:py-3 rounded-lg hover:opacity-90 transition-all"
                                 >
-                                    설문 참여하기
+                                    마인드포인트 알아보기
                                 </a>
                                 <button
                                     onClick={handleDontShowToday}

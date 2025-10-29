@@ -3,7 +3,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Session } from '@supabase/auth-helpers-nextjs';
-
 import { getSession, signIn, signOut, onAuthStateChange } from '../api/supabaseApi';
 
 type AuthContextType = {
@@ -18,17 +17,52 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [session, setSession] = useState<Session | null | undefined>(undefined);
     const router = useRouter();
 
+    // 🔒 12시간(밀리초 단위)
+    const EXPIRATION_TIME = 12 * 60 * 60 * 1000;
+
     useEffect(() => {
         const checkSession = async () => {
             const session = await getSession();
-            setSession(session);
+            const loginTime = localStorage.getItem('login_time');
+
+            if (session && loginTime) {
+                const elapsed = Date.now() - Number(loginTime);
+                if (elapsed > EXPIRATION_TIME) {
+                    // 12시간 초과 → 자동 로그아웃
+                    await handleAutoLogout();
+                } else {
+                    setSession(session);
+                    // 남은 시간 후 자동 로그아웃 예약
+                    scheduleLogout(EXPIRATION_TIME - elapsed);
+                }
+            } else {
+                setSession(session);
+            }
+        };
+
+        const handleAutoLogout = async () => {
+            await signOut();
+            setSession(null);
+            localStorage.removeItem('login_time');
+            router.replace('/login');
+        };
+
+        const scheduleLogout = (timeLeft: number) => {
+            setTimeout(() => {
+                handleAutoLogout();
+            }, timeLeft);
         };
 
         checkSession();
 
         const { data: authListener } = onAuthStateChange((event, session) => {
             setSession(session);
-            if (event === 'SIGNED_OUT') {
+            if (event === 'SIGNED_IN') {
+                localStorage.setItem('login_time', Date.now().toString());
+                // 새 로그인 시 12시간 후 자동 로그아웃 예약
+                scheduleLogout(EXPIRATION_TIME);
+            } else if (event === 'SIGNED_OUT') {
+                localStorage.removeItem('login_time');
                 router.replace('/login');
             }
         });
@@ -44,6 +78,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             alert('로그인 실패: ' + error.message);
         } else {
             setSession(data.session);
+            localStorage.setItem('login_time', Date.now().toString());
             router.replace('/dashboard');
         }
     };
@@ -51,6 +86,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const logout = async () => {
         await signOut();
         setSession(null);
+        localStorage.removeItem('login_time');
         router.replace('/login');
     };
 
