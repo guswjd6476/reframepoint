@@ -89,7 +89,7 @@ export default function Home() {
                     >
                         {/* 이미지 */}
                         <div className="relative w-full aspect-[4/5]">
-                            <Image src="/MINDPOINT.png" alt="마인드포인트 홍보 이미지" fill className="object-cover" />
+                            <Image src="/MINDPOINT.jpg" alt="마인드포인트 홍보 이미지" fill className="object-cover" />
                         </div>
 
                         {/* 닫기 */}
