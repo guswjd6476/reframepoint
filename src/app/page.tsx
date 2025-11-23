@@ -103,7 +103,7 @@ export default function Home() {
                         {/* 콘텐츠 */}
                         <div className="p-6 text-white text-center bg-gray-800/80">
                             <a
-                                href="/moim/mindpoint"
+                                href="/content"
                                 className="w-full block bg-Borange text-white font-bold px-5 py-3 rounded-lg hover:opacity-90"
                             >
                                 마인드포인트 알아보기
