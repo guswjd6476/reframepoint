@@ -5,7 +5,7 @@ Disallow: /admin
 Disallow: /dashboard
 
 # Host
-Host: https://www.selffindinglab.co.kr/
+Host: https://www.reframepoint.co.kr/
 
 # Sitemaps
-Sitemap: https://www.selffindinglab.co.kr/sitemap.xml
+Sitemap: https://www.reframepoint.co.kr/sitemap.xml

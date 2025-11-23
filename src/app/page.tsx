@@ -10,117 +10,161 @@ import Brandintro from './Brandintro';
 import MainStatistics from './MainStatistics';
 
 export default function Home() {
-    const [isPopupVisible, setIsPopupVisible] = useState(false);
-    const [isAnimating, setIsAnimating] = useState(false);
+    // 팝업별 표시 여부
+    const [isMindpointPopupVisible, setIsMindpointPopupVisible] = useState(false);
+    const [isSurveyPopupVisible, setIsSurveyPopupVisible] = useState(false);
+
+    // 팝업별 애니메이션 상태
+    const [isAnimatingMindpoint, setIsAnimatingMindpoint] = useState(false);
+    const [isAnimatingSurvey, setIsAnimatingSurvey] = useState(false);
 
     useEffect(() => {
-        // localStorage는 브라우저 환경에서만 접근 가능하므로 useEffect 내부에서 사용
-        const dontShowUntil = localStorage.getItem('popupDontShowUntil');
+        // 🔸 1) Mindpoint 팝업 체크
+        const mpExpire = localStorage.getItem('dontShowMindpointUntil');
+        const now = new Date().getTime();
 
-        // 저장된 시간이 있고, 그 시간이 현재 시간보다 미래라면 팝업을 보여주지 않음
-        if (dontShowUntil && new Date().getTime() < parseInt(dontShowUntil, 10)) {
-            return;
+        if (!mpExpire || now > parseInt(mpExpire, 10)) {
+            setTimeout(() => {
+                setIsMindpointPopupVisible(true);
+                requestAnimationFrame(() => setIsAnimatingMindpoint(true));
+            }, 500);
         }
 
-        // 0.5초 후에 팝업을 표시
-        const timer = setTimeout(() => {
-            setIsPopupVisible(true); // 팝업을 DOM에 추가
-            // requestAnimationFrame을 사용해 브라우저가 렌더링할 준비가 되었을 때 애니메이션 시작
-            requestAnimationFrame(() => {
-                setIsAnimating(true);
-            });
-        }, 500);
+        // 🔸 2) Survey 팝업 체크
+        const surveyExpire = localStorage.getItem('dontShowSurveyUntil');
 
-        return () => clearTimeout(timer);
-    }, []); // 최초 렌더링 시 한 번만 실행
-
-    const handleClosePopup = () => {
-        setIsAnimating(false); // 퇴장 애니메이션 시작
+        if (!surveyExpire || now > parseInt(surveyExpire, 10)) {
+            setTimeout(() => {
+                setIsSurveyPopupVisible(true);
+                requestAnimationFrame(() => setIsAnimatingSurvey(true));
+            }, 700); // 약간 딜레이 다르게 → 팝업 겹침 방지
+        }
+    }, []);
+    const closeMindpointPopup = () => {
+        setIsAnimatingMindpoint(false);
         setTimeout(() => {
-            setIsPopupVisible(false); // 애니메이션이 끝난 후 DOM에서 제거
-        }, 300); // CSS transition 시간과 일치해야 함
+            setIsMindpointPopupVisible(false);
+        }, 300);
+    };
+    const closeSurveyPopup = () => {
+        setIsAnimatingSurvey(false);
+        setTimeout(() => {
+            setIsSurveyPopupVisible(false);
+        }, 300);
     };
 
-    const handleDontShowToday = () => {
+    const dontShowSurveyToday = () => {
         const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1); // 내일 날짜 설정
-        localStorage.setItem('popupDontShowUntil', tomorrow.getTime().toString());
-        handleClosePopup();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        localStorage.setItem('dontShowSurveyUntil', tomorrow.getTime().toString());
+        closeSurveyPopup();
     };
 
+    const dontShowMindpointToday = () => {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        localStorage.setItem('dontShowMindpointUntil', tomorrow.getTime().toString());
+        closeMindpointPopup();
+    };
     return (
         <div style={{ fontFamily: 'sans-serif' }}>
-            {isPopupVisible && (
-                <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[9999] p-4 backdrop-blur-sm">
-                    {/* --- POPUP START --- */}
+            {isMindpointPopupVisible && (
+                <div className="fixed inset-y-0 left-0 w-1/2 flex items-center justify-center z-[9999] p-4">
                     <div
                         className={`
-                relative w-full max-w-md rounded-2xl shadow-2xl bg-gray-900 overflow-hidden
+                relative w-full max-w-md rounded-2xl shadow-2xl overflow-hidden
                 transform transition-all duration-300 ease-in-out
-                ${isAnimating ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}
+                ${isAnimatingMindpoint ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}
             `}
                     >
-                        {/* 1. 이미지 영역 */}
+                        {/* 이미지 */}
                         <div className="relative w-full aspect-[4/5]">
-                            <Image
-                                src="/MINDPOINT.png"
-                                alt="마인드포인트 홍보 이미지"
-                                layout="fill"
-                                objectFit="cover"
-                                priority
-                            />
+                            <Image src="/MINDPOINT.png" alt="마인드포인트 홍보 이미지" fill className="object-cover" />
                         </div>
 
-                        {/* 닫기 버튼 */}
+                        {/* 닫기 */}
                         <button
-                            onClick={handleClosePopup}
-                            className="absolute top-3 right-3 p-1 bg-black/50 rounded-full text-white hover:bg-black/80 transition-colors z-50"
+                            onClick={closeMindpointPopup}
+                            className="absolute top-3 right-3 p-1 bg-black/50 rounded-full text-white hover:bg-black/80"
                         >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2.5"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                            >
-                                <line
-                                    x1="18"
-                                    y1="6"
-                                    x2="6"
-                                    y2="18"
-                                ></line>
-                                <line
-                                    x1="6"
-                                    y1="6"
-                                    x2="18"
-                                    y2="18"
-                                ></line>
-                            </svg>
+                            ✕
                         </button>
 
-                        {/* 2. 텍스트 및 버튼 영역 */}
-                        <div className="p-6 text-white text-center">
-                            <div className="flex flex-col gap-3">
-                                <a
-                                    href="/moim/mindpoint" // 마인드포인트 관련 내부 링크 (필요 시 수정)
-                                    className="w-full text-center bg-Borange text-white font-bold px-5 py-2.5 text-sm sm:text-base sm:px-6 sm:py-3 rounded-lg hover:opacity-90 transition-all"
-                                >
-                                    마인드포인트 알아보기
-                                </a>
-                                <button
-                                    onClick={handleDontShowToday}
-                                    className="text-gray-400 text-xs hover:text-white transition"
-                                >
-                                    오늘 하루 보지 않기
-                                </button>
-                            </div>
+                        {/* 콘텐츠 */}
+                        <div className="p-6 text-white text-center bg-gray-800/80">
+                            <a
+                                href="/moim/mindpoint"
+                                className="w-full block bg-Borange text-white font-bold px-5 py-3 rounded-lg hover:opacity-90"
+                            >
+                                마인드포인트 알아보기
+                            </a>
+
+                            <button
+                                onClick={dontShowMindpointToday}
+                                className="text-gray-400 text-xs hover:text-white mt-3"
+                            >
+                                오늘 하루 보지 않기
+                            </button>
                         </div>
                     </div>
-                    {/* --- POPUP END --- */}
+                </div>
+            )}
+
+            {isSurveyPopupVisible && (
+                <div className="fixed inset-y-0 right-0 w-1/2  flex items-center justify-center z-[9999] p-4">
+                    <div
+                        className={`
+                relative w-full max-w-md rounded-2xl shadow-2xl  overflow-hidden
+                transform transition-all duration-300 ease-in-out
+                ${isAnimatingSurvey ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}
+            `}
+                    >
+                        {/* 이미지 */}
+                        <div className="relative w-full aspect-[4/4.5]">
+                            <Image src="/stress.jpg" alt="스트레스 설문 포스터" fill className="object-cover" />
+                        </div>
+
+                        {/* 닫기 */}
+                        <button
+                            onClick={closeSurveyPopup}
+                            className="absolute top-3 right-3 p-1 bg-black/50 rounded-full text-white hover:bg-black/80"
+                        >
+                            ✕
+                        </button>
+
+                        {/* 콘텐츠 */}
+                        <div className="p-2 text-white text-center bg-gray-800/80">
+                            <p className="text-xs sm:text-sm font-semibold text-Borange mb-2">
+                                스트레스 서베이 참여 안내
+                            </p>
+
+                            <h2 className="text-xl sm:text-2xl font-bold mb-3">
+                                20-30대의 스트레스,
+                                <br />
+                                함께 해결책을 찾아요
+                            </h2>
+
+                            <p className="text-xs sm:text-sm text-gray-300 mb-6">
+                                당신의 이야기가 더 나은 내일을 만듭니다.
+                            </p>
+
+                            <a
+                                href="https://smore.im/form/rbUBfNZ71d"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-full block bg-Borange text-white font-bold px-5 py-3 rounded-lg hover:opacity-90"
+                            >
+                                설문 참여하기
+                            </a>
+
+                            <button
+                                onClick={dontShowSurveyToday}
+                                className="text-gray-400 text-xs hover:text-white mt-3"
+                            >
+                                오늘 하루 보지 않기
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
 
@@ -185,13 +229,7 @@ export default function Home() {
                     <div className="w-[390px] h-[570px] bg-white border-[10px] border-Bgreen rounded-[240px] z-20 shadow-xl flex flex-col items-center justify-center gap-4 px-6 relative">
                         <div className="absolute top-8 text-Bgreen text-[120px] font-bold rotate-[30deg]">R</div>
 
-                        <Image
-                            src="/Group 6.png"
-                            alt="ReframePoint Logo"
-                            width={100}
-                            height={100}
-                            priority
-                        />
+                        <Image src="/Group 6.png" alt="ReframePoint Logo" width={100} height={100} priority />
 
                         <div className="absolute bottom-8 text-Bgreen text-[120px] font-bold -rotate-[40deg]">P</div>
                     </div>
@@ -224,30 +262,21 @@ export default function Home() {
                     </p>
                     <div className="grid md:grid-cols-3 gap-8">
                         <div className="p-8 border border-gray-200 rounded-lg shadow-sm hover:shadow-lg transition-shadow">
-                            <Library
-                                className="w-16 h-16 mx-auto mb-4 text-Bgreen"
-                                strokeWidth={1.5}
-                            />
+                            <Library className="w-16 h-16 mx-auto mb-4 text-Bgreen" strokeWidth={1.5} />
                             <h3 className="text-2xl font-bold text-Bgreen mb-2">엄선된 고품질 콘텐츠</h3>
                             <p className="text-gray-600">
                                 각 분야 전문가들이 제작한 깊이 있는 콘텐츠를 무제한으로 이용하세요.
                             </p>
                         </div>
                         <div className="p-8 border border-gray-200 rounded-lg shadow-sm hover:shadow-lg transition-shadow">
-                            <Users
-                                className="w-16 h-16 mx-auto mb-4 text-Bgreen"
-                                strokeWidth={1.5}
-                            />
+                            <Users className="w-16 h-16 mx-auto mb-4 text-Bgreen" strokeWidth={1.5} />
                             <h3 className="text-2xl font-bold text-Bgreen mb-2">성장을 돕는 커뮤니티</h3>
                             <p className="text-gray-600">
                                 같은 목표를 가진 사람들과 교류하며 동기부여를 얻고 함께 성장하세요.
                             </p>
                         </div>
                         <div className="p-8 border border-gray-200 rounded-lg shadow-sm hover:shadow-lg transition-shadow">
-                            <Target
-                                className="w-16 h-16 mx-auto mb-4 text-Bgreen"
-                                strokeWidth={1.5}
-                            />
+                            <Target className="w-16 h-16 mx-auto mb-4 text-Bgreen" strokeWidth={1.5} />
                             <h3 className="text-2xl font-bold text-Bgreen mb-2">개인 맞춤형 성장 계획</h3>
                             <p className="text-gray-600">
                                 나의 현재 상태를 진단하고, 목표 달성을 위한 최적의 로드맵을 제공받으세요.
