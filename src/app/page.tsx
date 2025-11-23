@@ -69,7 +69,17 @@ export default function Home() {
     return (
         <div style={{ fontFamily: 'sans-serif' }}>
             {isMindpointPopupVisible && (
-                <div className="fixed inset-y-0 left-0 w-1/2 flex items-center justify-center z-[9999] p-4">
+                <div
+                    className="
+    fixed inset-y-0 left-0
+    w-full sm:w-1/2 
+    flex items-center justify-center 
+    z-[9999] p-4
+
+    sm:translate-x-0 sm:translate-y-0     
+    translate-y-[-10px] translate-x-[-6px] 
+"
+                >
                     <div
                         className={`
                 relative w-full max-w-md rounded-2xl shadow-2xl overflow-hidden
@@ -111,7 +121,16 @@ export default function Home() {
             )}
 
             {isSurveyPopupVisible && (
-                <div className="fixed inset-y-0 right-0 w-1/2  flex items-center justify-center z-[9999] p-4">
+                <div
+                    className="
+    fixed inset-y-0 right-0
+    w-full sm:w-1/2 
+    flex items-center justify-center 
+    z-[9999] p-4
+    sm:translate-x-0 sm:translate-y-0    
+    translate-y-[10px] translate-x-[6px]   
+"
+                >
                     <div
                         className={`
                 relative w-full max-w-md rounded-2xl shadow-2xl  overflow-hidden
