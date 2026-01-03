@@ -18,7 +18,7 @@ function MindPointPage() {
         },
         {
             question: '프로그램은 언제 진행되나요?',
-            answer: '총 3주 동안 주 2회, 총 6회 진행됩니다. 구체적인 요일과 시간은 신청 페이지에서 확인해주세요.',
+            answer: '총 3주 동안 주 2회, 총 4회 진행됩니다. 구체적인 요일과 시간은 신청 페이지에서 확인해주세요.',
         },
         {
             question: '준비물이나 사전 지식이 필요한가요?',
@@ -76,7 +76,7 @@ function MindPointPage() {
                         </h1>
                         <p className="mb-4">“당신의 마음이 머무는 지점, 삶의 의미가 시작되는 좌표.”</p>
                         <p className="text-lg text-gray-700 mb-6">
-                            <span className="font-semibold text-gray-800">3주 (주 2회, 총 6회)</span> 자기 성장 프로그램
+                            <span className="font-semibold text-gray-800">3주 (주 2회, 총 4회)</span> 자기 성장 프로그램
                         </p>
                         <div className="flex justify-center md:justify-start">
                             <Link
