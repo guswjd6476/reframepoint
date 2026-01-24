@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 
 export default function HomePage() {
     const [name, setName] = useState('');
+    const [contact, setContact] = useState(''); // ✅ 연락처 추가
     const router = useRouter();
 
     const handleStartTest = () => {
@@ -12,7 +13,13 @@ export default function HomePage() {
             alert('이름을 입력해 주세요.');
             return;
         }
-        router.push(`/trial/emotion/quiz?clientid=${name}`);
+
+        if (contact.trim() === '') {
+            alert('연락처를 입력해 주세요.');
+            return;
+        }
+
+        router.push(`/trial/emotion/quiz?clientid=${encodeURIComponent(name)}&contact=${encodeURIComponent(contact)}`);
     };
 
     return (
@@ -36,11 +43,22 @@ export default function HomePage() {
                 <h1 className="text-2xl font-bold mb-2">🌱 성격 유형 검사 🌱</h1>
                 <p className="text-gray-600 mb-6">간단한 질문에 답하고, 당신에게 맞는 해소 방법을 찾아보세요!</p>
 
+                {/* 이름 */}
                 <motion.input
                     type="text"
                     placeholder="이름을 입력하세요"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
+                    className="w-full px-4 py-2 mb-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-400"
+                    whileFocus={{ scale: 1.05 }}
+                />
+
+                {/* 연락처 */}
+                <motion.input
+                    type="text"
+                    placeholder="연락처 (01012345678)"
+                    value={contact}
+                    onChange={(e) => setContact(e.target.value)}
                     className="w-full px-4 py-2 mb-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-400"
                     whileFocus={{ scale: 1.05 }}
                 />

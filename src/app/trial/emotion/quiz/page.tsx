@@ -8,12 +8,17 @@ export default function QuizPage() {
     const [answers, setAnswers] = useState<{ [key: string]: number }>({});
     const [current, setCurrent] = useState<number>(0);
     const router = useRouter();
+
     const [clientid, setClientName] = useState<string | null>(null);
+    const [contact, setContact] = useState<string | null>(null);
 
     useEffect(() => {
         const urlParams = new URLSearchParams(window.location.search);
         const name = urlParams.get('clientid');
+        const contactParam = urlParams.get('contact');
+
         if (name) setClientName(name);
+        if (contactParam) setContact(contactParam);
     }, []);
 
     const handleAnswer = (id: string, score: number) => {
@@ -35,8 +40,8 @@ export default function QuizPage() {
     };
 
     const handleSubmitResults = async () => {
-        if (!clientid) {
-            alert('사용자 이름을 가져올 수 없습니다.');
+        if (!clientid || !contact) {
+            alert('사용자 정보가 올바르지 않습니다.');
             return;
         }
 
@@ -46,7 +51,7 @@ export default function QuizPage() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ clientid, answers }),
+                body: JSON.stringify({ clientid, contact, answers }),
             });
 
             if (response.ok) {
@@ -55,7 +60,9 @@ export default function QuizPage() {
                     .map(([key, value]) => `${key}-${value}`)
                     .join(',');
 
-                router.push(`/trial/emotion/result?clientid=${encodeURIComponent(clientid)}&answers=${queryString}`);
+                router.push(
+                    `/trial/emotion/result?clientid=${encodeURIComponent(clientid)}&contact=${encodeURIComponent(contact)}&answers=${queryString}`,
+                );
             } else {
                 alert('데이터 삽입 중 오류가 발생했습니다.');
             }
@@ -67,7 +74,7 @@ export default function QuizPage() {
     return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-green-100 to-blue-100 px-4 py-10">
             <div className="relative bg-white shadow-xl rounded-2xl p-8 w-full max-w-xl text-center">
-                {/* 피크민 아이콘 */}
+                {/* 아이콘 */}
                 <div className="flex justify-center gap-2 mb-4">
                     <div className="w-4 h-4 rounded-full bg-green-400 animate-bounce"></div>
                     <div className="w-4 h-4 rounded-full bg-blue-400 animate-bounce delay-100"></div>
@@ -98,7 +105,7 @@ export default function QuizPage() {
                     ))}
                 </div>
 
-                {/* 뒤로가기 버튼 */}
+                {/* 뒤로가기 */}
                 {current > 0 && (
                     <button onClick={handleGoBack} className="mt-2 text-sm text-blue-600 underline hover:text-blue-800">
                         ← 이전 질문으로

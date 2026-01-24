@@ -1,25 +1,29 @@
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 
-interface AnswerData {
+/* =====================
+   타입
+===================== */
+export interface AnswerData {
     clientid: string;
+    contact: string;
     answers: Record<string, number>;
     created_at: string;
 }
 
-interface StampData {
-    clientid: string;
-    firststamp: boolean;
-    secondstamp: boolean;
-    thirdstamp: boolean;
-    laststamp: boolean;
-}
-
-// 답변 저장
-export const insertAnswers = async (clientid: string, answers: Record<string, number>) => {
+/* =====================
+   답변 저장
+===================== */
+export const insertAnswers = async (clientid: string, contact: string, answers: Record<string, number>) => {
     const supabase = createServerComponentClient({ cookies });
 
-    const { error } = await supabase.from('responses').insert([{ clientid, answers }]);
+    const { error } = await supabase.from('responses').insert([
+        {
+            clientid,
+            contact,
+            answers,
+        },
+    ]);
 
     if (error) {
         console.error('Error inserting data:', error.message);
@@ -27,27 +31,31 @@ export const insertAnswers = async (clientid: string, answers: Record<string, nu
     }
 };
 
-// 전체 답변 조회
-export const getAnswers = async (): Promise<AnswerData[] | null> => {
+/* =====================
+   전체 답변 조회
+===================== */
+export const getAnswers = async (): Promise<AnswerData[]> => {
     const supabase = createServerComponentClient({ cookies });
 
-    const { data, error } = await supabase.from('responses').select('clientid, answers, created_at');
+    const { data, error } = await supabase.from('responses').select('clientid, contact, answers, created_at');
 
     if (error) {
         console.error('데이터 조회 오류:', error.message);
         throw new Error('데이터 조회 오류');
     }
 
-    return data ?? null;
+    return data ?? [];
 };
 
-// 특정 ID 답변 조회
+/* =====================
+   특정 사용자 조회
+===================== */
 export const getIdAnswers = async (clientid: string): Promise<AnswerData | null> => {
     const supabase = createServerComponentClient({ cookies });
 
     const { data, error } = await supabase
         .from('responses')
-        .select('clientid, answers, created_at')
+        .select('clientid, contact, answers, created_at')
         .eq('clientid', clientid)
         .single();
 
@@ -59,7 +67,9 @@ export const getIdAnswers = async (clientid: string): Promise<AnswerData | null>
     return data;
 };
 
-// 사용자 삭제
+/* =====================
+   사용자 삭제
+===================== */
 export const deleteUser = async (clientid: string): Promise<void> => {
     const supabase = createServerComponentClient({ cookies });
 
@@ -74,7 +84,7 @@ export const deleteUser = async (clientid: string): Promise<void> => {
 // 도장(stamp) 업데이트
 export const updateStamp = async (
     clientid: string,
-    stampType: 'firststamp' | 'secondstamp' | 'thirdstamp' | 'laststamp'
+    stampType: 'firststamp' | 'secondstamp' | 'thirdstamp' | 'laststamp',
 ): Promise<void> => {
     const supabase = createServerComponentClient({ cookies });
 
@@ -90,19 +100,3 @@ export const updateStamp = async (
 };
 
 // 도장 상태 조회
-export const getIdStamp = async (clientid: string): Promise<StampData | null> => {
-    const supabase = createServerComponentClient({ cookies });
-
-    const { data, error } = await supabase
-        .from('responses')
-        .select('clientid, firststamp, secondstamp, thirdstamp, laststamp')
-        .eq('clientid', clientid)
-        .single();
-
-    if (error) {
-        console.error('도장 조회 오류:', error.message);
-        return null;
-    }
-
-    return data;
-};
