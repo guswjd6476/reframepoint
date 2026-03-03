@@ -69,55 +69,130 @@ export default function Home() {
     return (
         <div style={{ fontFamily: 'sans-serif' }}>
             {isMindpointPopupVisible && (
-                <div
-                    className="
-    fixed inset-y-0 left-0
-    w-full sm:w-1/2 
-    flex items-center justify-center 
-    z-[9999] p-4
-
-    sm:translate-x-0 sm:translate-y-0     
-    translate-y-[-10px] translate-x-[-6px] 
-"
-                >
+                <>
+                    {/* ✅ 배경 딤(오버레이) */}
                     <div
                         className={`
-                relative w-full max-w-md rounded-2xl shadow-2xl overflow-hidden
-                transform transition-all duration-300 ease-in-out
-                ${isAnimatingMindpoint ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}
-            `}
+        fixed inset-0 z-[9998]
+        bg-black/70 backdrop-blur-[3px]
+        transition-opacity duration-300
+        ${isAnimatingMindpoint ? 'opacity-100' : 'opacity-0'}
+      `}
+                        onClick={closeMindpointPopup}
+                        aria-hidden="true"
+                    />
+
+                    {/* ✅ 원래 위치 유지: left half */}
+                    <div
+                        className="
+        fixed inset-y-0 left-0
+        w-full sm:w-1/2
+        flex items-center justify-center
+        z-[9999] p-4
+        sm:translate-x-0 sm:translate-y-0
+        translate-y-[-10px] translate-x-[-6px]
+        pointer-events-none
+      "
                     >
-                        {/* 이미지 */}
-                        <div className="relative w-full aspect-[4/5]">
-                            <Image src="/MINDPOINT.jpg" alt="마인드포인트 홍보 이미지" fill className="object-cover" />
-                        </div>
-
-                        {/* 닫기 */}
-                        <button
-                            onClick={closeMindpointPopup}
-                            className="absolute top-3 right-3 p-1 bg-black/50 rounded-full text-white hover:bg-black/80"
+                        <div
+                            className={`
+          pointer-events-auto
+          relative w-full max-w-[420px] overflow-hidden
+          rounded-3xl
+          border border-white/10
+          bg-[#0b0b0b]/80 backdrop-blur-xl
+          shadow-[0_25px_80px_rgba(0,0,0,0.65)]
+          transform transition-all duration-300 ease-out
+          ${isAnimatingMindpoint ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-[0.97] translate-y-2'}
+        `}
+                            onClick={(e) => e.stopPropagation()}
                         >
-                            ✕
-                        </button>
+                            {/* 상단 헤어라인 */}
+                            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-[1px] bg-gradient-to-r from-transparent via-white/30 to-transparent" />
 
-                        {/* 콘텐츠 */}
-                        <div className="p-6 text-white text-center bg-gray-800/80">
-                            <a
-                                href="/content"
-                                className="w-full block bg-Borange text-white font-bold px-5 py-3 rounded-lg hover:opacity-90"
-                            >
-                                마인드포인트 알아보기
-                            </a>
+                            {/* 포스터 영역 */}
+                            <div className="relative w-full bg-black">
+                                {/* ✅ 포스터는 가능하면 안 잘리게: contain 추천 */}
+                                <div className="relative w-full h-[62vh] max-h-[520px]">
+                                    <Image
+                                        src="/deepq.jpg"
+                                        alt="프로젝트 딥퀘스쳔 홍보 이미지"
+                                        fill
+                                        priority
+                                        sizes="(max-width: 640px) 92vw, 420px"
+                                        className="object-contain"
+                                    />
+                                </div>
 
-                            <button
-                                onClick={dontShowMindpointToday}
-                                className="text-gray-400 text-xs hover:text-white mt-3"
-                            >
-                                오늘 하루 보지 않기
-                            </button>
+                                {/* 이미지 아래쪽 연결 그라데이션 */}
+                                <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-black/80" />
+
+                                {/* ✅ 닫기(X) - 클릭 보장 */}
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        closeMindpointPopup();
+                                    }}
+                                    className="
+              absolute top-3 right-3 z-20
+              w-10 h-10 rounded-full
+              bg-black/45 hover:bg-black/70
+              text-white
+              border border-white/15
+              backdrop-blur
+              flex items-center justify-center
+              transition
+              pointer-events-auto
+            "
+                                    aria-label="닫기"
+                                    type="button"
+                                >
+                                    ✕
+                                </button>
+                            </div>
+
+                            {/* 하단 CTA */}
+                            <div className="px-5 sm:px-6 pb-5 sm:pb-6 pt-4 text-center">
+                                <p className="text-sm sm:text-[15px] text-white/85 font-light leading-relaxed">
+                                    AI 시대, 답보다 중요한 건{' '}
+                                    <span className="text-white font-semibold">‘무엇을 물을지’</span>입니다.
+                                </p>
+
+                                <p className="mt-2 text-white font-semibold tracking-wide">PROJECT DEEP QUESTION</p>
+
+                                <a
+                                    href="/content"
+                                    className="
+              mt-4 w-full
+              inline-flex items-center justify-center
+              px-5 py-3.5 rounded-2xl
+              font-bold
+              text-white
+              bg-white/10 hover:bg-white/16
+              border border-white/15 hover:border-white/25
+              transition
+            "
+                                >
+                                    프로젝트 딥퀘스쳔 알아보기 →
+                                </a>
+
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        dontShowMindpointToday();
+                                    }}
+                                    className="mt-3 w-full text-xs text-white/50 hover:text-white/80 transition"
+                                    type="button"
+                                >
+                                    오늘 하루 보지 않기
+                                </button>
+                            </div>
+
+                            {/* 하단 헤어라인 */}
+                            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-40 h-[1px] bg-gradient-to-r from-transparent via-white/25 to-transparent" />
                         </div>
                     </div>
-                </div>
+                </>
             )}
 
             {isSurveyPopupVisible && (
@@ -140,7 +215,12 @@ export default function Home() {
                     >
                         {/* 이미지 */}
                         <div className="relative w-full aspect-[4/4.5]">
-                            <Image src="/stress.jpg" alt="스트레스 설문 포스터" fill className="object-cover" />
+                            <Image
+                                src="/stress.jpg"
+                                alt="스트레스 설문 포스터"
+                                fill
+                                className="object-cover"
+                            />
                         </div>
 
                         {/* 닫기 */}
@@ -248,7 +328,13 @@ export default function Home() {
                     <div className="w-[390px] h-[570px] bg-white border-[10px] border-Bgreen rounded-[240px] z-20 shadow-xl flex flex-col items-center justify-center gap-4 px-6 relative">
                         <div className="absolute top-8 text-Bgreen text-[120px] font-bold rotate-[30deg]">R</div>
 
-                        <Image src="/Group 6.png" alt="ReframePoint Logo" width={100} height={100} priority />
+                        <Image
+                            src="/Group 6.png"
+                            alt="ReframePoint Logo"
+                            width={100}
+                            height={100}
+                            priority
+                        />
 
                         <div className="absolute bottom-8 text-Bgreen text-[120px] font-bold -rotate-[40deg]">P</div>
                     </div>
@@ -281,21 +367,30 @@ export default function Home() {
                     </p>
                     <div className="grid md:grid-cols-3 gap-8">
                         <div className="p-8 border border-gray-200 rounded-lg shadow-sm hover:shadow-lg transition-shadow">
-                            <Library className="w-16 h-16 mx-auto mb-4 text-Bgreen" strokeWidth={1.5} />
+                            <Library
+                                className="w-16 h-16 mx-auto mb-4 text-Bgreen"
+                                strokeWidth={1.5}
+                            />
                             <h3 className="text-2xl font-bold text-Bgreen mb-2">엄선된 고품질 콘텐츠</h3>
                             <p className="text-gray-600">
                                 각 분야 전문가들이 제작한 깊이 있는 콘텐츠를 무제한으로 이용하세요.
                             </p>
                         </div>
                         <div className="p-8 border border-gray-200 rounded-lg shadow-sm hover:shadow-lg transition-shadow">
-                            <Users className="w-16 h-16 mx-auto mb-4 text-Bgreen" strokeWidth={1.5} />
+                            <Users
+                                className="w-16 h-16 mx-auto mb-4 text-Bgreen"
+                                strokeWidth={1.5}
+                            />
                             <h3 className="text-2xl font-bold text-Bgreen mb-2">성장을 돕는 커뮤니티</h3>
                             <p className="text-gray-600">
                                 같은 목표를 가진 사람들과 교류하며 동기부여를 얻고 함께 성장하세요.
                             </p>
                         </div>
                         <div className="p-8 border border-gray-200 rounded-lg shadow-sm hover:shadow-lg transition-shadow">
-                            <Target className="w-16 h-16 mx-auto mb-4 text-Bgreen" strokeWidth={1.5} />
+                            <Target
+                                className="w-16 h-16 mx-auto mb-4 text-Bgreen"
+                                strokeWidth={1.5}
+                            />
                             <h3 className="text-2xl font-bold text-Bgreen mb-2">개인 맞춤형 성장 계획</h3>
                             <p className="text-gray-600">
                                 나의 현재 상태를 진단하고, 목표 달성을 위한 최적의 로드맵을 제공받으세요.
