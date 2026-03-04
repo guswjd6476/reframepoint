@@ -115,7 +115,7 @@ export default function Home() {
                                 {/* ✅ 포스터는 가능하면 안 잘리게: contain 추천 */}
                                 <div className="relative w-full h-[62vh] max-h-[520px]">
                                     <Image
-                                        src="/deepq.jpg"
+                                        src="/IMG_5434.jpeg"
                                         alt="프로젝트 딥퀘스쳔 홍보 이미지"
                                         fill
                                         priority
