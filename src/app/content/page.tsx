@@ -80,7 +80,8 @@ function MindPointPage() {
                         </p>
                         <div className="flex justify-center md:justify-start">
                             <Link
-                                href="https://www.latpeed.com/products/DOKgG"
+                                href="https://www.latpeed.com/products/bctks"
+                                target="_blank"
                                 className="px-20 py-3 bg-indigo-500 text-white font-semibold rounded-full shadow-sm hover:bg-indigo-600 transition-all"
                             >
                                 신청하기
@@ -784,7 +785,8 @@ function DeepQuestionPage() {
 
                                 <div className="mt-8">
                                     <Link
-                                        href="/content"
+                                        href="https://www.latpeed.com/products/bctks"
+                                        target="_blank"
                                         className="inline-flex items-center justify-center px-8 py-4 rounded-xl font-bold border border-amber-200/30 bg-transparent hover:bg-white/[0.04] transition"
                                     >
                                         프로그램 신청하기 <span className="ml-2">→</span>
@@ -931,7 +933,9 @@ function DeepQuestionPage() {
                         <div className="mt-10 relative inline-block">
                             <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-amber-200/30 to-amber-400/10 blur opacity-60" />
                             <Link
-                                href="/content"
+                                href="https://www.latpeed.com/products/bctks"
+                                target="_blank"
+                                rel="noopener noreferrer"
                                 className="relative inline-flex items-center justify-center px-10 py-5 md:px-12 md:py-6 rounded-full font-bold text-lg md:text-xl border border-amber-200/30 bg-white/[0.03] hover:bg-white/[0.06] transition"
                             >
                                 프로젝트 딥퀘스쳔 시작하기
