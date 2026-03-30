@@ -39,7 +39,23 @@ export const savePersonalityTest = async (participantId: string, answers: Record
         },
     ]);
 };
+export const savePersonalityTest2 = async (participantId: string, answers: Record<string, number>) => {
+    return await supabase.from('personality_tests2').insert([
+        {
+            participant_id: participantId,
+            answers,
+        },
+    ]);
+};
 
+export const saveAttachmentTest = async (participantId: string, answers: Record<string, number>) => {
+    return await supabase.from('attachment_tests').insert([
+        {
+            participant_id: participantId,
+            answers,
+        },
+    ]);
+};
 export const getParticipants = async () => {
     const {
         data: { user },

@@ -1,19 +1,18 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { supabase } from '@/app/lib/supabase';
 import { getCoreEmotionTestResult } from '@/app/api/supabaseApi';
-
 export default function ParticipantPage() {
     const router = useRouter();
     const params = useParams();
 
     const [participantId, setParticipantId] = useState<string | null>(null);
-
     const [isPersonalityDone, setIsPersonalityDone] = useState(false);
+    const [isPersonalityDone2, setIsPersonalityDone2] = useState(false);
     const [isSixTypeDone, setIsSixTypeDone] = useState(false);
-    const [isFourTypeDone, setIsFourTypeDone] = useState(false);
+    const [isAttachmentDone, setIsAttachmentDone] = useState(false);
     const [isLifeGraphDone, setIsLifeGraphDone] = useState(false);
     const [isCoreEmotionDone, setIsCoreEmotionDone] = useState(false);
 
@@ -22,105 +21,107 @@ export default function ParticipantPage() {
 
     useEffect(() => {
         if (!params?.id) return;
-
         const id = Array.isArray(params.id) ? params.id[0] : params.id;
         setParticipantId(id);
 
         const fetchStatuses = async () => {
             try {
-                const { data: personality, error: pError } = await supabase
+                const { data: personality } = await supabase
                     .from('personality_tests')
                     .select('id')
                     .eq('participant_id', id)
                     .maybeSingle();
-                if (pError) throw pError;
                 setIsPersonalityDone(!!personality);
-
-                const { data: sixType, error: sError } = await supabase
+                const { data: personality2 } = await supabase
+                    .from('personality_tests2')
+                    .select('id')
+                    .eq('participant_id', id)
+                    .maybeSingle();
+                setIsPersonalityDone2(!!personality2);
+                const { data: sixType } = await supabase
                     .from('sixtypes')
                     .select('id')
                     .eq('participant_id', id)
                     .maybeSingle();
-                if (sError) throw sError;
                 setIsSixTypeDone(!!sixType);
 
-                const { data: fourType, error: fError } = await supabase
-                    .from('fourtypes')
+                const { data: attachment } = await supabase
+                    .from('attachment_tests')
                     .select('id')
                     .eq('participant_id', id)
                     .maybeSingle();
-                if (fError) throw fError;
-                setIsFourTypeDone(!!fourType);
+                setIsAttachmentDone(!!attachment);
 
-                const { data: lifeGraph, error: lError } = await supabase
+                const { data: lifeGraph } = await supabase
                     .from('lifegraphs')
                     .select('id')
                     .eq('participant_id', id)
                     .maybeSingle();
-                if (lError) throw lError;
                 setIsLifeGraphDone(!!lifeGraph);
 
-                const { data: coreEmotion, error: cError } = await getCoreEmotionTestResult(id);
-                if (cError) throw cError;
+                const { data: coreEmotion } = await getCoreEmotionTestResult(id);
                 setIsCoreEmotionDone(!!coreEmotion);
-            } catch (err) {
-                console.error('검사 상태 조회 오류:', err);
-                setError('검사 상태를 불러오는 중 오류가 발생했습니다.');
+            } catch {
+                // ✅ 'err'를 제거하여 'defined but never used' 에러 해결
+                setError('상태를 불러오는 중 오류가 발생했습니다.');
             } finally {
                 setLoading(false);
             }
         };
-
         fetchStatuses();
     }, [params]);
 
-    if (loading) return <p className="text-center text-gray-600 text-lg mt-20">⏳ 로딩 중...</p>;
+    if (loading)
+        return (
+            <div className="flex justify-center items-center h-screen bg-[#0f0f0f]">
+                <div className="w-8 h-8 border-4 border-orange-500/20 border-t-orange-500 rounded-full animate-spin" />
+            </div>
+        );
 
     if (error)
         return (
-            <p
-                className="text-center text-red-600 text-lg mt-20 font-semibold"
-                role="alert"
-            >
-                {error}
-            </p>
+            <div className="flex flex-col justify-center items-center h-screen bg-[#0f0f0f] text-white">
+                <p className="text-red-500 mb-4">{error}</p>
+                <button
+                    onClick={() => window.location.reload()}
+                    className="text-orange-500 underline"
+                >
+                    다시 시도
+                </button>
+            </div>
         );
 
     const tests = [
-        {
-            order: 1,
-            name: '6도형 검사',
-            done: isSixTypeDone,
-            basePath: 'sixtypes',
-            description: '6가지 유형을 통해 심층적인 성향을 파악합니다.',
-        },
-        {
-            order: 2,
-            name: '인생그래프',
-            done: isLifeGraphDone,
-            basePath: 'lifegraph',
-            description: '과거부터 현재까지 삶의 궤적을 시각화합니다.',
-        },
+        { order: 1, name: '6도형 검사', done: isSixTypeDone, basePath: 'sixtypes', description: '심층 성향 파악' },
+        { order: 2, name: '인생그래프', done: isLifeGraphDone, basePath: 'lifegraph', description: '삶의 궤적 시각화' },
         {
             order: 3,
             name: '성격유형 검사',
             done: isPersonalityDone,
             basePath: 'personality-test',
-            description: '개인의 성격 유형을 분석하여 이해도를 높입니다.',
+            description: '성격 유형 분석',
         },
         {
             order: 4,
-            name: '4도형 검사',
-            done: isFourTypeDone,
-            basePath: 'fourtypes',
-            description: '4가지 유형 분석으로 성격의 핵심을 이해합니다.',
+            name: '성격유형 검사(신)',
+
+            done: isPersonalityDone2,
+            basePath: 'personality-test2',
+            description: '성격 유형 분석',
         },
         {
             order: 5,
+            name: '애착유형 검사',
+            done: isAttachmentDone,
+            basePath: 'attachment-test',
+            description: '대인관계 패턴 및 정서적 유대 분석',
+        },
+        {
+            order: 6,
             name: '핵심감정 검사',
             done: isCoreEmotionDone,
             basePath: 'core-emotion-test',
-            description: '내면의 핵심 감정을 파악하여 자기 이해를 돕습니다.',
+            description: '내면 감정 파악',
         },
     ];
 
